@@ -541,7 +541,7 @@ const sendSearch = () => {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #1e293b);
   white-space: nowrap;
@@ -549,7 +549,7 @@ const sendSearch = () => {
 
 .mds-summary-store {
   margin-top: 0.1rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 500;
   color: var(--m-text-3, #64748b);
 }
@@ -602,6 +602,9 @@ const sendSearch = () => {
   max-height: calc(100dvh - 16vh - 0.75rem);
   overflow-y: auto;
   overscroll-behavior: contain;
+  /* 세로로 쌓고, 화면이 낮으면 매장 목록 칸만 줄여서 [조회] 버튼이 항상 보이게 */
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
   border-radius: 1.25rem;
   background: var(--m-surface, #fff);
@@ -623,14 +626,14 @@ const sendSearch = () => {
 }
 
 .mds-sheet-title {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
 
 .mds-sheet-sub {
   margin-top: 0.15rem;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -653,7 +656,7 @@ const sendSearch = () => {
 
 .mds-label {
   margin-bottom: 0.4rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
 }
@@ -675,7 +678,7 @@ const sendSearch = () => {
   height: 2.1rem;
   border: 0;
   background: transparent;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
 }
 
@@ -703,7 +706,7 @@ const sendSearch = () => {
 .mds-chip {
   height: 2.75rem;
   border-radius: 0.65rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
 }
@@ -740,7 +743,7 @@ const sendSearch = () => {
   border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.85rem;
   background: var(--m-surface, #fff);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   appearance: none;
 }
@@ -781,7 +784,7 @@ const sendSearch = () => {
   border-radius: 0.85rem;
   background: var(--m-surface, #fff);
   /* 16px 미만이면 iPhone 에서 입력창을 누를 때 화면이 확대된다 */
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   outline: none;
 }
@@ -811,7 +814,17 @@ const sendSearch = () => {
   inset: -0.375rem;
 }
 
-/* 높이 고정: 검색 결과 수가 바뀌어도 아래 [조회] 버튼 위치가 그대로 */
+/* 높이 고정: 검색 결과 수가 바뀌어도 아래 [조회] 버튼 위치가 그대로
+   (화면이 낮으면 12.5rem 에서 최소 6rem 까지 줄어든다) */
+.mds-sheet > * {
+  flex-shrink: 0;
+}
+
+.mds-sheet > .mds-store-list {
+  flex: 0 1 12.5rem;
+  min-height: 6rem;
+}
+
 .mds-store-list {
   height: 12.5rem;
   margin-bottom: 0.9rem;
@@ -835,7 +848,7 @@ const sendSearch = () => {
   min-height: 2.75rem;
   padding: 0 0.75rem;
   border-radius: 0.65rem;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   text-align: left;
   -webkit-tap-highlight-color: transparent;
@@ -858,7 +871,7 @@ const sendSearch = () => {
 
 .mds-store-empty {
   padding: 1.5rem 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
   text-align: center;
 }
@@ -869,7 +882,7 @@ const sendSearch = () => {
   border-radius: 0.85rem;
   background: #5782ff;
   color: #fff;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 700;
 }
 

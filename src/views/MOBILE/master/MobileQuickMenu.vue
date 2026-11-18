@@ -904,13 +904,13 @@ onMounted(() => {
 }
 
 .mq-title {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-text, #0f172a);
 }
 
 .mq-store {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
   white-space: nowrap;
   overflow: hidden;
@@ -936,7 +936,7 @@ onMounted(() => {
 .mq-test {
   padding: 0.4rem 0.85rem;
   background: var(--m-tint-warm, #fef3c7);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-warm-text, #92400e);
 }
 
@@ -959,7 +959,7 @@ onMounted(() => {
   border: 1px solid var(--m-tint-warm-border, #fde68a);
   border-radius: 0.9rem;
   background: var(--m-tint-warm, #fffbeb);
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   color: #78350f;
 }
 
@@ -993,7 +993,7 @@ onMounted(() => {
   border: 1px solid var(--m-tint-violet-border, #c4b5fd);
   border-radius: 0.7rem;
   background: var(--m-tint-violet, #f5f3ff);
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--m-fs, 1));
   font-weight: 600;
   line-height: 1.45;
   color: var(--m-violet-text, #5b21b6);
@@ -1030,7 +1030,7 @@ onMounted(() => {
   border-radius: 999px;
   background: linear-gradient(135deg, #818cf8, #4f46e5);
   box-shadow: 0 3px 8px rgba(79, 70, 229, 0.3);
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--m-fs, 1));
   font-weight: 800;
   color: #fff;
 }
@@ -1067,7 +1067,7 @@ onMounted(() => {
   max-width: 85%;
   padding: 0.6rem 0.75rem;
   border-radius: 0.9rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--m-fs, 1));
   line-height: 1.45;
 }
 
@@ -1094,7 +1094,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.3rem;
   margin-bottom: 0.35rem;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
   font-weight: 800;
   color: #16a34a;
 }
@@ -1122,7 +1122,7 @@ onMounted(() => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.6rem;
   background: var(--m-surface, #fff);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #334155);
 }
@@ -1152,7 +1152,7 @@ onMounted(() => {
   align-items: center;
   gap: 0.45rem;
   padding: 0.3rem 0;
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
 }
 
 .mq-store-item input {
@@ -1207,7 +1207,7 @@ onMounted(() => {
   padding: 0 0.85rem;
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 999px;
-  font-size: 1rem; /* 16px 미만이면 아이폰이 입력할 때 화면을 확대한다 */
+  font-size: calc(1rem * var(--m-fs, 1)); /* 16px 미만이면 아이폰이 입력할 때 화면을 확대한다 */
   outline: none;
 }
 
@@ -1319,7 +1319,7 @@ onMounted(() => {
 }
 
 .mq-listening-state {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-danger, #dc2626);
 }
@@ -1350,13 +1350,13 @@ onMounted(() => {
 }
 
 .mq-listening-title {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-danger, #b91c1c);
 }
 
 .mq-listening-sub {
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-danger, #ef4444);
 }
 
@@ -1365,7 +1365,7 @@ onMounted(() => {
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
   background: var(--m-surface, #fff);
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -1445,7 +1445,7 @@ onMounted(() => {
 
 .mq-btn {
   min-height: 2.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   touch-action: manipulation;
 }
 
@@ -1458,7 +1458,7 @@ onMounted(() => {
 .mq-store-item {
   min-height: 2.75rem;
   padding: 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
 }
 
 .mq-store-item input {

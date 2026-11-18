@@ -426,7 +426,7 @@ watch(
   height: 2.75rem;
   border-radius: 0.875rem;
   color: var(--m-text-2, #334155);
-  font-size: 1.15rem;
+  font-size: calc(1.15rem * var(--m-fs, 1));
   touch-action: manipulation;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
@@ -448,7 +448,7 @@ html[data-mtheme="dark"] .m-theme-btn {
 .m-title {
   min-width: 0;
   overflow: hidden;
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
   white-space: nowrap;
@@ -470,7 +470,7 @@ html[data-mtheme="dark"] .m-theme-btn {
   border-radius: 999px;
   background: var(--m-bg, #f8fafc);
   color: var(--m-text, #0f172a);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 500;
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -521,7 +521,7 @@ html[data-mtheme="dark"] .m-theme-btn {
   gap: 0.1rem;
   height: 3.6rem;
   color: var(--m-text-4, #94a3b8);
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--m-fs, 1));
   touch-action: manipulation;
   user-select: none;
   transition: color 0.15s ease;
@@ -543,7 +543,7 @@ html[data-mtheme="dark"] .m-theme-btn {
 }
 
 .m-tab-btn div {
-  font-size: 0.6875rem;
+  font-size: calc(0.6875rem * var(--m-fs, 1));
   font-weight: 600;
 }
 

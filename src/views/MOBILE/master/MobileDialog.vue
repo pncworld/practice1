@@ -124,14 +124,14 @@ const onMask = () => closeDialog(dialogState.type === "alert");
 
 .md-title {
   margin-top: 0.7rem;
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-text, #0f172a);
 }
 
 .md-message {
   margin-top: 0.35rem;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--m-fs, 1));
   line-height: 1.5;
   color: var(--m-text-3, #64748b);
   white-space: pre-line;
@@ -159,19 +159,19 @@ const onMask = () => closeDialog(dialogState.type === "alert");
 .md-change-label {
   flex-shrink: 0;
   width: 3.2rem;
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
 .md-change-from {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
   text-decoration: line-through;
   overflow-wrap: anywhere;
 }
 
 .md-change-to {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-accent, #2563eb);
   overflow-wrap: anywhere;
@@ -196,7 +196,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   height: 3rem;
   border-radius: 0.85rem;
   background: var(--m-surface-2, #f1f5f9);
-  font-size: 0.92rem;
+  font-size: calc(0.92rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #475569);
 }
@@ -223,7 +223,7 @@ const onMask = () => closeDialog(dialogState.type === "alert");
   border-radius: 999px;
   background: #0f172a;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.25);
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--m-fs, 1));
   font-weight: 600;
   color: #fff;
   transform: translateX(-50%);

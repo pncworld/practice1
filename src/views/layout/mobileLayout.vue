@@ -12,6 +12,7 @@
     <loading></loading>
     <Loading2></Loading2>
     <Inactive></Inactive>
+    <MobileVersionNotice />
     <main
       class="m-vh overflow-y-auto bg-slate-50"
       ref="scrollContainer"
@@ -150,6 +151,7 @@ import { useRoute } from "vue-router";
 
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
+import MobileVersionNotice from "../MOBILE/component/mobileVersionNotice.vue";
 /* 모바일 색 테마 (밝게/어둡게) — 웹 화면에는 영향 없음 */
 import "../MOBILE/mobileTheme.css";
 import { disposeMobileTheme, initMobileTheme } from "../MOBILE/mobileTheme";
@@ -578,7 +580,7 @@ const movePage = async (e, e2) => {
 .m-empty {
   padding: 4rem 1rem;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -625,14 +627,14 @@ const movePage = async (e, e2) => {
 .m-chevron {
   flex-shrink: 0;
   color: var(--m-text-4, #cbd5e1);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 .m-notice-title {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -653,18 +655,18 @@ const movePage = async (e, e2) => {
   border-radius: 999px;
   background: #ef4444;
   color: #fff;
-  font-size: 0.65rem;
+  font-size: calc(0.65rem * var(--m-fs, 1));
 }
 
 .m-notice-meta {
   margin-top: 0.35rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
 .m-notice-sub {
   margin-top: 0.15rem;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -676,7 +678,7 @@ const movePage = async (e, e2) => {
   min-height: 3.5rem;
   padding: 0.95rem 1rem;
   color: var(--m-text, #1e293b);
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 600;
   text-align: left;
   touch-action: manipulation;
@@ -685,7 +687,7 @@ const movePage = async (e, e2) => {
 
 .m-menu svg {
   color: var(--m-text-4, #cbd5e1);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 .m-detail {
@@ -696,7 +698,7 @@ const movePage = async (e, e2) => {
 
 .m-detail h1 {
   padding: 0.25rem 1.1rem 0.6rem;
-  font-size: 1.25rem;
+  font-size: calc(1.25rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-text, #0f172a);
   text-align: left;
@@ -704,7 +706,7 @@ const movePage = async (e, e2) => {
 
 .m-detail-meta {
   padding: 0 1.1rem 0.9rem;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
   text-align: left;
 }
@@ -726,7 +728,7 @@ const movePage = async (e, e2) => {
   border-radius: 999px;
   background: var(--m-accent-weak, #eff4ff);
   color: var(--m-accent, #2563eb);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   touch-action: manipulation;
   transition: background-color 0.15s ease;
@@ -750,7 +752,7 @@ const movePage = async (e, e2) => {
   border-radius: 1rem;
   background: var(--m-surface, #fff);
   color: var(--m-text-2, #334155);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   line-height: 1.6;
   text-align: left;
   white-space: pre-line;

@@ -4,6 +4,22 @@
  * - 어두운 화면: <html data-mtheme="dark"> 일 때만 아래 값으로 바뀐다 (mobileTheme.js 가 붙인다)
  * - 웹(PC) 화면은 var(--m-*) 를 쓰지 않으므로 영향 없음
  */
+/*
+ * 모바일 글자 크기 배율 — 모바일 화면의 font-size 는 calc(원래크기 * var(--m-fs, 1)) 로 되어 있다.
+ * 여백·높이·너비는 그대로 두고 글자만 키운다. data-mtheme 는 모바일 레이아웃에서만 붙으므로 웹(PC) 영향 없음
+ */
+html[data-mtheme] {
+  --m-fs: 1.1;
+}
+/* 예전 화면 template 의 Tailwind 글자 크기 클래스도 같은 배율 (줄 높이는 그대로) */
+html[data-mtheme] .text-xs { font-size: calc(0.75rem * var(--m-fs)); }
+html[data-mtheme] .text-sm { font-size: calc(0.875rem * var(--m-fs)); }
+html[data-mtheme] .text-base { font-size: calc(1rem * var(--m-fs)); }
+html[data-mtheme] .text-lg { font-size: calc(1.125rem * var(--m-fs)); }
+html[data-mtheme] .text-xl { font-size: calc(1.25rem * var(--m-fs)); }
+html[data-mtheme] .text-2xl { font-size: calc(1.5rem * var(--m-fs)); }
+html[data-mtheme] .text-3xl { font-size: calc(1.875rem * var(--m-fs)); }
+
 html[data-mtheme="dark"] {
   color-scheme: dark;
   --m-bg: #0b1120;

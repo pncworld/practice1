@@ -517,7 +517,7 @@ onMounted(() => {});
   border-radius: 0.75rem;
   background: var(--m-accent-weak, #eff4ff);
   color: var(--m-accent-strong, #1e40af);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
   word-break: keep-all;
 }
@@ -572,7 +572,7 @@ onMounted(() => {});
   gap: 0.125rem;
   padding-right: 0.5rem;
   color: var(--m-text-2, #334155);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 600;
 }
 
@@ -615,7 +615,7 @@ onMounted(() => {});
 }
 
 .so-name {
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 600;
   line-height: 1.3;
   word-break: keep-all;
@@ -655,12 +655,12 @@ onMounted(() => {});
 .so-save-count {
   margin-bottom: 0.5rem;
   color: var(--m-text-2, #475569);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
 }
 
 .so-save-count b {
   color: var(--m-accent, #2563eb);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
 }
 
 .so-save-row {

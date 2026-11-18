@@ -7,9 +7,28 @@
 <template>
   <div class="side">
     <div class="side-logo">
-      <img src="../../../assets/pnc_mobile_logo.png" alt="PNC Office" />
+      <!-- 브랜드 로고 (PC 상단 로고와 같은 이미지). 로그인 정보에 로고 주소가 없거나 못 불러오면 기존 PNC 로고 -->
+      <div v-if="brandLogoUrl && !brandLogoFailed" class="side-brand">
+        <img
+          :key="brandLogoUrl"
+          :src="brandLogoUrl"
+          alt="브랜드 로고"
+          @error="onBrandLogoError" />
+      </div>
+      <img v-else src="../../../assets/pnc_mobile_logo.png" alt="PNC Office" />
     </div>
-    <div class="side-store">{{ StoreName }}</div>
+    <!-- 로그인 사용자: 이니셜 원 + 이름 / 매장명 (한 줄 높이로 작게) -->
+    <div class="side-store">
+      <span class="side-store-avatar" aria-hidden="true">
+        <font-awesome-icon :icon="['fas', 'user']" />
+      </span>
+      <div class="side-store-text">
+        <div class="side-store-name">{{ StoreName }}</div>
+        <div v-if="loginStoreName && loginStoreName !== StoreName" class="side-store-sub">
+          {{ loginStoreName }}
+        </div>
+      </div>
+    </div>
     <button type="button" class="side-link" @click="showHome">
       <font-awesome-icon icon="house" />
       <span>홈</span>
@@ -71,8 +90,14 @@ import router from "@/router";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
+import { PNC_IMAGE_DEV_MIRROR_ORIGIN } from "@/constants/pncHosts";
+import {
+  isProductionBuild,
+  normalizePncImagePath,
+  resolveSessionLogoUrl,
+} from "@/utils/resolveSessionLogoUrl";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -188,7 +213,40 @@ const menuItems2 = ref([
   },
 ]);
 const store = useStore();
+
+/*
+ * 브랜드 로고 — 모바일 로그인 정보의 LOGO_URL (PC 의 strNLogoUrl 과 같은 값)
+ * 주소 변환은 PC 와 같은 resolveSessionLogoUrl 사용 (이미지 서버 주소 → /image/... 상대경로)
+ */
+const brandLogoFailed = ref(false);
+const brandLogoUrl = computed(() => {
+  const raw = String(store.state.userData?.LOGO_URL ?? "").trim();
+  if (!raw) return "";
+  return resolveSessionLogoUrl({ strNLogoUrl: raw }, "");
+});
+watch(brandLogoUrl, () => {
+  brandLogoFailed.value = false;
+});
+/* 개발 서버는 /image 프록시 실패 시 미러 주소로 1번 더 시도, 그래도 안 되면 기존 PNC 로고 */
+const onBrandLogoError = (e) => {
+  const img = e?.target;
+  if (img && !isProductionBuild() && !img.dataset.mirrorTried) {
+    try {
+      const path = new URL(img.src, window.location.href).pathname;
+      if (/^\/image\//i.test(path)) {
+        img.dataset.mirrorTried = "1";
+        img.src = `${PNC_IMAGE_DEV_MIRROR_ORIGIN}${normalizePncImagePath(path)}`;
+        return;
+      }
+    } catch (_) {
+      /* ignore */
+    }
+  }
+  brandLogoFailed.value = true;
+};
 const StoreName = ref("");
+/* 서랍 위 사용자 표시: 로그인 매장명 */
+const loginStoreName = computed(() => String(store.state.userData?.STORE_NM || "").trim());
 const toggleHeight = ref(false);
 const toggleSubMenu = (e) => {
   menuItems.value[e].isOpen = !menuItems.value[e].isOpen;
@@ -310,15 +368,67 @@ const logout = () => {
   max-width: 9rem;
 }
 
-.side-store {
-  margin: 0 0.85rem 0.5rem;
-  padding: 0.85rem 0.5rem;
+/* 브랜드 로고는 PC 처럼 흰 바탕 카드 안에 (어두운 화면에서도 로고 색이 그대로 보이게) */
+.side-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 4rem;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
-  background: #3b82f6;
-  color: #fff;
-  font-size: 1.05rem;
+}
+
+.side-brand img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.side-store {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0 1rem 0.5rem;
+  padding: 0.25rem 0.1rem 0.5rem;
+}
+
+.side-store-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: var(--m-accent-weak, #eff4ff);
+  color: var(--m-accent-strong, #2563eb);
+  font-size: 0.85rem;
+}
+
+.side-store-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.side-store-name {
+  overflow: hidden;
+  color: var(--m-text, #0f172a);
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
-  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.side-store-sub {
+  overflow: hidden;
+  margin-top: 0.05rem;
+  color: var(--m-text-4, #94a3b8);
+  font-size: calc(0.75rem * var(--m-fs, 1));
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 /*
@@ -412,7 +522,7 @@ const logout = () => {
   min-height: 3rem;
   padding: 0.95rem 1.1rem;
   color: var(--m-text, #1e293b);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 600;
   text-align: left;
   -webkit-tap-highlight-color: transparent;
@@ -454,7 +564,7 @@ const logout = () => {
   padding: 0.4rem 0.7rem;
   border-radius: 0.7rem;
   color: var(--m-text-2, #475569);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   text-align: left;
   word-break: keep-all;
   -webkit-tap-highlight-color: transparent;
@@ -485,7 +595,7 @@ const logout = () => {
   gap: 0.35rem;
   height: 3.25rem;
   color: var(--m-text-3, #64748b);
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
   font-weight: 600;
   -webkit-tap-highlight-color: transparent;
 }

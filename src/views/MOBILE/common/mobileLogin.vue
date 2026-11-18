@@ -384,7 +384,7 @@ input[type="checkbox"]:checked::after {
 
 .ml-input {
   height: 3rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
 }
 
 .ml-btn {

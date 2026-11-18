@@ -53,11 +53,7 @@
     </div>
     <div v-if="rowData.length == 0" class="mu-empty">
       {{
-        hqWaiting
-          ? "매장을 고르거나 사용 구분을 누르면 조회합니다."
-          : loaded
-            ? "조회된 좌석이 없습니다."
-            : "좌석 정보를 불러오는 중입니다."
+        loaded ? "조회된 좌석이 없습니다." : "좌석 정보를 불러오는 중입니다."
       }}
     </div>
     <div v-for="(i, idx) in rowData" :key="idx" class="mu-row">
@@ -150,9 +146,6 @@ const selectStoreCd = ref("");
 const selectSeat = ref(0);
 
 const StoreList = ref([]);
-/* 본사 계정: 자동 조회 안 함 (hqWaiting = 아직 조회 전 안내, hqSkipFirst = 첫 기본값 변경은 건너뜀) */
-const hqWaiting = ref(false);
-let hqSkipFirst = false;
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -174,9 +167,7 @@ onMounted(async () => {
    */
   const allRow = StoreList.value.find((i) => isAllStoreRow(i));
   const concreteCnt = StoreList.value.filter((i) => !isAllStoreRow(i)).length;
-  /* 본사는 들어오자마자 자동 조회하지 않는다 (첫 선택값만 「전체」로 보여 주고, 고르거나 구분을 누르면 조회) */
-  hqWaiting.value = Boolean(allRow && concreteCnt > 1);
-  hqSkipFirst = hqWaiting.value;
+  /* 이 화면은 조회 버튼이 따로 없으므로 본사도 들어오자마자 「전체」로 조회한다 (값이 정해지면 아래 watch 가 조회) */
   selectStoreCd.value =
     allRow && concreteCnt > 1
       ? { STORE_CD: allRow.STORE_CD, GROUP_CD: allRow.GROUP_CD }
@@ -219,8 +210,7 @@ const openStoreSheet = () => {
 /* 고르면 selectStoreCd 가 바뀌고 기존 watch 가 그대로 조회한다 */
 const pickStore = (i) => {
   storeSheet.value = false;
-  /* 이미 선택된 매장이어도 본사 첫 조회 전이면 조회한다 (새 객체 → watch 가 조회) */
-  if (isPicked(i) && !hqWaiting.value) return;
+  if (isPicked(i)) return;
   selectStoreCd.value = { STORE_CD: i.STORE_CD, GROUP_CD: i.GROUP_CD };
 };
 
@@ -251,12 +241,6 @@ watch(
   }
 );
 watch([selectStoreCd, selectSeat], async () => {
-  /* 본사 첫 진입: 「전체」 기본 선택으로 생긴 변경은 조회하지 않는다 */
-  if (hqSkipFirst) {
-    hqSkipFirst = false;
-    return;
-  }
-  hqWaiting.value = false;
   try {
     store.state.loading2 = true;
     const res = await getMobileSeatInfo(
@@ -303,7 +287,7 @@ onMounted(() => {});
 .tr-store-chev {
   flex-shrink: 0;
   color: var(--m-text-4, #94a3b8);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 /* 아래에서 올라오는 매장 시트 */
@@ -343,7 +327,7 @@ onMounted(() => {});
 }
 
 .tr-sheet-title {
-  font-size: 1.0625rem;
+  font-size: calc(1.0625rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -370,7 +354,7 @@ onMounted(() => {});
   padding: 0 2.75rem 0 2.5rem;
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.75rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   outline: none;
 }
 
@@ -407,7 +391,7 @@ onMounted(() => {});
   min-height: 3rem;
   padding: 0 0.5rem;
   border-bottom: 1px solid var(--m-border, #f1f5f9);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   text-align: left;
   -webkit-tap-highlight-color: transparent;
@@ -429,7 +413,7 @@ onMounted(() => {});
 
 .tr-empty {
   padding: 1.5rem 0;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
   text-align: center;
 }
@@ -439,7 +423,7 @@ onMounted(() => {});
   margin-top: 0.75rem;
   border-radius: 0.875rem;
   background: var(--m-surface-2, #f1f5f9);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-2, #334155);
 }

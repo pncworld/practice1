@@ -720,7 +720,7 @@ onMounted(() => {});
 
 .cm-title {
   color: var(--m-text, #0f172a);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
 }
 
@@ -744,7 +744,7 @@ onMounted(() => {});
   min-height: 2.75rem;
   padding-left: 0.75rem;
   color: var(--m-text-2, #334155);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 600;
   cursor: pointer;
   touch-action: manipulation;
@@ -768,7 +768,7 @@ onMounted(() => {});
   align-items: center;
   gap: 0.25rem;
   color: var(--m-text-3, #64748b);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
 }
 
 .cm-time select.mu-field {
@@ -799,7 +799,7 @@ onMounted(() => {});
   border-radius: 0.75rem;
   background: var(--m-surface, #fff);
   color: var(--m-text-2, #475569);
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 600;
   cursor: pointer;
   user-select: none;
@@ -846,7 +846,7 @@ onMounted(() => {});
 
 .cm-save .mu-btn {
   min-height: 3rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
 }
 
 @media (prefers-reduced-motion: reduce) {

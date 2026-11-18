@@ -378,7 +378,7 @@ watch(
 }
 
 .cat-sheet-title {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -407,7 +407,7 @@ watch(
 .cat-submit {
   min-height: 3rem;
   margin-top: 0.25rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
 }
 
 .cat-summary:active {
@@ -426,7 +426,7 @@ watch(
   background: var(--m-surface, #fff);
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
   color: var(--m-text, #1e293b);
-  font-size: 0.9rem;
+  font-size: calc(0.9rem * var(--m-fs, 1));
   font-weight: 700;
   text-align: left;
 }

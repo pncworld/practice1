@@ -901,7 +901,7 @@ onMounted(async () => {
 .mm-empty {
   padding: 2.5rem 1rem;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--m-fs, 1));
   line-height: 1.6;
   color: var(--m-text-4, #94a3b8);
 }
@@ -918,14 +918,14 @@ onMounted(async () => {
 
 .mm-top-label {
   flex-shrink: 0;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-3, #64748b);
 }
 
 .mm-top-store {
   min-width: 0;
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-text, #0f172a);
   word-break: keep-all;
@@ -966,7 +966,7 @@ onMounted(async () => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.6rem;
   background: var(--m-surface, #fff);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #0f172a);
 }
 
@@ -975,7 +975,7 @@ onMounted(async () => {
   padding: 0.55rem 0.65rem;
   border-radius: 0.6rem;
   background: var(--m-surface-2, #f1f5f9);
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   line-height: 1.45;
   color: var(--m-text-2, #475569);
 }
@@ -997,7 +997,7 @@ onMounted(async () => {
   padding: 0.45rem 0.6rem;
   border-radius: 0.6rem;
   background: var(--m-tint-violet, #f5f3ff);
-  font-size: 0.68rem;
+  font-size: calc(0.68rem * var(--m-fs, 1));
   font-weight: 600;
   line-height: 1.45;
   color: var(--m-violet-text, #5b21b6);
@@ -1082,7 +1082,7 @@ onMounted(async () => {
 }
 
 .mm-tool-title {
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--m-fs, 1));
   font-weight: 800;
   word-break: keep-all;
 }
@@ -1097,7 +1097,7 @@ onMounted(async () => {
 
 .mm-tool-sub {
   margin-top: 0.1rem;
-  font-size: 0.62rem;
+  font-size: calc(0.62rem * var(--m-fs, 1));
   line-height: 1.3;
   color: var(--m-text-3, #64748b);
   word-break: keep-all;
@@ -1125,7 +1125,7 @@ onMounted(async () => {
   border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 999px;
   background: var(--m-surface, #fff);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   outline: none;
 }
 
@@ -1152,7 +1152,7 @@ onMounted(async () => {
   border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 999px;
   background: var(--m-surface, #fff);
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-2, #475569);
   white-space: nowrap;
@@ -1202,7 +1202,7 @@ onMounted(async () => {
 }
 
 .mm-item-name {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
   word-break: keep-all;
@@ -1211,7 +1211,7 @@ onMounted(async () => {
 
 .mm-item-meta {
   margin-top: 0.15rem;
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -1224,7 +1224,7 @@ onMounted(async () => {
 }
 
 .mm-item-price {
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-accent, #3b82f6);
 }
@@ -1237,7 +1237,7 @@ onMounted(async () => {
 .mm-badge {
   padding: 0.05rem 0.35rem;
   border-radius: 999px;
-  font-size: 0.58rem;
+  font-size: calc(0.58rem * var(--m-fs, 1));
   font-weight: 700;
 }
 
@@ -1278,7 +1278,7 @@ onMounted(async () => {
   gap: 0.6rem;
   padding: 0.38rem 0;
   border-bottom: 1px solid var(--m-border, #f1f5f9);
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--m-fs, 1));
 }
 
 .mm-field-label {
@@ -1311,7 +1311,7 @@ onMounted(async () => {
   border: 1px solid var(--m-accent-border, #bfdbfe);
   border-radius: 999px;
   background: var(--m-accent-weak, #eff6ff);
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-accent, #2563eb);
 }
@@ -1340,7 +1340,7 @@ onMounted(async () => {
   padding: 0 0.6rem;
   border: 1px solid #3b82f6;
   border-radius: 0.5rem;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   outline: none;
 }
 
@@ -1389,7 +1389,7 @@ onMounted(async () => {
   border: 1px solid #3b82f6;
   border-radius: 0.5rem;
   background: var(--m-surface, #fff);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #0f172a);
 }
 
@@ -1408,7 +1408,7 @@ onMounted(async () => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.5rem;
   background: var(--m-surface, #fff);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #475569);
 }
@@ -1434,7 +1434,7 @@ onMounted(async () => {
   border: 1px solid var(--m-accent-border, #c7d2fe);
   border-radius: 0.6rem;
   background: var(--m-tint-violet, #eef2ff);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-violet-text, #4338ca);
 }
@@ -1465,7 +1465,7 @@ onMounted(async () => {
 }
 
 .mm-image-name {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 800;
   color: #fff;
   text-align: center;
@@ -1490,13 +1490,13 @@ onMounted(async () => {
 
 .mm-image-empty {
   padding: 2.5rem 1rem;
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
   text-align: center;
 }
 
 .mm-image-hint {
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   color: var(--m-text-4, #cbd5e1);
 }
 
@@ -1506,7 +1506,7 @@ onMounted(async () => {
   padding: 0.4rem;
   border-radius: 0.6rem;
   background: var(--m-bg, #f8fafc);
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #475569);
 }
@@ -1553,7 +1553,7 @@ onMounted(async () => {
   border: 1px dashed var(--m-border-strong, #cbd5e1);
   border-radius: 0.85rem;
   background: var(--m-surface, #fff);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #475569);
 }
@@ -1574,7 +1574,7 @@ onMounted(async () => {
 .mm-edit-btn {
   min-width: 3.25rem;
   height: 2.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   touch-action: manipulation;
 }
 
@@ -1587,7 +1587,7 @@ onMounted(async () => {
   align-items: center;
   min-height: 2.5rem;
   padding: 0 0.875rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   touch-action: manipulation;
 }
 
@@ -1601,7 +1601,7 @@ onMounted(async () => {
 .mm-image-btn,
 .mm-load-more {
   min-height: 2.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   touch-action: manipulation;
 }
 

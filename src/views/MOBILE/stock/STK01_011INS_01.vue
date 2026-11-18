@@ -868,7 +868,7 @@ onMounted(async () => {
   padding: 0 0.75rem;
   background: var(--m-surface, #fff);
   color: var(--m-text, #1e293b);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -890,7 +890,7 @@ onMounted(async () => {
   height: 2.75rem;
   padding: 0 1rem;
   border-radius: 0.75rem;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -953,7 +953,7 @@ onMounted(async () => {
 
 .stk-tab {
   height: 2.75rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-3, #64748b);
   background: var(--m-surface, #fff);
@@ -974,7 +974,7 @@ onMounted(async () => {
 .stk-item-count {
   min-width: 1.5rem;
   text-align: right;
-  font-size: 0.8rem;
+  font-size: calc(0.8rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-4, #94a3b8);
 }
@@ -1009,7 +1009,7 @@ onMounted(async () => {
   border: 0;
   background: transparent;
   color: #fff;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 700;
 }
 
@@ -1048,14 +1048,14 @@ onMounted(async () => {
 }
 
 .stk-code {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-2, #334155);
 }
 
 .stk-name {
   margin-top: 0.1rem;
-  font-size: 0.82rem;
+  font-size: calc(0.82rem * var(--m-fs, 1));
   font-weight: 700;
   line-height: 1.3;
   color: var(--m-text, #0f172a);
@@ -1064,7 +1064,7 @@ onMounted(async () => {
 
 .stk-meta {
   margin-top: 0.1rem;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   line-height: 1.3;
   color: var(--m-text-3, #64748b);
 }
@@ -1076,13 +1076,13 @@ onMounted(async () => {
   margin-top: 0.4rem;
   padding-top: 0.35rem;
   border-top: 1px solid var(--m-border, #e2e8f0);
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
 .stk-unit strong {
   color: var(--m-text, #0f172a);
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
   font-weight: 700;
 }
 
@@ -1100,12 +1100,12 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   gap: 0.35rem;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
 .stk-price-row strong {
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
 }
 
@@ -1128,7 +1128,7 @@ onMounted(async () => {
   width: 2.25rem;
   height: 2.5rem;
   color: var(--m-text-2, #334155);
-  font-size: 1.2rem;
+  font-size: calc(1.2rem * var(--m-fs, 1));
   font-weight: 600;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -1152,7 +1152,7 @@ onMounted(async () => {
   border-right: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0;
   text-align: center;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
   font-variant-numeric: tabular-nums;

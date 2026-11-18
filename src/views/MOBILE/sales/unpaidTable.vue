@@ -764,6 +764,13 @@ const fitScale = computed(() => {
   if (!isVertical.value || !h) return Math.max(0.01, byW);
   return Math.max(0.01, Math.min(byW, (h - PAD * 2) / bounds.value.maxY));
 });
+/* '전체' 버튼: 가로·세로 보기 모두 배치 전체가 한 화면(폭·높이)에 들어가게 (세로로 긴 매장 배치 넘침 방지) */
+const wholeScale = computed(() => {
+  const { w, h } = canvasSize.value;
+  if (!w || !h) return fitScale.value;
+  const byH = (h - PAD * 2) / bounds.value.maxY;
+  return Math.max(0.01, Math.min(fitScale.value, byH));
+});
 const readableScale = computed(() => {
   let minH = 0;
   for (const d of dispRows.value) {
@@ -775,9 +782,9 @@ const readableScale = computed(() => {
 const scale = computed(() => {
   const fit = fitScale.value;
   const large = Math.max(fit * 1.8, readableScale.value);
-  if (zoom.value === "fit") return fit;
+  if (zoom.value === "fit") return wholeScale.value;
   if (zoom.value === "large") return large;
-  return fit * (64 / readableScale.value) < 48 ? large : fit;
+  return fit * (64 / readableScale.value) < 48 ? large : wholeScale.value;
 });
 const needsMinimap = computed(() => scale.value > fitScale.value * 1.05);
 const stage = computed(() => ({
@@ -1109,7 +1116,7 @@ onBeforeUnmount(() => {
   background: linear-gradient(135deg, #1e40af, #2563eb);
   box-shadow: 0 6px 16px rgb(37 99 235 / 0.2);
   color: #dbeafe;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
 }
 
 .mut-summary__row {
@@ -1161,7 +1168,7 @@ onBeforeUnmount(() => {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 700;
   color: #fff;
   text-overflow: ellipsis;
@@ -1171,7 +1178,7 @@ onBeforeUnmount(() => {
 .mut-store__chev {
   flex: 0 0 auto;
   color: #bfdbfe;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 .mut-refresh {
@@ -1185,7 +1192,7 @@ onBeforeUnmount(() => {
   border-radius: 0.75rem;
   background: rgb(255 255 255 / 0.16);
   color: #fff;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   transition: background-color 0.15s ease;
 }
 
@@ -1199,7 +1206,7 @@ onBeforeUnmount(() => {
 
 .mut-summary__amt {
   flex: 0 0 auto;
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--m-fs, 1));
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.15;
@@ -1210,7 +1217,7 @@ onBeforeUnmount(() => {
 
 .mut-summary__amt small {
   margin-left: 0.15rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 600;
 }
 
@@ -1229,12 +1236,12 @@ onBeforeUnmount(() => {
 
 .mut-summary__side b {
   color: #fff;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
 }
 
 .mut-summary__time {
   min-height: 1rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   color: #bfdbfe;
 }
 
@@ -1283,7 +1290,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 0.5625rem;
   background: transparent;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
   transition: color 0.2s ease;
@@ -1312,7 +1319,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 999px;
   background: var(--m-surface, #fff);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-2, #334155);
   white-space: nowrap;
@@ -1347,7 +1354,7 @@ onBeforeUnmount(() => {
   gap: 0.35rem;
   min-width: 0;
   margin: 0;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   line-height: 1.15rem;
   color: var(--m-danger, #dc2626);
   word-break: keep-all;
@@ -1366,7 +1373,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 1rem;
   background: var(--m-surface, #fff);
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   line-height: 1.5;
   color: var(--m-text-3, #64748b);
   text-align: center;
@@ -1385,7 +1392,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 0.75rem;
   background: #2563eb;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
   color: #fff;
 }
@@ -1451,7 +1458,7 @@ onBeforeUnmount(() => {
 
 .mut-card__table {
   overflow: hidden;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
   text-overflow: ellipsis;
@@ -1460,7 +1467,7 @@ onBeforeUnmount(() => {
 
 .mut-card__meta {
   margin-top: 0.15rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--m-text-3, #64748b);
 }
@@ -1478,7 +1485,7 @@ onBeforeUnmount(() => {
 }
 
 .mut-card__amt {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--m-fs, 1));
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   color: var(--m-danger, #dc2626);
@@ -1487,7 +1494,7 @@ onBeforeUnmount(() => {
 
 .mut-card__amt small {
   margin-left: 0.1rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 .mut-card__chev {
@@ -1532,7 +1539,7 @@ onBeforeUnmount(() => {
   margin: 0;
   padding: 0.5rem 0 0;
   list-style: none;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
 }
 
 .mut-menu li + li {
@@ -1554,13 +1561,13 @@ onBeforeUnmount(() => {
 
 .mut-menu__sub {
   padding-left: 0.75rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
 .mut-menu__none {
   padding: 0.5rem 0;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
@@ -1576,7 +1583,7 @@ onBeforeUnmount(() => {
 .mut-screen-info {
   min-width: 0;
   overflow: hidden;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-2, #475569);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1647,7 +1654,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 999px;
   background: var(--m-surface, #fff);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-2, #475569);
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
@@ -1673,7 +1680,7 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: #ef4444;
   color: #fff;
-  font-size: 0.6875rem;
+  font-size: calc(0.6875rem * var(--m-fs, 1));
   line-height: 1.1rem;
   text-align: center;
 }
@@ -1816,7 +1823,7 @@ onBeforeUnmount(() => {
   padding: 0 0.6rem;
   border: none;
   background: transparent;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-2, #475569);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
@@ -1897,7 +1904,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem 0.375rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-2, #475569);
 }
 
@@ -1985,7 +1992,7 @@ onBeforeUnmount(() => {
 }
 
 .mut-sheet__title {
-  font-size: 1.0625rem;
+  font-size: calc(1.0625rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -2014,7 +2021,7 @@ onBeforeUnmount(() => {
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.75rem;
   background: var(--m-surface, #fff);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   outline: none;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
@@ -2070,7 +2077,7 @@ onBeforeUnmount(() => {
   border-bottom: 1px solid var(--m-border, #f1f5f9);
   border-radius: 0.5rem;
   background: transparent;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   text-align: left;
   transition: background-color 0.15s ease;
@@ -2096,7 +2103,7 @@ onBeforeUnmount(() => {
   border: none;
   border-radius: 0.875rem;
   background: var(--m-surface-2, #f1f5f9);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-2, #334155);
   transition: background-color 0.15s ease;

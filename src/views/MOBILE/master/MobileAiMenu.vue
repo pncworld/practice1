@@ -4679,7 +4679,7 @@ onMounted(() => {
 
 /* AI 대화 팝업 테스트 모드 안내 */
 .mst003-ai-test {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-warm-text, #b45309);
 }
@@ -4731,7 +4731,7 @@ onMounted(() => {
 }
 
 .mst003-chat-title {
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #1e293b);
 }
@@ -4739,7 +4739,7 @@ onMounted(() => {
 /* 팝업 제목 옆 처리 중인 매장명 (메뉴 개별 설정 브랜드) */
 .mst003-chat-store {
   margin-left: 0.25rem;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-violet-text, #6d28d9);
 }
@@ -4841,7 +4841,7 @@ onMounted(() => {
   min-width: 0;
   padding: 0.55rem 0.8rem;
   border-radius: 1rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   line-height: 1.45;
   white-space: pre-wrap;
   word-break: break-all;
@@ -4891,7 +4891,7 @@ onMounted(() => {
   border-radius: 9999px;
   background: rgba(15, 23, 42, 0.65);
   color: #fff;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
 }
 
 .mst003-chat-img-zoom svg {
@@ -4928,7 +4928,7 @@ onMounted(() => {
 }
 
 .mst003-zoom-caption {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: #e2e8f0;
 }
 
@@ -4977,7 +4977,7 @@ onMounted(() => {
   border-radius: 0.25rem;
   background: var(--m-tint-violet, #f5f3ff);
   color: var(--m-violet-text, #6d28d9);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 600;
   white-space: nowrap;
 }
@@ -4994,7 +4994,7 @@ onMounted(() => {
 /* 최종 확인: AI 주의 문구(빨강)와 최종 등록 버튼(빨강) */
 .mst003-ai-caution {
   margin-top: 0.4rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-danger, #dc2626);
 }
@@ -5013,14 +5013,14 @@ onMounted(() => {
 /* AI 메뉴 도우미 시작 안내의 입력 예시 */
 .mst003-chat-examples-title {
   margin-top: 0.5rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   color: #7c3aed; /* AI 봇 아이콘 색 */
 }
 
 .mst003-chat-examples {
   margin-top: 0.15rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: #6b7280;
 }
 
@@ -5071,7 +5071,7 @@ onMounted(() => {
 .mst003-chat-lang {
   margin-top: 0.4rem;
   border-collapse: collapse;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
 }
 
 .mst003-chat-lang th,
@@ -5118,7 +5118,7 @@ onMounted(() => {
 }
 
 .mst003-chat-empty {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
@@ -5158,14 +5158,14 @@ onMounted(() => {
   display: flex;
   align-items: baseline;
   gap: 0.5rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text, #1e293b);
   padding-bottom: 0.25rem;
 }
 
 .mst003-chat-items-hint {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 400;
   color: var(--m-text-3, #64748b);
 }
@@ -5183,7 +5183,7 @@ onMounted(() => {
   min-width: 34rem;
   table-layout: fixed;
   border-collapse: collapse;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
 }
 
 .mst003-chat-tbl th,
@@ -5294,7 +5294,7 @@ onMounted(() => {
   border: 1px solid var(--m-tint-violet-border, #c4b5fd);
   border-radius: 0.5rem;
   background: var(--m-tint-violet, #f5f3ff);
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
   line-height: 1.45;
   color: var(--m-violet-text, #5b21b6);
@@ -5322,7 +5322,7 @@ onMounted(() => {
 /* AI 이용 안내: 입력창 아래 작은 회색 글씨 */
 .mst003-chat-notice {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   line-height: 1.4;
   color: #9ca3af;
   text-align: center;
@@ -5333,7 +5333,7 @@ onMounted(() => {
   min-width: 0;
   resize: none;
   padding: 0.375rem 0.5rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   border: 1px solid var(--m-border-strong, #cbd5e1);
   border-radius: 0.375rem;
 }
@@ -5373,7 +5373,7 @@ onMounted(() => {
 }
 
 .mst003-chat-popup--mobile .mst003-chat-title {
-  font-size: 0.98rem;
+  font-size: calc(0.98rem * var(--m-fs, 1));
 }
 
 .mst003-chat-popup--mobile .mst003-chat-log {
@@ -5392,7 +5392,7 @@ onMounted(() => {
 .mst003-chat-popup--mobile textarea,
 .mst003-chat-popup--mobile input,
 .mst003-chat-popup--mobile select {
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
 }
 
 /* 말풍선 안 버튼 줄(추가 설정 항목 등): 옆으로 넘치지 않게 두 칸씩 줄바꿈해 한 화면에 */
@@ -5476,7 +5476,7 @@ onMounted(() => {
   height: 1.7rem;
   border-radius: 999px;
   background: var(--m-surface-2, #f1f5f9);
-  font-size: 0.78rem;
+  font-size: calc(0.78rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-text-2, #475569);
 }
@@ -5492,7 +5492,7 @@ onMounted(() => {
 }
 
 .mai-card-name {
-  font-size: 0.92rem;
+  font-size: calc(0.92rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
   word-break: keep-all;
@@ -5501,7 +5501,7 @@ onMounted(() => {
 
 .mai-card-meta {
   margin-top: 0.1rem;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -5511,14 +5511,14 @@ onMounted(() => {
 }
 
 .mai-card-amt {
-  font-size: 0.95rem;
+  font-size: calc(0.95rem * var(--m-fs, 1));
   font-weight: 800;
   color: var(--m-accent, #2563eb);
 }
 
 .mai-card-rate {
   margin-top: 0.1rem;
-  font-size: 0.72rem;
+  font-size: calc(0.72rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
 }
@@ -5548,7 +5548,7 @@ onMounted(() => {
 }
 
 .mai-foot .mai-card-name {
-  font-size: 0.85rem;
+  font-size: calc(0.85rem * var(--m-fs, 1));
 }
 
 /* 시작 안내 예시: 항목 이름(메뉴 등록·메뉴 조회 등)을 보라색 표시로 (웹은 굵은 회색 글씨) */
@@ -5563,7 +5563,7 @@ onMounted(() => {
   padding: 0.08rem 0.45rem;
   border-radius: 999px;
   background: var(--m-tint-violet, #f5f3ff);
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-violet-text, #6d28d9);
 }
@@ -5590,7 +5590,7 @@ onMounted(() => {
   position: absolute;
   top: 50%;
   right: 0.6rem;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text-4, #cbd5e1);
   transform: translateY(-55%);
@@ -5606,7 +5606,7 @@ onMounted(() => {
   padding: 0.45rem 0.65rem;
   border-radius: 0.6rem;
   background: var(--m-tint-warm, #fff7ed);
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-warm-text, #c2410c);
   text-align: center;
@@ -5639,7 +5639,7 @@ onMounted(() => {
   background: transparent;
   resize: none;
   /* 16px 미만이면 아이폰이 입력할 때 화면을 확대해 화면이 밀린다 */
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   line-height: 1.35;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -5694,7 +5694,7 @@ onMounted(() => {
   padding: 0.02rem 0.4rem;
   border-radius: 999px;
   background: var(--m-danger-weak, #fee2e2);
-  font-size: 0.66rem;
+  font-size: calc(0.66rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-danger, #dc2626);
   vertical-align: middle;
@@ -5706,7 +5706,7 @@ onMounted(() => {
   padding: 0.4rem 0.65rem;
   border-radius: 0.6rem;
   background: var(--m-tint-violet, #eef2ff);
-  font-size: 0.74rem;
+  font-size: calc(0.74rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-violet-text, #4338ca);
   text-align: center;

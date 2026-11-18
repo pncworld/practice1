@@ -431,12 +431,12 @@ onMounted(async () => {
 }
 
 .home-kicker {
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
 .home-updated {
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--m-text-4, #94a3b8);
   white-space: nowrap;
@@ -444,7 +444,7 @@ onMounted(async () => {
 
 .home-name {
   margin-top: 0.15rem;
-  font-size: 1.125rem;
+  font-size: calc(1.125rem * var(--m-fs, 1));
   font-weight: 700;
   line-height: 1.35;
   color: var(--m-text, #0f172a);
@@ -494,7 +494,7 @@ onMounted(async () => {
 
 .home-quick-title {
   flex: 0 0 auto;
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
@@ -503,7 +503,7 @@ onMounted(async () => {
   flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -571,14 +571,14 @@ onMounted(async () => {
 }
 
 .home-row-label {
-  font-size: 0.9375rem;
+  font-size: calc(0.9375rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
 
 .home-row-prev {
   margin-top: 0.2rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--m-text-3, #64748b);
   white-space: nowrap;
@@ -594,7 +594,7 @@ onMounted(async () => {
 
 .home-row-now {
   min-width: 2rem;
-  font-size: 1.1875rem;
+  font-size: calc(1.1875rem * var(--m-fs, 1));
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.25;
@@ -605,13 +605,13 @@ onMounted(async () => {
 
 /* 오늘 매출이 가장 먼저 눈에 들어오게 */
 .home-row.is-today .home-row-now {
-  font-size: 1.5rem;
+  font-size: calc(1.5rem * var(--m-fs, 1));
   color: var(--m-accent, #2563eb);
 }
 
 .home-row-now small {
   margin-left: 0.1rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 600;
 }
 
@@ -628,7 +628,7 @@ onMounted(async () => {
   align-items: center;
   gap: 0.25rem;
   margin-top: 0.2rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--m-text-2, #475569);
@@ -659,7 +659,7 @@ onMounted(async () => {
   justify-content: space-between;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   color: var(--m-text-3, #64748b);
 }
 
@@ -716,7 +716,7 @@ onMounted(async () => {
 .home-bar-cap {
   margin-top: 0.4rem;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-variant-numeric: tabular-nums;
   color: var(--m-text-3, #64748b);
   white-space: nowrap;
@@ -724,7 +724,7 @@ onMounted(async () => {
 
 .home-bar-cap.is-now {
   margin-top: 0.1rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }

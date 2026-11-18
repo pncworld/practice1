@@ -378,7 +378,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8125rem;
+  font-size: calc(0.8125rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #1e293b);
   white-space: nowrap;
@@ -386,7 +386,7 @@ onMounted(() => {
 
 .mds-summary-store {
   margin-top: 0.1rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 500;
   color: var(--m-text-3, #64748b);
 }
@@ -454,14 +454,14 @@ onMounted(() => {
 }
 
 .mds-sheet-title {
-  font-size: 1.05rem;
+  font-size: calc(1.05rem * var(--m-fs, 1));
   font-weight: 700;
   color: var(--m-text, #0f172a);
 }
 
 .mds-sheet-sub {
   margin-top: 0.15rem;
-  font-size: 0.7rem;
+  font-size: calc(0.7rem * var(--m-fs, 1));
   color: var(--m-text-4, #94a3b8);
 }
 
@@ -485,7 +485,7 @@ onMounted(() => {
 
 .mds-label {
   margin-bottom: 0.4rem;
-  font-size: 0.75rem;
+  font-size: calc(0.75rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
 }
@@ -518,7 +518,7 @@ onMounted(() => {
   border: 0;
   outline: none;
   background: transparent;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
 }
 
@@ -555,7 +555,7 @@ onMounted(() => {
 .mds-chip {
   height: 2.5rem;
   border-radius: 0.65rem;
-  font-size: 0.875rem;
+  font-size: calc(0.875rem * var(--m-fs, 1));
   font-weight: 600;
   color: var(--m-text-3, #64748b);
   touch-action: manipulation;
@@ -594,7 +594,7 @@ onMounted(() => {
   border: 1px solid var(--m-border, #e2e8f0);
   border-radius: 0.85rem;
   background: var(--m-surface, #fff);
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   color: var(--m-text, #1e293b);
   appearance: none;
   -webkit-appearance: none;
@@ -623,7 +623,7 @@ onMounted(() => {
   border-radius: 0.85rem;
   background: #2563eb;
   color: #fff;
-  font-size: 1rem;
+  font-size: calc(1rem * var(--m-fs, 1));
   font-weight: 700;
   touch-action: manipulation;
   transition: background-color 0.15s ease, transform 0.15s ease;
