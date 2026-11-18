@@ -69,7 +69,10 @@
           type="button"
           class="m-menu"
           @click="movePage(i.code, i.name)">
-          <span>{{ i.name }}</span>
+          <span>
+            {{ i.name }}
+            <span v-if="isNewProgram(i.code)" class="m-new-badge" aria-label="신규">N</span>
+          </span>
           <font-awesome-icon :icon="['fas', 'chevron-right']" />
         </button>
       </div>
@@ -152,6 +155,7 @@ import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 import MobileTotalMenu from "../MOBILE/component/mobileTotalMenu.vue";
 import MobileVersionNotice from "../MOBILE/component/mobileVersionNotice.vue";
+import { isNewProgram } from "../MOBILE/component/mobileNewProgram";
 /* 모바일 색 테마 (밝게/어둡게) — 웹 화면에는 영향 없음 */
 import "../MOBILE/mobileTheme.css";
 import { disposeMobileTheme, initMobileTheme } from "../MOBILE/mobileTheme";

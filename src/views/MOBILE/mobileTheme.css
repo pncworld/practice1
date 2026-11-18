@@ -127,6 +127,24 @@ html[data-mtheme="dark"] textarea {
   color: var(--m-text);
 }
 
+/* 신규 프로그램 N 표시 (메뉴 이름 옆, mobileNewProgram.js) */
+.m-new-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-left: 0.3rem;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 800;
+  line-height: 1;
+  vertical-align: 0.1em;
+  flex-shrink: 0;
+}
+
 /* 테마가 바뀔 때 색만 부드럽게 (움직임 줄이기 설정이면 즉시) */
 html.m-theme-switching,
 html.m-theme-switching * {

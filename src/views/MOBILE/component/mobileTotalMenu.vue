@@ -65,6 +65,7 @@
             class="side-sub-btn"
             @click="moveProgram(subItem.code, subItem.name)">
             {{ subItem.name }}
+            <span v-if="isNewProgram(subItem.code)" class="m-new-badge" aria-label="신규">N</span>
           </button>
         </div>
       </div>
@@ -98,6 +99,7 @@ import {
   normalizePncImagePath,
   resolveSessionLogoUrl,
 } from "@/utils/resolveSessionLogoUrl";
+import { isNewProgram, loadNewPrograms } from "./mobileNewProgram";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -298,6 +300,7 @@ watch(
 
 onMounted(() => {
   StoreName.value = store.state.userData.USER_NM;
+  loadNewPrograms();
 });
 
 const route = useRoute();
