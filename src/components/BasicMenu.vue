@@ -206,7 +206,19 @@
                       : favoriteadd(sub.lngProgramID)
                   "
                 ></button>
-                {{ sub.strTitle }}
+                <span v-if="!isNewProgram(menuScreenId(sub.strUrl))">{{
+                  sub.strTitle
+                }}</span>
+                <!-- 신규: 마지막 단어와 N 을 붙여서, 줄이 바뀌어도 N 만 혼자 떨어지지 않게 -->
+                <span v-else
+                  >{{ titleHead(sub.strTitle)
+                  }}<span class="pc-new-tail"
+                    >{{ titleTail(sub.strTitle)
+                    }}<span class="pc-new-tag" aria-label="신규"
+                      >N</span
+                    ></span
+                  ></span
+                >
               </div>
               <span class="ico-arrow"></span>
             </a>
@@ -376,6 +388,28 @@ import Swal from "sweetalert2";
 import { v4 } from "uuid";
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import { useStore } from "vuex";
+import {
+  isNewProgram,
+  loadNewPrograms,
+} from "@/views/MOBILE/component/mobileNewProgram";
+
+/* 신규 프로그램 NEW 표시: 공통코드 449 의 strDCode 에 화면 ID(예: SLS02_033RPT)로 등록된 메뉴만 */
+const menuScreenId = (strUrl) =>
+  String(strUrl || "")
+    .split("::")
+    .pop()
+    .replace(/\.xml$/i, "");
+/** 메뉴 이름의 마지막 단어 앞부분 (공백 포함) / 마지막 단어 */
+const titleHead = (t) => {
+  const s = String(t ?? "");
+  const i = s.lastIndexOf(" ");
+  return i < 0 ? "" : s.slice(0, i + 1);
+};
+const titleTail = (t) => {
+  const s = String(t ?? "");
+  const i = s.lastIndexOf(" ");
+  return i < 0 ? s : s.slice(i + 1);
+};
 const emit = defineEmits(["emittab", "activeTab"]);
 const props = defineProps({
   selectCategoryId: {
@@ -808,6 +842,7 @@ const closeSidemenu = () => {
 
 onMounted(() => {
   document.addEventListener("click", onDocClick);
+  loadNewPrograms();
   ////console.log(store.state.userData);
   // 인사말: 로그인 ID가 아니라 세션 담당자명(고객명). 없으면 ID
   const u = store.state.userData || {};
@@ -1085,6 +1120,29 @@ watch(
 );
 </script>
 <style scoped>
+/* 신규 프로그램 N 표시 (모바일 m-new-badge 와 같은 모양) */
+.pc-new-tail {
+  white-space: nowrap;
+}
+
+.pc-new-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 3px;
+  border-radius: 999px;
+  background: linear-gradient(145deg, #ff6b6b 0%, #f43f5e 55%, #e11d48 100%);
+  box-shadow: 0 1px 3px rgba(225, 29, 72, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  color: #fff;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 900;
+  line-height: 1;
+  vertical-align: 0.5em;
+}
+
 /* ── 사용자 메뉴 호스트 (타원 + 드롭다운 묶음) ─────── */
 .user-menu-host {
   position: relative;

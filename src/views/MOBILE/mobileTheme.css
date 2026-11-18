@@ -127,21 +127,23 @@ html[data-mtheme="dark"] textarea {
   color: var(--m-text);
 }
 
-/* 신규 프로그램 N 표시 (메뉴 이름 옆, mobileNewProgram.js) */
+/* 신규 프로그램 N 표시 (메뉴 이름 오른쪽 위, mobileNewProgram.js) — 빨간 그라데이션 원 + 흰 N */
 .m-new-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.05rem;
-  height: 1.05rem;
-  margin-left: 0.3rem;
+  width: 0.95rem;
+  height: 0.95rem;
+  margin-left: 0.25rem;
   border-radius: 999px;
-  background: #ef4444;
+  background: linear-gradient(145deg, #ff6b6b 0%, #f43f5e 55%, #e11d48 100%);
+  box-shadow: 0 1px 3px rgba(225, 29, 72, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
   color: #fff;
-  font-size: 0.625rem;
-  font-weight: 800;
+  font-family: "Arial Black", Arial, sans-serif;
+  font-size: 0.5625rem;
+  font-weight: 900;
   line-height: 1;
-  vertical-align: 0.1em;
+  vertical-align: 0.5em;
   flex-shrink: 0;
 }
 
