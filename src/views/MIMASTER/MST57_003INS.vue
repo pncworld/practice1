@@ -14,10 +14,16 @@
       <button @click="copyButton" class="button copy w-auto">복사</button>
     </div>
   </div>
-  <br />
+  <!-- 조회 AREA: 넓으면 한 줄, 좁으면 두 줄 (MST44_054INS 와 같은 방식) -->
   <div
-    class="flex justify-start space-x-5 bg-gray-200 rounded-lg md:h-16 h-24 items-center">
+    class="mst573-search"
+    :class="{
+      'mst573-tp--ok': mst573TablePosState == 'ok',
+      'mst573-tp--none': mst573TablePosState == 'none',
+    }">
     <PickStore
+      compact-search-bar
+      :compact-store-combo-max-rem="15"
       @areaCd="handleStoreAreaCd"
       @update:storeCd="handleStoreCd"
       @tablePosNo="handlePosNo"
@@ -44,144 +50,126 @@
       :blnBrandAdmin="isBrandAdmin">
     </DupliPopUp>
   </div>
-  <div
-    v-if="changeScreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%]">
-      <h2 class="text-lg font-bold">화면키 수정</h2>
-      <div class="flex flex-col justify-start h-12">
-        <div>
-          <p>화면키명</p>
+  <!-- 화면키 수정 팝업 -->
+  <Teleport to="body">
+    <div v-if="changeScreenKey" class="mst573-pop-mask">
+      <div class="mst573-pop" role="dialog" aria-modal="true">
+        <div class="mst573-pop-head">
+          <h2 class="mst573-pop-title">화면키 수정</h2>
         </div>
-        <div class="h-full w-full">
-          <input
-            type="text"
-            class="border border-gray-400 pl-1 h-full w-full"
-            v-model="currentscreenKeyNm" />
+        <div class="mst573-pop-body">
+          <label class="mst573-pop-field">
+            <span class="mst573-pop-label">화면키명</span>
+            <input type="text" class="mst573-pop-input" v-model="currentscreenKeyNm" />
+          </label>
         </div>
-      </div>
-      <div class="flex justify-center space-x-3 w-full h-16">
-        <button
-          @click="confirmScreenKey()"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          확인
-        </button>
-        <button
-          @click="exitScreenKey"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
+        <div class="mst573-pop-foot">
+          <button type="button" class="pnc-sub-btn" @click="confirmScreenKey()">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            확인
+          </button>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="exitScreenKey">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <div
-    v-if="addscreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-[25%] h-[40%]">
-      <h2 class="text-lg font-bold">화면키 추가</h2>
-      <div class="flex flex-col justify-start h-12">
-        <div>
-          <p>화면키명</p>
+  </Teleport>
+  <!-- 화면키 추가 팝업 -->
+  <Teleport to="body">
+    <div v-if="addscreenKey" class="mst573-pop-mask">
+      <div class="mst573-pop" role="dialog" aria-modal="true">
+        <div class="mst573-pop-head">
+          <h2 class="mst573-pop-title">화면키 추가</h2>
         </div>
-        <div class="h-full w-full rounded-sm">
-          <input
-            type="text"
-            class="border border-gray-400 pl-1 h-14 w-full rounded-sm"
-            v-model="currentscreenKeyNm" />
+        <div class="mst573-pop-body">
+          <label class="mst573-pop-field">
+            <span class="mst573-pop-label">화면키명</span>
+            <input type="text" class="mst573-pop-input" v-model="currentscreenKeyNm" />
+          </label>
         </div>
-      </div>
-      <div class="flex justify-center space-x-3 w-full h-16 mt-28">
-        <button
-          @click="confirmaddScreenKey()"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          확인
-        </button>
-        <button
-          @click="exitScreenKey"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
+        <div class="mst573-pop-foot">
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="confirmaddScreenKey()">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+            </svg>
+            추가
+          </button>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="exitScreenKey">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <div
-    v-show="showChangeScreenKey"
-    class="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white p-6 rounded shadow-lg w-2/3 h-3/4 overflow-auto">
-      <div class="border-gray-500 text-2xl">화면키 순서 변경</div>
-      <div class="border-gray-500 text-xl">
-        화면키를 끌어서 이동하면 순서가 변경됩니다.
-      </div>
-      <!-- VueDraggableNext 사용 -->
-      <VueDraggableNext
-        v-model="ScreenKeyOrigin"
-        :group="{ name: 'subCategory', pull: 'clone', put: true }"
-        class="space-y-2"
-        :move="onMove2"
-        @end="onEnd2">
-        <div
-          v-for="(item, index) in ScreenKeyOrigin"
-          class="p-4 bg-gray-200 rounded-lg shadow-md cursor-move h-12"
-          v-show="item && item.strScreenName !== ''">
-          <p>{{ item.strScreenName }}</p>
+  </Teleport>
+  <!-- 화면키 순서 변경 팝업 -->
+  <Teleport to="body">
+    <div v-show="showChangeScreenKey" class="mst573-pop-mask">
+      <div class="mst573-pop mst573-pop--order" role="dialog" aria-modal="true">
+        <div class="mst573-pop-head">
+          <h2 class="mst573-pop-title">화면키 순서 변경</h2>
+          <p class="mst573-pop-desc">화면키를 끌어서 이동하면 순서가 변경됩니다.</p>
         </div>
-      </VueDraggableNext>
-
-      <div class="flex justify-center space-x-3">
-        <button
-          @click="showScreenKeysOrder"
-          class="mt-4 p-2 bg-blue-500 text-white rounded">
-          닫기
-        </button>
+        <div class="mst573-pop-body mst573-pop-body--scroll">
+          <!-- VueDraggableNext 사용 -->
+          <VueDraggableNext
+            v-model="ScreenKeyOrigin"
+            :group="{ name: 'subCategory', pull: 'clone', put: true }"
+            class="mst573-order-list"
+            :move="onMove2"
+            @end="onEnd2">
+            <div
+              v-for="(item, index) in ScreenKeyOrigin"
+              class="mst573-order-item"
+              v-show="item && item.strScreenName !== ''">
+              <span class="mst573-order-no">{{ index + 1 }}</span>
+              <p>{{ item.strScreenName }}</p>
+            </div>
+          </VueDraggableNext>
+        </div>
+        <div class="mst573-pop-foot">
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="showScreenKeysOrder">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            닫기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-  <span
-    class="h-5 mt-3 flex justify-between items-center w-[900px] ml-[700px] z-40">
-    <h1 class="font-bold text-xl z-40">테이블포스 메뉴키 배치정보</h1>
-    <span class="flex space-x-3 ml-32 pl-56 items-center">순서변경 &nbsp; &nbsp;
-      <label class="z-40">
-        <input
-          type="radio"
-          name="changingMode"
-          @click.stop="changingMode(1)"
-          checked />교체하기 
-      </label>
-      <label class="z-40">
-        <input
-          type="radio"
-          name="changingMode"
-          @click.stop="changingMode(2)" />밀어내기
-      </label>
-      <button class="whitebutton z-40" @click.stop="deletekey">
-        삭제
-      </button>
-    </span>
-  </span>
-  <div class="flex h-5/6 w-full -mt-5">
-    <div class="flex flex-col w-3/5 h-4/6">
-      <div
-        class="flex justify-between mt-0 ml-10 w-full border-b border-b-gray-300">
-        <div class="font-bold text-xl w-auto">
+  </Teleport>
+  <!-- 본문: 좌(메뉴 리스트) / 우(테이블포스 메뉴키 배치정보). 키 크기는 고정, 좁아지면 우측 패널만 가로 스크롤 -->
+  <div class="mst573-body">
+    <div class="mst573-left">
+      <div class="mst573-panel-head">
+        <div class="font-bold text-xl">
           <!-- <button class="contents_tab-button " :class="{'text-blue-600' : currentMenu==false }" @click="showMenus(1)">메뉴관리</button> -->
           메뉴 리스트
         </div>
-        <div class="mt-3">
-          <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
-          <button class="whitebutton" @click="movePage">추가</button>
-        </div>
+        <!-- <button class="whitebutton" @click="searchMenuList3">조회</button> -->
+        <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="movePage">
+          <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
+          추가
+        </button>
       </div>
-      <div class="h-[30vh]" v-show="currentMenu == false">
-        <div
-          class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-2 gap-0 w-full">
+      <div class="mst573-left-body" v-show="currentMenu == false">
+        <div class="mst573-filter">
           <div class="customtableIndex border border-gray-400 rounded-tl-lg">
             메뉴분류
           </div>
-          <div class="px-4 py-2 border border-gray-300 rounded-tr-lg flex">
+          <div class="mst573-filter-cell border border-gray-300 rounded-tr-lg">
             <select
               name="majorGroupCd"
               id=""
-              class="flex-1"
+              class="mst573-filter-select"
               @change="setSubCd"
               v-model="forsearchMain">
               <option value="-1">전체</option>
@@ -192,7 +180,7 @@
             <select
               name="subGroupCd"
               id=""
-              class="flex-1"
+              class="mst573-filter-select"
               v-model="forsearchSub"
               @change="setSubCd">
               <option value="-1">전체</option>
@@ -204,15 +192,15 @@
           <div class="customtableIndex border border-gray-400 rounded-bl-lg">
             메뉴명/코드
           </div>
-          <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
+          <div class="mst573-filter-cell border border-gray-300 rounded-br-lg">
             <input
               type="text"
-              class="border w-full h-full px-1 border-gray-400 rounded-lg"
+              class="mst573-filter-input"
               @input="searchMenuList"
               v-model="searchword1" />
           </div>
         </div>
-        <div class="ml-10 w-full h-[180%]">
+        <div class="mst573-left-grid">
           <Realgrid
             :progname="'MST44_052INS_VUE'"
             :progid="2"
@@ -224,147 +212,203 @@
             :searchWord3="searchword1"></Realgrid>
         </div>
       </div>
-      <!--그리드 영역 -->
-      <!--드래그 영역 -->
-      <div class="h-4/6" v-show="currentMenu">
-        <div
-          class="mt-3 ml-10 grid grid-cols-[1fr,3fr] grid-rows-1 gap-0 w-full">
-          <div class="customtableIndex border border-gray-400 rounded-tl-lg">
+      <!--드래그 영역 (TLU) -->
+      <div class="mst573-left-body" v-show="currentMenu">
+        <div class="mst573-filter mst573-filter--one">
+          <div class="customtableIndex border border-gray-400 rounded-l-lg">
             TLU명/코드
           </div>
-          <div class="px-1 py-1 border border-gray-300 rounded-br-lg">
+          <div class="mst573-filter-cell border border-gray-300 rounded-r-lg">
             <input
               type="text"
-              class="border w-full h-full px-1 border-gray-400 rounded-lg"
+              class="mst573-filter-input"
               @input="searchMenuList2"
               v-model="searchword3" />
           </div>
         </div>
-        <!-- <div class="ml-10 mt-5 w-full h-full">
-          <div id="realgrid2" style="width: 100%; height: 90%"></div>
-          <div
-            id="realgrid3"
-            style="width: 100%; height: 90%"
-            class="mt-5"></div>
-        </div> -->
       </div>
     </div>
-    <div
-      class="grid grid-rows-[2fr,5fr] grid-cols-1 ml-10 w-full h-[65vh] z-20">
-      <div class="flex h-full w-[950px] mt-10" v-show="afterSearch">
-        <div
-          class="grid grid-cols-4 grid-rows-2 gap-1 ml-10 mt-0 w-full h-[80%]">
-          <div
-            v-for="(item, index) in ScreenKeys"
-            class="screen-muuri-sort-empty flex justify-center items-center w-full h-full"
-            :class="{
-              '!bg-orange-500 !border-blue-700': clickedScreenKeyIndex == index,
-            }"
-            @click="
-              clickedScreenKeyIndex = index;
-              clickedScreenKeys();
-            ">
-            <p
-              v-if="item.strScreenName != ''"
-              @click="showMenuKey(item.intScreenNo)"
-              class="flex items-center justify-center w-full h-full">
-              <!-- <button class="">{{ item.strScreenName2 + item.strScreenName }}</button> -->
-              <button class="">{{ item.strScreenName2 }}<br>{{ item.strScreenName }}</button>
-              <!-- <button
-                @click.stop="
-                  editScreenKey(item.intScreenNo, item.strScreenName)
-                ">
-                <font-awesome-icon :icon="['far', 'pen-to-square']" />
-              </button> -->
-            </p>
-            <!-- <p
-              v-else-if="item.new == true"
-              @click="addScreenKey(index)"
-              class="flex items-center justify-center w-full h-full">
-              <button
-                class="w-full h-full text-gray-300 flex justify-center items-center">
-                <img src="../../assets/ic_add_gray_24.png" alt="" /> 화면키 추가
-              </button>
-            </p> -->
-            <p v-else class="flex items-center justify-center"></p>
-          </div>
-        </div>
-        <div class="flex flex-col mt-1 ml-2 w-10 h-5/6">
-          <button
-            class="border border-[#CCCCCC] w-full h-full rounded-md"
-            @click="showPrev">
-            <img src="../../assets/arrow_up_wo_border.svg" alt="" /></button
-          >
-          <!-- <button
-            class="border border-[#CCCCCC] h-full rounded-md"
-            @click="showScreenKeysOrder">
-            <img src="../../assets/table-change_2.svg" alt="" />
-          </button> -->
-          <button
-            class="border border-[#CCCCCC] w-full h-full rounded-md"
-            @click="showNext">
-            <img src="../../assets/arrow_down_wo_border.svg" alt="" />
-          </button>
-          {{ currentsubPage }}/{{ AllscreenKeyPage }}
-        </div>
+    <div class="mst573-right">
+      <div class="mst573-panel-head">
+        <h1 class="font-bold text-xl whitespace-nowrap">테이블포스 메뉴키 배치정보</h1>
+        <span class="flex items-center gap-3 whitespace-nowrap"
+          >순서변경<label class="flex items-center gap-1"
+            ><input
+              type="radio"
+              name="changingMode"
+              @click.stop="changingMode(1)"
+              checked />교체하기</label
+          ><label class="flex items-center gap-1"
+            ><input
+              type="radio"
+              name="changingMode"
+              @click.stop="changingMode(2)" />밀어내기</label
+          ><button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click.stop="deletekey">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            삭제
+          </button></span
+        >
       </div>
-      <div v-show="afterSearch" class="flex -mt-2 w-[950px] h-[95%]">
-        <div class="flex w-full h-full">
-          <VueDraggableNext
-            v-model="items"
-            :move="onMove"
-            @end="onEnd"
-            animation="200"
-            class="grid grid-cols-4 grid-rows-4 ml-10 mt-4 w-full h-full gap-x-2">
+      <div class="mst573-right-scroll">
+        <div class="mst573-key-area">
+          <!-- 화면키(카테고리) 4칸 x 2줄 — 위 작은 글씨: 대카테고리 / 아래 굵은 글씨: 서브카테고리 -->
+          <div class="mst573-screen-keys" :class="{ 'mst573-hidden': !afterSearch }">
             <div
-              v-for="(item, index) in items"
-              class="screen-muuri-sort-empty flex items-start justify-center !h-28 !w-52"
+              v-for="(item, index) in ScreenKeys"
+              class="screen-muuri-sort-empty mst573-screen-key"
               :class="{
-                '!bg-orange-400 !border-blue-700': clickedMenuKey == index,
+                'mst573-screen-key--current':
+                  items.length > 0 &&
+                  item.intScreenNo !== '' &&
+                  item.intScreenNo != null &&
+                  item.intScreenNo == clickedintScreenNo,
+                'mst573-screen-key--target':
+                  clickedScreenKeyIndex == index &&
+                  clickedScreenOrMenu == false &&
+                  item.intScreenNo == clickedintScreenNo,
               }"
               @click="
-                saveMenuKeyposition(index);
-                clickedMenuKey = index;
-                clickedMenukeys();
+                clickedScreenKeyIndex = index;
+                clickedScreenKeys();
               ">
-              <span class="flex flex-col items-center justify-center"
-                ><span
-                  v-if="
-                    item &&
-                    item.strUserFileName != '' &&
-                    item.strUserFileName != undefined
-                  "
-                  class="h-20 w-28 flex justify-center"
-                  ><img
-                    :src="getMenuKeyImageSrc(item)"
-                    @load="handleMenuImageLoad"
-                    @error="handleMenuImageError($event, item)"
-                    alt=""
-                    class="h-full w-full" /></span
-                ><span
-                  v-else-if="item && item.strUserFileName == ''"
-                  class="h-20 w-28 flex justify-center"
-                  ><img
-                    src="../../assets/noimage2.png"
-                    alt=""
-                    class="h-full w-full" /></span
-                ><span>{{ item ? item.strKeyName : "" }}</span></span
+              <p
+                v-if="item.strScreenName != ''"
+                @click="showMenuKey(item.intScreenNo)"
+                class="mst573-screen-key-label">
+                <span class="mst573-screen-major">{{ item.strScreenName2 }}</span>
+                <span class="mst573-screen-sub">{{ item.strScreenName }}</span>
+              </p>
+              <p v-else class="flex items-center justify-center"></p>
+            </div>
+          </div>
+          <!-- 화면키 페이지 막대 (한 페이지 8개) -->
+          <div class="mst573-pager" :class="{ 'mst573-hidden': !afterSearch }">
+            <button
+              type="button"
+              class="mst573-pager-step"
+              :disabled="mst573ScreenPager.page <= 1"
+              @click="showPrev">
+              ‹ 이전
+            </button>
+            <div class="mst573-pager-pages">
+              <button
+                v-for="n in mst573ScreenPager.pages"
+                :key="n"
+                type="button"
+                class="mst573-pager-num"
+                :class="{
+                  'mst573-pager-num--on': n == mst573ScreenPager.page,
+                  'mst573-pager-num--open':
+                    mst573OpenScreen && n == mst573OpenScreen.page,
+                }"
+                :title="
+                  mst573OpenScreen && n == mst573OpenScreen.page
+                    ? `열린 화면: ${mst573OpenScreen.major} > ${mst573OpenScreen.name}`
+                    : `${n} 페이지`
+                "
+                @click="mst573GoScreenPage(n)">
+                {{ n }}
+              </button>
+            </div>
+            <button
+              type="button"
+              class="mst573-pager-step"
+              :disabled="mst573ScreenPager.page >= mst573ScreenPager.pages"
+              @click="showNext">
+              다음 ›
+            </button>
+            <span class="mst573-pager-text">
+              <template v-if="mst573ScreenPager.total == 0">카테고리 없음</template>
+              <template v-else
+                >카테고리
+                <b>{{ mst573ScreenPager.from }}–{{ mst573ScreenPager.to }}</b> / 총
+                {{ mst573ScreenPager.total }}개</template
               >
+            </span>
+          </div>
+          <div class="mst573-menu-keys-wrap" :class="{ 'mst573-hidden': !afterSearch }">
+            <!-- 아래 메뉴키가 어느 카테고리 것인지 — 위 화면키를 다른 페이지로 넘겨도 유지 -->
+            <div class="mst573-open-screen">
+              <template v-if="mst573OpenScreen">
+                <span class="mst573-open-screen-label">현재 화면</span>
+                <span class="mst573-open-screen-name"
+                  ><span class="mst573-open-screen-major">{{ mst573OpenScreen.major }}</span>
+                  ›
+                  {{ mst573OpenScreen.name }}</span
+                >
+                <button
+                  v-if="mst573OpenScreen.page != mst573ScreenPager.page"
+                  type="button"
+                  class="mst573-open-screen-go"
+                  @click="mst573GoScreenPage(mst573OpenScreen.page)">
+                  화면키 위치로 ({{ mst573OpenScreen.page }}페이지)
+                </button>
+              </template>
+              <template v-else>위에서 카테고리를 선택하면 메뉴키가 표시됩니다.</template>
             </div>
-          </VueDraggableNext>
-          <div
-            class="flex flex-col ml-3 w-10 h-full mt-5 items-center justify-center">
-            <div
-              class="border flex items-center border-[#CCCCCC] w-full h-full rounded-md"
-              @click="prevMenuKey">
-              <img src="../../assets/arrow_up_wo_border.svg" alt="" />
+            <VueDraggableNext
+              v-model="items"
+              :move="onMove"
+              @end="onEnd"
+              animation="200"
+              class="mst573-menu-keys">
+              <div
+                v-for="(item, index) in items"
+                class="screen-muuri-sort-empty mst573-menu-key"
+                :class="{
+                  'mst573-menu-key--selected':
+                    clickedMenuKey == index && clickedScreenOrMenu == true,
+                }"
+                @click="
+                  saveMenuKeyposition(index);
+                  clickedMenuKey = index;
+                  clickedMenukeys();
+                ">
+                <span class="flex flex-col items-center justify-center"
+                  ><span
+                    v-if="
+                      item &&
+                      item.strUserFileName != '' &&
+                      item.strUserFileName != undefined
+                    "
+                    class="h-20 w-28 flex justify-center"
+                    ><img
+                      :src="getMenuKeyImageSrc(item)"
+                      @load="handleMenuImageLoad"
+                      @error="handleMenuImageError($event, item)"
+                      alt=""
+                      class="h-full w-full" /></span
+                  ><span
+                    v-else-if="item && item.strUserFileName == ''"
+                    class="h-20 w-28 flex justify-center"
+                    ><img
+                      src="../../assets/noimage2.png"
+                      alt=""
+                      class="h-full w-full" /></span
+                  ><span>{{ item ? item.strKeyName : "" }}</span></span
+                >
+              </div>
+            </VueDraggableNext>
+            <!-- 메뉴키 페이지 (한 페이지 16개, 최대 33페이지) -->
+            <div class="mst573-pager">
+              <button
+                type="button"
+                class="mst573-pager-step"
+                :disabled="currmenuKeyPage <= 1"
+                @click="prevMenuKey">
+                ‹ 이전
+              </button>
+              <span class="mst573-pager-count"
+                >메뉴키 <b>{{ currmenuKeyPage }}</b> / 33 페이지</span
+              >
+              <button
+                type="button"
+                class="mst573-pager-step"
+                :disabled="currmenuKeyPage >= 33"
+                @click="nextMenuKey">
+                다음 ›
+              </button>
             </div>
-            <div
-              class="border border-[#CCCCCC] w-full h-full rounded-md flex items-center"
-              @click="nextMenuKey">
-              <img src="../../assets/arrow_down_wo_border.svg" alt="" />
-            </div>
-            <div>{{ currmenuKeyPage }} /33</div>
           </div>
         </div>
       </div>
@@ -415,6 +459,7 @@ import DupliPopUp from "@/components/dupliPopUp.vue";
  */
 
 import PickStore from "@/components/pickStore.vue";
+import { getTablePosList } from "@/api/common";
 /**
  * 	그리드 생성
  */
@@ -513,6 +558,53 @@ const copyButton = () => {
   showPopup2.value = true;
 };
 
+/** 화면키(카테고리) 페이지 막대 — 한 페이지 8개 (표시 전용) */
+const mst573ScreenPager = computed(() => {
+  const total = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  ).length;
+  const page = Number(currentsubPage.value) || 1;
+  return {
+    page,
+    pages: Math.max(1, Math.ceil(total / 8)),
+    total,
+    from: Math.min(total, (page - 1) * 8 + 1),
+    to: Math.min(total, page * 8),
+  };
+});
+
+/** 아래 메뉴키가 펼쳐진 카테고리(대·서브 이름, 몇 페이지) — 다른 페이지로 넘겨도 어느 카테고리 것인지 표시 */
+const mst573OpenScreen = computed(() => {
+  if (!items.value.length) return null;
+  const list = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  );
+  const idx = list.findIndex(
+    (item) => item.intScreenNo == clickedintScreenNo.value
+  );
+  if (idx < 0) return null;
+  return {
+    major: list[idx].strScreenName2,
+    name: list[idx].strScreenName,
+    page: Math.floor(idx / 8) + 1,
+  };
+});
+
+/** 페이지 번호 클릭 — 기존 이전/다음(showPrev/showNext)을 필요한 횟수만큼 호출 */
+const mst573GoScreenPage = (n) => {
+  let guard = 50;
+  while (Number(currentsubPage.value) < n && guard-- > 0) {
+    const before = currentsubPage.value;
+    showNext();
+    if (currentsubPage.value == before) break;
+  }
+  while (Number(currentsubPage.value) > n && guard-- > 0) {
+    const before = currentsubPage.value;
+    showPrev();
+    if (currentsubPage.value == before) break;
+  }
+};
+
 const showNext = () => {
   if (currentsubPage.value >= AllscreenKeyPage.value) {
     return;
@@ -522,11 +614,16 @@ const showNext = () => {
   addfor8ScreenKey();
 };
 
+/** 메뉴 리스트 "추가" — 실제 쓰는 메뉴 코드 등록(MST01_003INS)으로 이동. 프로그램 번호는 계정 메뉴마다 달라 메뉴 목록에서 찾음 */
 const movePage = () => {
+  const MENU_URL = "MIMASTER::MST01_003INS.xml";
+  const menu = (store.state.minorCategory || []).find(
+    (item) => item && item.strUrl == MENU_URL
+  );
   store.state.moveOtherTab = {
-    strUrl: "MIMASTER::MST01_033INS.xml",
-    lngProgramID: 73762,
-    strTitle: "메뉴 코드 등록.",
+    strUrl: MENU_URL,
+    lngProgramID: menu?.lngProgramID ?? 73762,
+    strTitle: menu?.strTitle ?? "메뉴 코드 등록.",
   };
 };
 const showPrev = () => {
@@ -611,6 +708,31 @@ const isBrandAdmin = computed(
 
 const userData = store.state.userData;
 const groupCd = ref(userData.lngStoreGroup);
+
+/**
+ * 테이블포스 POS 번호는 프로시저들에 99 로 고정이라 고를 필요가 없음.
+ * 매장이 정해지면 테이블포스 목록을 직접 불러 첫(유일한) 행으로 지역코드·POS번호를 잡고 조회까지 진행.
+ * 화면에는 콤보 대신 "테이블포스"(없으면 "미등록") 고정 표시 — 조회 AREA 의 mst573-tp--* 클래스
+ */
+const mst573TablePosState = ref("");
+watch(nowStoreCd, async (storeCd) => {
+  mst573TablePosState.value = "";
+  if (storeCd == undefined || storeCd == "0") return;
+  try {
+    const res = await getTablePosList(groupCd.value, storeCd);
+    if (storeCd != nowStoreCd.value) return; // 그사이 매장이 바뀌었으면 무시
+    const row = (res?.data?.tablePos || [])[0];
+    if (!row) {
+      mst573TablePosState.value = "none";
+      return;
+    }
+    mst573TablePosState.value = "ok";
+    handleStoreAreaCd(row.lngAreaCode);
+    handlePosNo(row.lngCode);
+  } catch (error) {
+    mst573TablePosState.value = "none";
+  }
+});
 
 /**
  * strUserFileName이 있을 때만(템플릿 v-if와 동일) 이미지 URL만 분기.
@@ -1023,7 +1145,12 @@ const saveButton = async () => {
           confirmButtonText: "확인",
         });
 
-        searchButton();
+        // 저장 후 재조회해도 보던 카테고리(와 그 페이지)를 다시 열어 둠
+        const keepNo = items.value.length ? clickedintScreenNo.value : null;
+        const keepName = (ScreenKeyOrigin.value || []).find(
+          (item) => item && item.intScreenNo == keepNo
+        )?.strScreenName;
+        searchButton().then(() => reopenScreenKey(keepNo, keepName));
       }
     }
   });
@@ -1219,8 +1346,50 @@ const handlePosNo = (newValue) => {
     posNo.value != undefined &&
     posNo.value != 0
   ) {
-    searchButton();
+    searchButton().then(openFirstScreenKey);
   }
+};
+
+/** 테이블포스 선택 후 조회되면 첫 번째 카테고리를 바로 열어 메뉴키를 보여줌 (화면키 클릭과 같은 순서) */
+const openFirstScreenKey = () => {
+  const index = ScreenKeys.value.findIndex(
+    (item) => item && item.strScreenName != ""
+  );
+  if (index < 0) return;
+  showMenuKey(ScreenKeys.value[index].intScreenNo);
+  clickedScreenKeyIndex.value = index;
+  clickedScreenKeys();
+};
+
+/**
+ * 저장 후 재조회 — 저장 전에 열려 있던 카테고리를 찾아(번호 우선, 번호가 바뀌었으면 이름) 그 페이지로 가서 다시 엶.
+ * 못 찾으면 첫 번째 카테고리를 엶.
+ */
+const reopenScreenKey = (screenNo, screenName) => {
+  if (screenNo == null || screenNo === "") {
+    openFirstScreenKey();
+    return;
+  }
+  const list = (ScreenKeyOrigin.value || []).filter(
+    (item) => item && item.intScreenNo !== "" && item.intScreenNo != null
+  );
+  let idx = list.findIndex(
+    (item) =>
+      item.intScreenNo == screenNo &&
+      (screenName == null || item.strScreenName == screenName)
+  );
+  if (idx < 0 && screenName != null) {
+    idx = list.findIndex((item) => item.strScreenName == screenName);
+  }
+  if (idx < 0) {
+    openFirstScreenKey();
+    return;
+  }
+  currentsubPage.value = Math.floor(idx / 8) + 1;
+  addfor8ScreenKey();
+  showMenuKey(list[idx].intScreenNo);
+  clickedScreenKeyIndex.value = idx % 8;
+  clickedScreenKeys();
 };
 
 watch(
@@ -1511,4 +1680,537 @@ const searchinit = (newvalue) => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* ===== 팝업 (화면키 수정·추가·순서 변경) — body 로 Teleport, 덮개 z-index 10050 ===== */
+.mst573-pop-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+.mst573-pop {
+  display: flex;
+  flex-direction: column;
+  width: 28rem;
+  max-width: 100%;
+  max-height: calc(100vh - 2rem);
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+.mst573-pop--order {
+  width: 32rem;
+}
+.mst573-pop-head {
+  padding: 1.125rem 1.5rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.mst573-pop-head::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.125rem;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+  background: #2563eb;
+  vertical-align: -2px;
+}
+.mst573-pop-title {
+  display: inline;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.mst573-pop-desc {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+.mst573-pop-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+}
+.mst573-pop-body--scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+.mst573-pop-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.mst573-pop-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+.mst573-pop-input {
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+}
+.mst573-pop-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.mst573-pop-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.mst573-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.mst573-order-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: 3rem;
+  padding: 0 0.875rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #fff;
+  cursor: grab;
+}
+.mst573-order-no {
+  min-width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: #eef2ff;
+  color: #4338ca;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  text-align: center;
+}
+
+/* ===== 조회 AREA — MST44_054INS 와 같은 수치 =====
+   콤보 8.5rem·매장 콤보 14rem·높이 2rem·테두리 #cbd5e1, 항목명→콤보 1rem, 앞 공백 = 뒤 공백 */
+.mst573-search {
+  --mst573-ctl-border: #cbd5e1;
+  --mst573-ctl-w: 9.1rem; /* 8.5rem × 1.07 */
+  --mst573-label-gap: 1rem;
+  --mst573-ctl-gap: 0.5rem;
+  --mst573-group-gap: 2.5rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 3.25rem;
+  margin: 0.75rem 0.5rem 0 1.25rem;
+  padding: 0.5rem 0;
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  /* 공통 .w-right 가 1440px 이하에서 width:auto → 내용 폭만큼 밀리지 않게 */
+  container-type: inline-size;
+}
+.mst573-search :deep(> div) {
+  /* 넓으면 6.8cqi(최대 6.8rem), 좁아지면 한 줄(항목 합계 약 920px)이 유지되는 만큼만 줄어듦 */
+  --mst573-pad: min(8.8rem, 8.8cqi, max(2.5rem, calc((100cqi - 880px) / 2)));
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: var(--mst573-ctl-gap);
+  row-gap: 0.5rem;
+  width: 100%;
+  padding-inline: var(--mst573-pad);
+  white-space: nowrap;
+}
+.mst573-search :deep(> div > div:first-child) {
+  margin-right: calc(var(--mst573-label-gap) - var(--mst573-ctl-gap));
+}
+.mst573-search :deep(#storeGroup),
+.mst573-search :deep(> div > div:nth-child(3) > select) {
+  width: var(--mst573-ctl-w);
+}
+.mst573-search :deep(> div > div.relative.flex-1) {
+  flex: 0 0 auto;
+  width: 15rem; /* 14rem × 1.07 */
+}
+/* 테이블POS번호 블록 */
+.mst573-search :deep(> div > div.ml-5) {
+  display: flex;
+  align-items: center;
+  gap: var(--mst573-label-gap);
+  margin-left: 0;
+  padding-left: var(--mst573-group-gap);
+  flex-shrink: 0;
+  min-height: 2rem;
+}
+.mst573-search :deep(> div > div.ml-5 > span) {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mst573-search :deep(> div > div.ml-5 select) {
+  width: var(--mst573-ctl-w);
+  height: 2rem;
+  margin-left: 0;
+  padding: 0 0.5rem;
+}
+/* 테이블POS번호 — 99 고정이라 콤보는 숨기고 "테이블포스"(또는 "미등록") 고정 표시 */
+.mst573-search :deep(> div > div.ml-5 select) {
+  display: none;
+}
+.mst573-search :deep(> div > div.ml-5)::after {
+  content: "확인 중";
+  display: inline-flex;
+  align-items: center;
+  height: 2rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--mst573-ctl-border);
+  border-radius: 0.375rem;
+  background: #f8fafc;
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+.mst573-search.mst573-tp--ok :deep(> div > div.ml-5)::after {
+  content: "테이블포스";
+  border-color: #c7d2fe;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 600;
+}
+.mst573-search.mst573-tp--none :deep(> div > div.ml-5)::after {
+  content: "미등록";
+  border-color: #fecdd3;
+  background: #fff1f2;
+  color: #be123c;
+  font-weight: 600;
+}
+.mst573-search :deep(select),
+.mst573-search :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--mst573-ctl-border) !important;
+}
+.mst573-search :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+/* 좁을 때: 둘째 줄에 테이블POS번호 ("매장명"과 시작선 맞춤) */
+@container (max-width: 999.98px) {
+  .mst573-search :deep(> div)::after {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+    height: 0;
+  }
+  .mst573-search :deep(> div > div.ml-5) {
+    order: 2;
+    padding-left: 0;
+  }
+}
+/* 넓을 때: 한 줄, 테이블POS번호는 오른쪽 끝 */
+@container (min-width: 1000px) {
+  .mst573-search :deep(> div) {
+    flex-wrap: nowrap;
+  }
+  .mst573-search :deep(> div > div.ml-5) {
+    margin-left: auto !important;
+  }
+}
+
+/* ===== 본문 — 좌(메뉴 리스트)는 줄어들고, 우(키 영역)는 키 크기 유지·좁으면 가로 스크롤 ===== */
+.mst573-body {
+  display: grid;
+  /* 우측은 키 영역 폭(856px)+여유, 좌측은 남는 폭(최소 320px) */
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 870px);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: 1.5rem;
+  /* 높이 = 오른쪽 키 영역 높이(왼쪽 그리드가 채워 아래 끝선 맞춤), 화면이 낮으면 안에서 스크롤 */
+  flex: 0 1 auto;
+  min-height: 0;
+  align-items: stretch;
+  margin-top: 0.75rem;
+  padding: 0 0.5rem 0.5rem 1.25rem;
+}
+.mst573-left,
+.mst573-right {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+.mst573-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 2.5rem;
+  padding-bottom: 0.375rem;
+  border-bottom: 1px solid #d1d5db;
+}
+.mst573-left-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-top: 0.5rem;
+}
+.mst573-filter {
+  display: grid;
+  grid-template-columns: 7rem minmax(0, 1fr);
+  grid-auto-rows: 2.5rem;
+}
+.mst573-filter-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+}
+.mst573-filter-select,
+.mst573-filter-input {
+  flex: 1 1 0;
+  min-width: 0;
+  height: 2rem;
+  padding: 0 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+.mst573-left-grid {
+  flex: 1 1 auto;
+  min-height: 200px;
+}
+.mst573-right-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding-top: 0.75rem;
+  contain: inline-size;
+}
+/* 키 영역 끝선 = 메뉴키 4칸 폭. 제목 줄·화면키·페이지 막대도 같은 끝선 */
+.mst573-right {
+  --mst573-key-w: 208px;
+  --mst573-key-gap: 0.5rem;
+  --mst573-keys-w: calc(var(--mst573-key-w) * 4 + var(--mst573-key-gap) * 3);
+}
+.mst573-right > .mst573-panel-head {
+  width: 100%;
+  max-width: var(--mst573-keys-w);
+}
+.mst573-key-area {
+  width: max-content;
+}
+.mst573-hidden {
+  visibility: hidden;
+}
+/* 화면키(카테고리) 4칸 x 2줄 */
+.mst573-screen-keys {
+  display: grid;
+  grid-template-columns: repeat(4, var(--mst573-key-w));
+  grid-template-rows: repeat(2, 60px);
+  gap: var(--mst573-key-gap);
+  width: var(--mst573-keys-w);
+}
+.mst573-screen-key {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.mst573-screen-key-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.125rem;
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5rem;
+  text-align: center;
+}
+/* 위: 대카테고리 (작은 회색) / 아래: 서브카테고리 (굵게) */
+.mst573-screen-major {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+.mst573-screen-sub {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+/* 선택 색 — 상단 현재 화면(남색) / 하단 선택 키(주황) */
+.mst573-screen-key.mst573-screen-key--current {
+  background: #eef2ff;
+  border: 2px solid #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+}
+.mst573-screen-key--current .mst573-screen-major {
+  color: #6366f1;
+}
+.mst573-screen-key--current .mst573-screen-sub {
+  color: #3730a3;
+}
+.mst573-screen-key.mst573-screen-key--target {
+  outline: 3px solid #c7d2fe;
+  outline-offset: 1px;
+}
+/* 페이지 막대 */
+.mst573-pager {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: var(--mst573-keys-w);
+  margin-top: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  background: #f8fafc;
+}
+.mst573-pager-step {
+  height: 1.75rem;
+  padding: 0 0.625rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #4338ca;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mst573-pager-step:hover:not(:disabled) {
+  background: #eef2ff;
+}
+.mst573-pager-step:disabled {
+  border-color: #e2e8f0;
+  color: #cbd5e1;
+  cursor: default;
+}
+.mst573-pager-pages {
+  display: flex;
+  gap: 0.25rem;
+}
+.mst573-pager-num {
+  position: relative;
+  min-width: 1.75rem;
+  height: 1.75rem;
+  padding: 0 0.375rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.mst573-pager-num:hover {
+  border-color: #a5b4fc;
+}
+.mst573-pager-num--on {
+  border-color: #6366f1;
+  background: #6366f1;
+  color: #fff;
+}
+/* 아래 메뉴키가 열린 카테고리가 있는 페이지 — 번호 아래 점 */
+.mst573-pager-num--open::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 9999px;
+  background: #6366f1;
+}
+.mst573-pager-text,
+.mst573-pager-count {
+  font-size: 0.8125rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+.mst573-pager-text {
+  margin-left: auto;
+}
+.mst573-pager-text b,
+.mst573-pager-count b {
+  color: #3730a3;
+}
+/* 메뉴키 */
+.mst573-menu-keys-wrap {
+  margin-top: 0.625rem;
+}
+.mst573-open-screen {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.75rem;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+  color: #475569;
+}
+.mst573-open-screen-label {
+  color: #4f46e5;
+  font-weight: 600;
+}
+.mst573-open-screen-name {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 0.375rem;
+  background: #eef2ff;
+  color: #3730a3;
+  font-weight: 700;
+}
+.mst573-open-screen-major {
+  font-weight: 500;
+  color: #6366f1;
+}
+.mst573-open-screen-go {
+  margin-left: 0.25rem;
+  font-size: 0.8125rem;
+  color: #4f46e5;
+  text-decoration: underline;
+}
+.mst573-menu-keys {
+  display: grid;
+  grid-template-columns: repeat(4, var(--mst573-key-w));
+  /* 1080 높이 화면에서 4줄이 한 화면에 들어가도록 96px (이미지 64px + 이름) */
+  grid-template-rows: repeat(4, 96px);
+  gap: var(--mst573-key-gap);
+  width: var(--mst573-keys-w);
+}
+.mst573-menu-key {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.mst573-menu-key > span > span:first-child.h-20 {
+  height: 64px;
+  width: 96px;
+  margin-top: 0.25rem;
+}
+.mst573-menu-key > span > span:last-child {
+  padding: 0 0.25rem;
+  line-height: 1.25;
+}
+.mst573-menu-key.mst573-menu-key--selected {
+  background: #fff7ed;
+  border: 2px solid #f97316;
+  color: #9a3412;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25);
+}
+.mst573-menu-keys-wrap > .mst573-pager .mst573-pager-count {
+  margin: 0 auto;
+}
+</style>

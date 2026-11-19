@@ -22,7 +22,12 @@
 
   <!-- 조회 조건 -->
   <div class="mst57-search-bar">
-    <PickStore @update:storeAreaCd="handleStoreAreaCd" @update:storeCd="handleStoreCd" :showAreaCd="true"></PickStore>
+    <PickStore
+      compact-search-bar
+      :compact-store-combo-max-rem="15"
+      @update:storeAreaCd="handleStoreAreaCd"
+      @update:storeCd="handleStoreCd"
+      :showAreaCd="true"></PickStore>
   </div>
 
   <!-- 데이터 영역 -->
@@ -40,27 +45,38 @@
           등록된 카테고리가 없습니다.
         </div>
         <div v-for="i in Category" :key="i.MajorCode" class="mst57-category-item">
-          <button 
-            @click="bringCategory(i.MajorCode)" 
+          <button
+            @click="selectMainCategory(i.MajorCode)"
             class="mst57-category-main-btn"
-            :class="{ 'mst57-category-active': selectedButton === i.MajorCode && !selectedSubButton }">
-            {{ i.MajorName }}
+            :class="{
+              'mst57-category-active': selectedButton === i.MajorCode && !selectedSubButton,
+              'mst57-category-main-btn--parent': selectedButton === i.MajorCode && selectedSubButton,
+            }">
+            <svg class="mst57-cat-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+            </svg>
+            <span class="mst57-cat-name">{{ i.MajorName }}</span>
+            <span v-if="i.SubCategory && i.SubCategory.length" class="mst57-cat-count">{{ i.SubCategory.length }}</span>
           </button>
-          <div v-for="x in i.SubCategory" :key="x.SubCode" class="mst57-subcategory-item">
-            <button 
-              class="mst57-category-sub-btn" 
-              @click="bringSubCategory(i.MajorCode, x.SubCode)"
-              :class="{ 'mst57-category-active': selectedSubButton === x.SubCode && selectedButton === i.MajorCode }">
-              {{ x.SubName }}
-            </button>
+          <div class="mst57-subcategory-list" v-if="i.SubCategory && i.SubCategory.length">
+            <div v-for="x in i.SubCategory" :key="x.SubCode" class="mst57-subcategory-item">
+              <button
+                class="mst57-category-sub-btn"
+                @click="bringSubCategory(i.MajorCode, x.SubCode)"
+                :class="{ 'mst57-category-active': selectedSubButton === x.SubCode && selectedButton === i.MajorCode }">
+                <span class="mst57-cat-name">{{ x.SubName }}</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
       <div class="mst57-action-buttons-left" v-show="afterSearch">
-        <button class="whitebutton mst57-add-category-btn" @click="addMainCategory">
+        <button type="button" class="pnc-sub-btn pnc-sub-btn--rose mst57-left-btn" @click="addMainCategory">
+          <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
           메인카테고리 추가
         </button>
-        <button class="whitebutton mst57-order-btn" @click="testOrderManage" v-show="Category && Category.length > 0">
+        <button type="button" class="pnc-sub-btn mst57-left-btn" @click="testOrderManage" v-show="Category && Category.length > 0">
+          <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 4v16M8 4L5 7M8 4l3 3M16 20V4M16 20l-3-3M16 20l3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
           노출 순서 관리
         </button>
       </div>
@@ -123,7 +139,8 @@
     <div class="mst57-main-category-form" v-if="afterCategory">
       <div class="mst57-form-header">
         <span class="mst57-section-title">대카테고리 정보</span>
-        <button class="whitebutton mst57-delete-main-btn" @click="deleteMainCategory">
+        <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="deleteMainCategory">
+          <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
           대카테고리 삭제
         </button>
       </div>
@@ -175,17 +192,24 @@
       </div>
       <div class="mst57-sub-section-bar" v-if="afterCategory">
         <span class="mst57-section-title">서브카테고리</span>
-        <button class="whitebutton mst57-add-subcategory-btn" @click="addsubCategory">
+        <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="addsubCategory">
+          <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" /></svg>
           서브카테고리 추가
         </button>
       </div>
       <div class="mst57-sub-category-form"
         v-for="i in subMultiLang"
         v-if="afterCategory"
-        :key="i[0]?.categoryCode">
+        :key="i[0]?.categoryCode"
+        :data-sub-code="i[0]?.categoryCode"
+        :class="{ 'mst57-sub-category-form--active': selectedSubButton != null && String(i[0]?.categoryCode) === String(selectedSubButton) }">
         <div class="mst57-sub-form-header">
-          <span class="mst57-sub-form-title">{{ i[0]?.LanguageName || '새 서브카테고리' }}</span>
-          <button class="whitebutton mst57-delete-sub-btn" @click="deleteSubCategory(i[0].categoryCode)">
+          <span class="mst57-sub-form-title"
+            ><span v-if="languageName0" class="mst57-sub-form-major">{{ languageName0 }} -</span
+            >{{ i[0]?.LanguageName || '새 서브카테고리' }}</span
+          >
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="deleteSubCategory(i[0].categoryCode)">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" /></svg>
             삭제
           </button>
         </div>
@@ -507,7 +531,7 @@ import Swal from "sweetalert2";
 /*
  * 공통 표준  Function
  */
-import { onMounted, ref, watch } from "vue";
+import { nextTick, onMounted, ref, watch } from "vue";
 
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
@@ -1401,11 +1425,53 @@ const bringCategory = (value) => {
 
 };
 
+/** 전환 효과용 class 를 다시 붙여 애니메이션을 처음부터 재생 */
+const mst57ReplayClass = (el, cls) => {
+  if (!el) return;
+  el.classList.remove(cls);
+  void el.offsetWidth; // 리플로우 — 같은 class 를 다시 붙여도 애니메이션이 다시 돌게 함
+  el.classList.add(cls);
+};
+
 const bringSubCategory = (majorCode, subCode) => {
+  // 대카테고리가 바뀌는지 (바뀌면 오른쪽 내용 전체를 새로 보여주는 효과)
+  const majorChanged = String(selectedButton.value) !== String(majorCode);
   // 먼저 메인 카테고리 정보를 로드
   bringCategory(majorCode);
   // 그 다음 서브 카테고리 선택
   selectedSubButton.value = subCode;
+  // 오른쪽 상세에서 선택한 서브카테고리 위치로 스크롤
+  // (scrollIntoView 는 바깥 페이지까지 스크롤해 제목·조회 영역이 밀려 올라가므로 데이터 영역 안에서만 이동)
+  nextTick(() => {
+    const target = document.querySelector(
+      `.mst57-sub-category-form[data-sub-code="${subCode}"]`
+    );
+    const area = target?.closest(".mst57-data-area");
+    if (target && area) {
+      const top =
+        target.getBoundingClientRect().top -
+        area.getBoundingClientRect().top +
+        area.scrollTop -
+        12;
+      // 대카테고리가 바뀌면 이전 내용 위에서 미끄러지지 않게 바로 자리 잡고 새 내용이 올라오듯 표시
+      area.scrollTo({ top, behavior: majorChanged ? "auto" : "smooth" });
+      if (majorChanged) mst57ReplayClass(area, "mst57-data-area--enter");
+      // 고른 서브 칸은 도착 후 주황 테두리가 한 번 퍼지며 표시
+      mst57ReplayClass(target, "mst57-sub-form--flash");
+    }
+  });
+};
+
+/** 왼쪽 대카테고리 클릭 — 불러온 뒤 오른쪽을 맨 위(대카테고리 정보)로 올림 (서브 클릭은 bringSubCategory 가 그 서브 칸으로 이동) */
+const selectMainCategory = (majorCode) => {
+  const majorChanged = String(selectedButton.value) !== String(majorCode);
+  bringCategory(majorCode);
+  nextTick(() => {
+    const area = document.querySelector(".mst57-data-area");
+    if (!area) return;
+    area.scrollTo({ top: 0, behavior: majorChanged ? "auto" : "smooth" });
+    if (majorChanged) mst57ReplayClass(area, "mst57-data-area--enter");
+  });
 };
 
 const addsubCategory = () => {
@@ -1915,17 +1981,94 @@ const saveButtonPopup = async () => {
   flex-shrink: 0;
 }
 
+/* 조회 AREA — 메뉴키 설정(테이블포스) MST57_003INS 와 같은 수치
+   콤보 9.1rem·매장 콤보 15rem·높이 2rem·테두리 #cbd5e1, 항목명→콤보 1rem, 앞 공백 = 뒤 공백, 지역코드는 오른쪽 끝 */
 .mst57-search-bar {
+  --mst57-ctl-border: #cbd5e1;
+  --mst57-ctl-w: 9.1rem;
+  --mst57-label-gap: 1rem;
+  --mst57-ctl-gap: 0.5rem;
+  --mst57-group-gap: 2.5rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  min-height: 3.25rem;
+  margin: 0.75rem 0.5rem 0 1.25rem;
+  padding: 0.5rem 0;
+  background: #e5e7eb;
+  border-radius: 0.5rem;
+  /* 공통 .w-right 가 1440px 이하에서 width:auto → 내용 폭만큼 밀리지 않게 */
+  container-type: inline-size;
+}
+.mst57-search-bar :deep(> div) {
+  --mst57-pad: min(8.8rem, 8.8cqi, max(2.5rem, calc((100cqi - 880px) / 2)));
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  column-gap: var(--mst57-ctl-gap);
+  row-gap: 0.5rem;
+  width: 100%;
+  padding-inline: var(--mst57-pad);
+  white-space: nowrap;
+}
+.mst57-search-bar :deep(> div > div:first-child) {
+  margin-right: calc(var(--mst57-label-gap) - var(--mst57-ctl-gap));
+}
+.mst57-search-bar :deep(#storeGroup),
+.mst57-search-bar :deep(> div > div:nth-child(3) > select) {
+  width: var(--mst57-ctl-w);
+}
+.mst57-search-bar :deep(> div > div.relative.flex-1) {
+  flex: 0 0 auto;
+  width: 15rem;
+}
+/* 지역코드 블록 (PickStore 안 ml-5 블록) */
+.mst57-search-bar :deep(> div > div.ml-5) {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  margin-top: 0.75rem;
-  padding: 0.75rem 1rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-  min-height: 3.5rem;
+  gap: var(--mst57-label-gap);
+  margin-left: 0;
+  padding-left: var(--mst57-group-gap);
   flex-shrink: 0;
+  min-height: 2rem;
+}
+.mst57-search-bar :deep(> div > div.ml-5 > span) {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mst57-search-bar :deep(> div > div.ml-5 select) {
+  width: var(--mst57-ctl-w);
+  height: 2rem;
+  margin-left: 0;
+  padding: 0 0.5rem;
+}
+.mst57-search-bar :deep(select),
+.mst57-search-bar :deep(.pickstore-vs-shell) {
+  border: 1px solid var(--mst57-ctl-border) !important;
+}
+.mst57-search-bar :deep(select:focus) {
+  border-color: #3b82f6 !important;
+}
+/* 좁을 때: 둘째 줄에 지역코드 ("매장명"과 시작선 맞춤) */
+@container (max-width: 999.98px) {
+  .mst57-search-bar :deep(> div)::after {
+    content: "";
+    order: 1;
+    flex-basis: 100%;
+    height: 0;
+  }
+  .mst57-search-bar :deep(> div > div.ml-5) {
+    order: 2;
+    padding-left: 0;
+  }
+}
+/* 넓을 때: 한 줄, 지역코드는 오른쪽 끝 */
+@container (min-width: 1000px) {
+  .mst57-search-bar :deep(> div) {
+    flex-wrap: nowrap;
+  }
+  .mst57-search-bar :deep(> div > div.ml-5) {
+    margin-left: auto !important;
+  }
 }
 
 .mst57-data-area {
@@ -1941,9 +2084,9 @@ const saveButtonPopup = async () => {
   gap: 1rem;
   width: 100%;
   align-items: flex-start;
-  /* 카테고리 목록을 왼쪽 끝 ↔ 입력폼 사이쯤으로 */
-  padding-left: clamp(24px, 4vw, 56px);
-  padding-right: 1rem;
+  /* 왼쪽 시작선 = 조회 AREA 시작선 (MST57_003INS 와 같은 1.25rem) */
+  padding-left: 1.25rem;
+  padding-right: 0.5rem;
   box-sizing: border-box;
 }
 
@@ -1951,6 +2094,9 @@ const saveButtonPopup = async () => {
 .mst57-category-list-wrapper {
   width: 260px;
   flex-shrink: 0;
+  /* 오른쪽 상세가 스크롤돼도 카테고리 목록은 제자리 */
+  position: sticky;
+  top: 0;
   display: flex;
   flex-direction: column;
   background: #fff;
@@ -1971,17 +2117,45 @@ const saveButtonPopup = async () => {
 
 .mst57-panel-title,
 .mst57-section-title {
-  font-size: 1rem;
+  font-size: 1.0625rem; /* 17px — 섹션 제목 */
   font-weight: 700;
   line-height: 1.25;
   color: #545876;
+}
+
+/* 서브타이틀 레이블 기호 — 소제목(섹션) 앞 파란 세로 바 (PUR03_006INS 기준) */
+.mst57-panel-title,
+.mst57-section-title,
+.mst57-sub-form-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.mst57-panel-title::before,
+.mst57-section-title::before {
+  content: "";
+  flex: 0 0 0.25rem;
+  width: 0.25rem;
+  height: 1.05em;
+  border-radius: 999px;
+  background: #2563eb;
+}
+/* 섹션 안 칸 제목(서브카테고리 하나하나)은 한 단계 아래 — 막대 대신 작은 점 */
+.mst57-sub-form-title::before {
+  content: "";
+  flex: 0 0 0.4rem;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #475569;
 }
 
 .mst57-category-list {
   width: 100%;
   background: #fff;
   padding: 0.5rem 0;
-  max-height: calc(100vh - 360px);
+  /* 목록 패널 전체가 본문(데이터 영역) 높이 안에 들어가야 sticky 고정이 유지됨 */
+  max-height: calc(100vh - 400px);
   overflow-y: auto;
   flex: 1;
   min-height: 200px;
@@ -2003,49 +2177,121 @@ const saveButtonPopup = async () => {
   margin-bottom: 2px;
 }
 
+/* 왼쪽 카테고리 목록 — 대카테고리(폴더·개수) / 서브카테고리(트리 들여쓰기), 선택은 주황 계열 */
+.mst57-category-item {
+  margin: 0 0.5rem 0.25rem;
+}
+
 .mst57-category-main-btn,
 .mst57-category-sub-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   width: 100%;
   text-align: left;
-  padding: 0.625rem 1rem;
-  font-size: 0.875rem;
   background: transparent;
   border: none;
-  border-left: 3px solid transparent;
+  border-radius: 0.375rem;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  color: #374151;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .mst57-category-main-btn {
-  font-weight: 600;
-}
-
-.mst57-category-sub-btn {
-  font-weight: 400;
-  padding-left: 2rem;
-  font-size: 0.8125rem;
-  color: #6b7280;
-}
-
-.mst57-category-main-btn:hover,
-.mst57-category-sub-btn:hover {
-  background: #f9fafb;
-}
-
-.mst57-category-active {
-  background: #fef2f2 !important;
-  color: #C10000 !important;
-  border-left-color: #C10000 !important;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.9375rem; /* 15px — 대카테고리 */
   font-weight: 700;
+  color: #1f2937;
 }
 
-.mst57-category-active:hover {
-  background: #fee2e2 !important;
+.mst57-cat-icon {
+  flex: 0 0 auto;
+  width: 1rem;
+  height: 1rem;
+  color: #94a3b8;
+}
+
+.mst57-cat-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mst57-cat-count {
+  flex: 0 0 auto;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.375rem;
+  border-radius: 9999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.75rem; /* 12px — 개수 */
+  font-weight: 700;
+  line-height: 1.25rem;
+  text-align: center;
+}
+
+/* 서브카테고리 — 대카테고리 아이콘 아래에서 내려오는 트리 선 */
+.mst57-subcategory-list {
+  margin: 0.125rem 0 0.25rem 1.125rem;
+  padding-left: 0.625rem;
+  border-left: 1px solid #e2e8f0;
 }
 
 .mst57-subcategory-item {
   margin-top: 1px;
+}
+
+.mst57-category-sub-btn {
+  position: relative;
+  padding: 0.4375rem 0.625rem;
+  font-size: 0.875rem; /* 14px — 서브카테고리 */
+  font-weight: 500;
+  color: #475569;
+}
+
+.mst57-category-sub-btn::before {
+  content: "";
+  position: absolute;
+  left: -0.625rem;
+  top: 50%;
+  width: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mst57-category-main-btn:hover,
+.mst57-category-sub-btn:hover {
+  background: #f1f5f9;
+}
+
+/* 선택한 항목 — 주황 (구조 표시인 파란 막대와 구분, 메뉴키 설정의 "선택한 키"와 같은 계열) */
+.mst57-category-active {
+  background: #fff7ed !important;
+  color: #c2410c !important;
+  font-weight: 700;
+}
+
+.mst57-category-active .mst57-cat-icon {
+  color: #ea580c;
+}
+
+.mst57-category-active .mst57-cat-count {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.mst57-category-active:hover {
+  background: #ffedd5 !important;
+}
+
+/* 서브를 고른 상태의 대카테고리 — 위치만 알 수 있게 글자·아이콘만 주황 */
+.mst57-category-main-btn--parent {
+  color: #c2410c;
+}
+
+.mst57-category-main-btn--parent .mst57-cat-icon {
+  color: #ea580c;
 }
 
 .mst57-action-buttons-left {
@@ -2057,43 +2303,9 @@ const saveButtonPopup = async () => {
   background: #fafafa;
 }
 
-.mst57-action-buttons-left .mst57-add-category-btn,
-.mst57-action-buttons-left .mst57-order-btn {
+/* 왼쪽 아래 버튼 (메인카테고리 추가·노출 순서 관리) — pnc-sub-btn, 폭만 꽉 채움 */
+.mst57-left-btn {
   width: 100%;
-  justify-content: center;
-}
-
-.mst57-add-category-btn {
-  background: #C10000;
-  color: #fff;
-  border: none;
-  padding: 0.625rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.mst57-add-category-btn:hover {
-  background: #a00000;
-}
-
-.mst57-order-btn {
-  background: #fff;
-  color: #4b5563;
-  border: 1px solid #d1d5db;
-  padding: 0.625rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.mst57-order-btn:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
 }
 
 /* 오른쪽 폼 영역 */
@@ -2127,26 +2339,6 @@ const saveButtonPopup = async () => {
   gap: 0.75rem;
 }
 
-.mst57-delete-main-btn,
-.mst57-delete-sub-btn {
-  background: #fff;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  padding: 0.375rem 0.875rem;
-  border-radius: 0.375rem;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-.mst57-delete-main-btn:hover,
-.mst57-delete-sub-btn:hover {
-  background: #fef2f2;
-  color: #C10000;
-  border-color: #fca5a5;
-}
-
 .mst57-form-grid {
   display: grid;
   grid-template-columns: 160px 1fr;
@@ -2164,8 +2356,8 @@ const saveButtonPopup = async () => {
   border-right: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
-  font-weight: 500;
-  color: #4b5563;
+  font-weight: 600; /* 입력 항목명 — 반굵게 */
+  color: #374151;
 }
 
 .mst57-form-label:nth-last-child(2) {
@@ -2215,22 +2407,6 @@ const saveButtonPopup = async () => {
   gap: 0.75rem;
 }
 
-.mst57-add-subcategory-btn {
-  background: #C10000;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.375rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.mst57-add-subcategory-btn:hover {
-  background: #a00000;
-}
-
 .mst57-sub-category-form {
   width: 100%;
   margin-top: 0.75rem;
@@ -2238,6 +2414,37 @@ const saveButtonPopup = async () => {
   background: #fafafa;
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
+  scroll-margin-top: 0.75rem;
+}
+
+/* 왼쪽에서 고른 서브 칸 — 왼쪽 선택과 같은 주황 */
+.mst57-sub-category-form--active {
+  border-color: #f97316;
+  box-shadow: 0 0 0 1px #f97316;
+}
+
+/* 대카테고리가 바뀔 때 오른쪽 내용이 살짝 올라오며 나타남 */
+.mst57-data-area--enter > * {
+  animation: mst57-area-enter 0.28s ease-out;
+}
+@keyframes mst57-area-enter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 고른 서브 칸 — 도착할 때 주황 테두리가 한 번 퍼짐 */
+.mst57-sub-form--flash {
+  animation: mst57-sub-flash 0.9s ease-out 0.15s;
+}
+@keyframes mst57-sub-flash {
+  0%   { box-shadow: 0 0 0 1px #f97316, 0 0 0 0 rgba(249, 115, 22, 0.45); background-color: #fff7ed; }
+  70%  { box-shadow: 0 0 0 1px #f97316, 0 0 0 10px rgba(249, 115, 22, 0); background-color: #fff7ed; }
+  100% { box-shadow: 0 0 0 1px #f97316, 0 0 0 0 rgba(249, 115, 22, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mst57-data-area--enter > *,
+  .mst57-sub-form--flash { animation: none; }
 }
 
 .mst57-sub-form-header {
@@ -2248,10 +2455,16 @@ const saveButtonPopup = async () => {
   gap: 0.75rem;
 }
 
-.mst57-sub-form-title {
-  font-size: 0.875rem;
+/* 서브카테고리 칸 제목 앞 "대카테고리 -" (조금 흐리게) */
+.mst57-sub-form-major {
+  color: #64748b;
   font-weight: 600;
-  color: #374151;
+}
+/* 각 서브카테고리 칸의 제목 — 섹션 제목 수준으로 키움 */
+.mst57-sub-form-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b; /* 진한 남회색 — 섹션 제목(#545876)보다 진하게 */
 }
 
 .mst57-sub-form-grid {
