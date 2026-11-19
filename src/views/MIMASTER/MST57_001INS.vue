@@ -1299,10 +1299,19 @@ const saveButton = async () => {
         saveErrorMsg = error?.message || "오류가 발생했습니다.";
       }
 
+      // 저장 후 다시 조회해도 보던 대카테고리·서브카테고리·스크롤 위치는 그대로 유지 (데이터만 새로 불러옴)
       const keepMajor = currentMajorCode.value;
+      const keepSub = selectedSubButton.value;
+      const keepScroll = document.querySelector(".mst57-data-area")?.scrollTop ?? 0;
       await searchButton();
       if (keepMajor != null && keepMajor !== "") {
         bringCategory(keepMajor);
+        if (keepSub != null && keepSub !== "") {
+          selectedSubButton.value = keepSub;
+        }
+        await nextTick();
+        const area = document.querySelector(".mst57-data-area");
+        if (area) area.scrollTop = keepScroll;
       }
 
       if (saveOk) {
