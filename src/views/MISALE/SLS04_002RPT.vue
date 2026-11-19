@@ -1440,7 +1440,7 @@ const sls0402GroupFields = () =>
     .filter(Boolean);
 const SLS0402_TEXT_COLS =["strStore", "strMajor", "strSub", "lngCode", "strMenu", "dtmDate"];
 const sls0402GroupFieldOf = (group) => {
-  const fields = sls0402GroupFields();
+  const fields = sls0402LoadedFields.value;
   const lv = Number(group?.level) || 0;
   return { field: fields[lv - 1] || "", rank: fields.length - lv };
 };
@@ -1561,7 +1561,7 @@ const onSls0402GridReady = (id) => {
     } else if (SLS0402_GROUP_NAME[fieldName]) {
       // 그룹 열: 소계 단계와 그 위 단계 값만 표시, 아래 단계 칸은 비움
       col.groupFooter.valueCallback = (grid, column, footerIndex, group) => {
-        const fields = sls0402GroupFields();
+        const fields = sls0402LoadedFields.value;
         const idx = fields.indexOf(fieldName);
         const lv = Number(group?.level) || 0;
         if (idx < 0 || idx > lv - 1) return "";
@@ -1582,7 +1582,7 @@ const onSls0402GridReady = (id) => {
 
 /**
  * 전주비·전년비 합계 계산 (프로시저 usp_VUE_slsGetMenuSales2_CON 과 같은 식)
- *  - 현재 금액: 순매출액(lngNetAmt = 프로시저의 a.lngActAmt), 전기 금액: lngPreWeekAmt / lngPreYearAmt
+ *  - 현재 금액: 실매출액(lngActAmt), 전기 금액: lngPreWeekAmt / lngPreYearAmt (메뉴 행 53건으로 프로시저 값과 일치 확인)
  *  - ASMX 가 전기 금액을 아직 안 주면(구버전 API) 기존 평균 표시를 그대로 둔다
  */
 const SLS0402_RATE_PRE = { dblPreWeek: "lngPreWeekAmt", dblPreYear: "lngPreYearAmt" };
@@ -1597,8 +1597,9 @@ const sls0402Num = (v) => {
 const sls0402Rate = (rows, preField) => {
   let cur = 0;
   let pre = 0;
+  // 전기 금액은 프로시저가 단가별 행에 이번 매출 비율대로 나눠 주므로(#TMP_CM 반영 후) 그대로 합산
   rows.forEach((r) => {
-    cur += sls0402Num(r.lngNetAmt);
+    cur += sls0402Num(r.lngActAmt);
     pre += sls0402Num(r[preField]);
   });
   let rate;
@@ -1617,7 +1618,7 @@ const sls0402DateKey = (v) => {
 };
 /** 소계 그룹에 속한 원본 행(rowData) — 그룹 단계까지의 그룹 열 값이 같은 행 */
 const sls0402RowsOfGroup = (grid, group) => {
-  const fields = sls0402GroupFields();
+  const fields = sls0402LoadedFields.value;
   const lv = Number(group?.level) || 0;
   const keys = fields.slice(0, lv);
   const dataRow = group?.firstItem?.dataRow;
@@ -1666,6 +1667,12 @@ const checkedlngPrice = ref(0);
 const checkedlngPrint = ref(1);
 const customOrder = ["strStore", "strMajor", "strSub", "dtmDate"];
 const checking = (e) => {
+  // 묶음·데이터가 바뀌는 조건을 조회 뒤에 바꾸면 예전 데이터와 새 열/소계가 섞여 보이므로 그리드를 비운다
+  // (셀병합은 화면 표시만 바뀌므로 유지) → 조회를 다시 눌러야 새 조건으로 나옴
+  if (e.target.id !== "unite" && Array.isArray(rowData.value) && rowData.value.length > 0) {
+    rowData.value = [];
+    afterSearch.value = false;
+  }
   if (e.target.id == "store") {
     if (e.target.checked) {
       checkedReportTypes.add(2);
