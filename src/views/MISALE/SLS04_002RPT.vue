@@ -45,6 +45,7 @@
               omit-main-label
               filter-bar-align
               :mainName="'기간'"
+              :initEndYesterday="true"
               :closePopUp="closePopUp"
               @endDate="endDate"
               @startDate="startDate"
@@ -88,9 +89,8 @@
           </div>
         </div>
 
-        <!-- 3~4행: 조회/요일 — 동일 폭, 공휴일 끝 = 조회조건(셀병합) 끝 -->
-        <div class="sls0402-cond-stack">
-          <div class="sls0402-row">
+        <!-- 3행: 조회조건 (전체 폭) -->
+          <div class="sls0402-row sls0402-row--cond">
             <span class="sls0402-lbl shrink-0">조회조건</span>
             <div class="sls0402-checks sls0402-checks--single flex min-w-0 items-center">
               <label class="sls0402-check-label" for="store">
@@ -98,11 +98,11 @@
                 매장명표시
               </label>
               <label class="sls0402-check-label" for="maingroup">
-                <input id="maingroup" type="checkbox" class="sls0402-check" @change="checking" />
+                <input id="maingroup" type="checkbox" class="sls0402-check" checked @change="checking" />
                 대그룹
               </label>
               <label class="sls0402-check-label" for="subgroup">
-                <input id="subgroup" type="checkbox" class="sls0402-check" @change="checking" />
+                <input id="subgroup" type="checkbox" class="sls0402-check" checked @change="checking" />
                 서브그룹
               </label>
               <label class="sls0402-check-label" for="day">
@@ -118,16 +118,37 @@
                 단가제외
               </label>
               <label class="sls0402-check-label" for="sum">
-                <input id="sum" type="checkbox" class="sls0402-check" @change="checking" />
+                <input id="sum" type="checkbox" class="sls0402-check" checked @change="checking" />
                 합계
               </label>
               <label class="sls0402-check-label" for="unite">
-                <input id="unite" type="checkbox" class="sls0402-check" @change="checking" />
+                <input id="unite" type="checkbox" class="sls0402-check" checked @change="checking" />
                 셀병합
               </label>
             </div>
           </div>
 
+          <!-- 4행 왼쪽: 조회 기준(그룹)별 접기·펼치기 -->
+          <div class="sls0402-row sls0402-row--level">
+            <span class="sls0402-lbl shrink-0">펼침 단계</span>
+            <div class="sls0402-level-btns flex min-w-0 items-center">
+              <template v-for="(lv, i) in sls0402LevelOptions" :key="lv.key">
+                <span v-if="i > 0" class="sls0402-level-sep" aria-hidden="true">›</span>
+                <button
+                  type="button"
+                  class="sls0402-level-btn"
+                  :class="[`sls0402-level-btn--${lv.key}`, { 'is-active': sls0402ActiveLevel === lv.key }]"
+                  :disabled="!sls0402LevelEnabled"
+                  :title="lv.title"
+                  @click="sls0402ExpandTo(lv)">
+                  {{ lv.label }}
+                </button>
+              </template>
+            </div>
+          </div>
+
+        <!-- 4행 오른쪽: 요일조건 · 공휴일 (매장명과 같은 시작선) -->
+        <div class="sls0402-right-cond">
           <div class="sls0402-row">
             <span class="sls0402-lbl shrink-0">요일조건</span>
             <div class="sls0402-checks sls0402-checks--days flex min-w-0 items-center">
@@ -159,14 +180,14 @@
                 <input id="sun" type="checkbox" class="sls0402-check" checked @change="checkday" />
                 일
               </label>
-              <div class="sls0402-holiday">
-                <span class="sls0402-holiday-lbl">공휴일</span>
-                <select v-model="selectedHoliday" class="sls0402-sg-select">
-                  <option :value="0">선택</option>
-                  <option :value="1">포함</option>
-                  <option :value="2">제외</option>
-                </select>
-              </div>
+            </div>
+            <div class="sls0402-holiday">
+              <span class="sls0402-holiday-lbl">공휴일</span>
+              <select v-model="selectedHoliday" class="sls0402-sg-select">
+                <option :value="0">선택</option>
+                <option :value="1">포함</option>
+                <option :value="2">제외</option>
+              </select>
             </div>
           </div>
         </div>
@@ -198,8 +219,13 @@
           :setGroupFooterColID="setGroupFooterColID"
           :setGroupFooterExpressions="setGroupFooterExpressions"
           :setRowGroupSpan="setRowGroupSpan"
+          :setMergeMode="checkedUnite"
           :rowStateeditable="false"
-          :setGroupSumCustomLevel2="setGroupSumCustomLevel2"></Realgrid>
+          :setGroupSumCustomLevel2="setGroupSumCustomLevel2"
+          row-group-collapsed-adornments="footer"
+          :setFooterCustomColumnId="['strMenu']"
+          :setFooterCustomText="['총합계']"
+          @gridReady="onSls0402GridReady"></Realgrid>
       </div>
     </div>
 
@@ -318,6 +344,7 @@ import Chart from "@/components/chart.vue";
  *  */
 
 import Datepicker2 from "@/components/Datepicker2.vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry";
 /**
  *  페이지명 자동 입력 컴포넌트
  *  */
@@ -350,7 +377,7 @@ import printJS from "print-js";
  * 공통 표준  Function
  */
 
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -360,7 +387,7 @@ import { useStore } from "vuex";
 /** 조회 AREA — SLS04_004 / SLS02_031 wire 패턴 */
 const sls0402ControlBorder = "#cbd5e1";
 const sls0402ColGutter = "1.25rem";
-const sls0402RowGap = "0.75rem";
+const sls0402RowGap = "0.5rem";
 const sls0402LabelCol = "5.5rem";
 
 const colors = [
@@ -395,7 +422,7 @@ const colors = [
   "#3CB371",
   "#FFB6C1",
 ];
-const setGroupFooter = ref(false);
+const setGroupFooter = ref(true);
 const setFooterColID = ref([
   "strStore",
   "lngCode",
@@ -487,9 +514,9 @@ const setGroupFooterExpressions = ref([
 ]);
 const setGroupSumCustomColumnId = ref(["strStore", "strMajor", "strSub"]);
 const setGroupSumCustomText = ref(["매장 소계", "", ""]);
-const setGroupSumCustomLevel = ref(1);
-const setGroupColumnId = ref([""]);
-const setGroupColumnId2 = ref("");
+const setGroupSumCustomLevel = ref(2);
+const setGroupColumnId = ref(["strMajor", "strSub", ""]);
+const setGroupColumnId2 = ref("strMajor,strSub,");
 const setGroupSumCustomLevel2 = ref(1);
 const progid = ref(2);
 const reload = ref(false);
@@ -604,7 +631,9 @@ const chartButton = async () => {
   chartPop.place();
   await searchButton2();
 };
-const setRowGroupSpan = ref("");
+const setRowGroupSpan = ref("strStore,strMajor,strSub");
+// 셀병합 체크값 → 그룹 묶음(row group) 셀 병합 여부
+const checkedUnite = ref(true);
 const tempSeeDay = ref(0);
 const seeDays = (e) => {
   if (e.target.checked) {
@@ -623,6 +652,14 @@ const searchButton = async () => {
   store.state.loading = true;
   try {
     initGrid();
+
+    // 일자별 + 하루만 조회: 일자 합계가 서브그룹 합계와 같은 값이라 일자로는 묶지 않음 (일자 열은 표시)
+    const sls0402SingleDay =
+      checkedReportTypes.has(1) &&
+      selectedstartDate.value === selectedendDate.value;
+    setGroupColumnId2.value = setGroupColumnId.value
+      .filter((f) => !(sls0402SingleDay && f === "dtmDate"))
+      .join(",");
 
     reload.value = !reload.value;
 
@@ -652,7 +689,7 @@ const searchButton = async () => {
       selectedHoliday.value
     );
     //console.log(res);
-    rowData.value = res.data.MENUS;
+    rowData.value = sls0402SortByDate(res.data.MENUS);
 
     afterSearch.value = true;
   } catch (error) {
@@ -1182,7 +1219,7 @@ const searchCondition = ref([
   "셀병합",
 ]);
 const dayCondition = ref(["일", "월", "화", "수", "목", "금", "토"]);
-const ConditionSet = new Set([4]);
+const ConditionSet = new Set([1, 2, 4, 6, 7]);
 /**
  * 엑셀 내보내기 함수
  */
@@ -1380,16 +1417,253 @@ onMounted(async () => {
   );
   subList.value = res.data.SUBLIST;
 });
+// 구버전과 같이 대그룹·서브그룹·합계·셀병합 기본 체크 (그룹 열 표시)
 const hideColumnsId = ref([
   "strStore",
-  "strMajor",
-  "strSub",
   "dtmDate",
 ]);
-const checkedReportTypes = new Set([0]);
+/**
+ * 소계(그룹 푸터) 행 보기 개선 — 이 화면 전용 (realgrid.vue 공통 동작은 그대로)
+ *  - 메뉴명 칸에 "○○ 서브그룹 합계 / 대그룹 합계 / 매장 합계 / 일자 합계" 표시
+ *  - 단계별 배경색·굵은 글씨, 단가 합계(의미 없는 값)는 비움
+ */
+const SLS0402_GROUP_NAME = {
+  strStore: "매장 합계",
+  strMajor: "대그룹 합계",
+  strSub: "서브그룹 합계",
+  dtmDate: "일자 합계",
+};
+/** 그리드에 실제로 넘긴 그룹 열 목록 (setGroupColumnId2 기준, 빈 값 제외) */
+const sls0402GroupFields = () =>
+  String(setGroupColumnId2.value || "")
+    .split(",")
+    .filter(Boolean);
+const SLS0402_TEXT_COLS =["strStore", "strMajor", "strSub", "lngCode", "strMenu", "dtmDate"];
+const sls0402GroupFieldOf = (group) => {
+  const fields = sls0402GroupFields();
+  const lv = Number(group?.level) || 0;
+  return { field: fields[lv - 1] || "", rank: fields.length - lv };
+};
+const sls0402GroupValue = (grid, group, field) => {
+  try {
+    const dataRow = group?.firstItem?.dataRow;
+    if (dataRow == null || dataRow < 0 || !field) return "";
+    const v = grid.getDataSource().getValue(dataRow, field);
+    if (v == null) return "";
+    if (field === "dtmDate") {
+      const d = v instanceof Date ? v : new Date(String(v).replace(" ", "T"));
+      if (isNaN(d.getTime())) return String(v).slice(0, 10);
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${d.getFullYear()}-${mm}-${dd}`;
+    }
+    return String(v);
+  } catch (_) {
+    return "";
+  }
+};
+/**
+ * 펼침 단계 — 조회 기준(그룹)별 접기·펼치기
+ *  - 버튼은 마지막 조회에 적용된 그룹(매장·대그룹·서브그룹·일자) 순서대로 + "메뉴 전체"
+ *  - "대그룹" = 대그룹 합계까지만, "서브그룹" = 서브그룹 합계까지, "메뉴 전체" = 모두 펼침
+ */
+const SLS0402_LEVEL_LABEL = {
+  strStore: "매장",
+  strMajor: "대그룹",
+  strSub: "서브그룹",
+  dtmDate: "일자",
+};
+const sls0402GridId = ref("");
+const sls0402LoadedFields = ref([]);
+const sls0402ActiveLevel = ref("all");
+const sls0402LevelOptions = computed(() => {
+  const fields = sls0402LoadedFields.value.length
+    ? sls0402LoadedFields.value
+    : setGroupFooter.value
+    ? String(setGroupColumnId2.value || "").split(",").filter(Boolean)
+    : [];
+  return [
+    ...fields.map((f, i) => ({
+      key: f,
+      label: SLS0402_LEVEL_LABEL[f] || f,
+      depth: i,
+      title: `${SLS0402_LEVEL_LABEL[f] || f} 합계까지만 보기`,
+    })),
+    { key: "all", label: "메뉴 전체", depth: fields.length, title: "메뉴까지 모두 펼치기" },
+  ];
+});
+const sls0402LevelEnabled = computed(
+  () =>
+    sls0402LoadedFields.value.length > 0 &&
+    Array.isArray(rowData.value) &&
+    rowData.value.length > 0
+);
+const sls0402ExpandTo = (lv) => {
+  const gv = rgGetInstance(sls0402GridId.value)?.gridView;
+  if (!gv || !sls0402LevelEnabled.value) return;
+  const total = sls0402LoadedFields.value.length;
+  sls0402ByButton = true;
+  try {
+    if (lv.depth >= total) {
+      gv.expandAll(true);
+    } else {
+      gv.collapseAll(true);
+      if (lv.depth > 0) gv.expandAll(true, lv.depth);
+    }
+  } finally {
+    sls0402ByButton = false;
+  }
+  sls0402ActiveLevel.value = lv.key;
+};
+/** 그리드의 ▽/▷로 직접 접거나 펴면 버튼 단계와 달라지므로 선택 표시 해제 */
+let sls0402ByButton = false;
+const sls0402WatchManualToggle = (gv) => {
+  const clear = () => {
+    if (!sls0402ByButton) sls0402ActiveLevel.value = "";
+  };
+  gv.onExpanded = clear;
+  gv.onCollapsed = clear;
+};
+
+const onSls0402GridReady = (id) => {
+  const gv = rgGetInstance(id)?.gridView;
+  if (!gv) return;
+  sls0402GridId.value = id;
+  sls0402LoadedFields.value = setGroupFooter.value ? sls0402GroupFields() : [];
+  sls0402ActiveLevel.value = "all";
+  sls0402WatchManualToggle(gv);
+  sls0402ApplyTotalRate(gv);
+  if (!setGroupFooter.value) {
+    gv.refresh();
+    return;
+  }
+  const cols = gv.getColumns?.() || [];
+  cols.forEach((c) => {
+    const fieldName = c.fieldName;
+    const col = gv.columnByField(fieldName);
+    if (!col || !col.groupFooter) return;
+    const align = SLS0402_TEXT_COLS.includes(fieldName)
+      ? "setTextAlignLeft"
+      : "setTextAlignRight";
+    col.groupFooter.styleCallback = (grid, footer) => {
+      // 합계 종류별 고정 색 (조회조건 조합이 바뀌어도 같은 합계는 같은 색)
+      // styleCallback 의 footer.level 은 그룹 level + 1 (valueCallback 의 group.level 과 1 차이)
+      const { field } = sls0402GroupFieldOf({ level: (Number(footer?.level) || 0) - 1 });
+      return { styleName: `sls0402-gf sls0402-gf-${field || "etc"} ${align}` };
+    };
+    if (fieldName === "strMenu") {
+      col.groupFooter.valueCallback = (grid, column, footerIndex, group) => {
+        const { field } = sls0402GroupFieldOf(group);
+        if (!field) return "소계";
+        const name = sls0402GroupValue(grid, group, field);
+        return `${name ? name + " " : ""}${SLS0402_GROUP_NAME[field] || "소계"}`;
+      };
+    } else if (SLS0402_GROUP_NAME[fieldName]) {
+      // 그룹 열: 소계 단계와 그 위 단계 값만 표시, 아래 단계 칸은 비움
+      col.groupFooter.valueCallback = (grid, column, footerIndex, group) => {
+        const fields = sls0402GroupFields();
+        const idx = fields.indexOf(fieldName);
+        const lv = Number(group?.level) || 0;
+        if (idx < 0 || idx > lv - 1) return "";
+        return sls0402GroupValue(grid, group, fieldName);
+      };
+    } else if (fieldName === "lngCode" || fieldName === "lngPrice") {
+      col.groupFooter.valueCallback = () => "";
+    } else if (SLS0402_RATE_PRE[fieldName] && sls0402HasPreAmt()) {
+      // 전주비·전년비 소계: 단순 평균이 아니라 (소계 금액 - 전기 금액) / 전기 금액
+      col.groupFooter.valueCallback = (grid, column, footerIndex, group) => {
+        const rows = sls0402RowsOfGroup(grid, group);
+        return sls0402Rate(rows, SLS0402_RATE_PRE[fieldName]);
+      };
+    }
+  });
+  gv.refresh();
+};
+
+/**
+ * 전주비·전년비 합계 계산 (프로시저 usp_VUE_slsGetMenuSales2_CON 과 같은 식)
+ *  - 현재 금액: 순매출액(lngNetAmt = 프로시저의 a.lngActAmt), 전기 금액: lngPreWeekAmt / lngPreYearAmt
+ *  - ASMX 가 전기 금액을 아직 안 주면(구버전 API) 기존 평균 표시를 그대로 둔다
+ */
+const SLS0402_RATE_PRE = { dblPreWeek: "lngPreWeekAmt", dblPreYear: "lngPreYearAmt" };
+const sls0402HasPreAmt = () =>
+  Array.isArray(rowData.value) &&
+  rowData.value.length > 0 &&
+  Object.prototype.hasOwnProperty.call(rowData.value[0], "lngPreWeekAmt");
+const sls0402Num = (v) => {
+  const n = Number(String(v ?? "").replace(/,/g, ""));
+  return Number.isFinite(n) ? n : 0;
+};
+const sls0402Rate = (rows, preField) => {
+  let cur = 0;
+  let pre = 0;
+  rows.forEach((r) => {
+    cur += sls0402Num(r.lngNetAmt);
+    pre += sls0402Num(r[preField]);
+  });
+  let rate;
+  if (cur > 0 && pre === 0) rate = 100;
+  else if (cur < 0 && pre === 0) rate = -100;
+  else if (cur === pre) rate = 0;
+  else if (cur === 0) rate = -100;
+  else rate = ((cur - pre) / pre) * 100;
+  return Math.round(rate * 10) / 10;
+};
+const sls0402DateKey = (v) => {
+  if (v == null || v === "") return "";
+  const d = v instanceof Date ? v : new Date(String(v).replace(" ", "T"));
+  if (isNaN(d.getTime())) return String(v).slice(0, 10);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+/** 소계 그룹에 속한 원본 행(rowData) — 그룹 단계까지의 그룹 열 값이 같은 행 */
+const sls0402RowsOfGroup = (grid, group) => {
+  const fields = sls0402GroupFields();
+  const lv = Number(group?.level) || 0;
+  const keys = fields.slice(0, lv);
+  const dataRow = group?.firstItem?.dataRow;
+  if (dataRow == null || dataRow < 0) return [];
+  const ds = grid.getDataSource();
+  const want = keys.map((f) => {
+    const v = ds.getValue(dataRow, f);
+    return f === "dtmDate" ? sls0402DateKey(v) : String(v ?? "");
+  });
+  return rowData.value.filter((r) =>
+    keys.every((f, i) =>
+      (f === "dtmDate" ? sls0402DateKey(r[f]) : String(r[f] ?? "")) === want[i]
+    )
+  );
+};
+/**
+ * 일자별 조회 시 서브그룹 안을 "일자 → 메뉴" 순서로 정렬
+ *  - 프로시저는 매장·대그룹·서브그룹·메뉴명·일자 순으로 주므로, 그대로 묶으면 같은 일자 합계가 메뉴마다 쪼개진다
+ *  - 매장·대그룹·서브그룹 순서는 프로시저 순서(처음 나온 순서) 그대로, 그 안에서 일자 오름차순, 같은 일자 안은 원래(메뉴명) 순서
+ */
+const sls0402SortByDate = (list) => {
+  if (!Array.isArray(list) || !checkedReportTypes.has(1)) return list;
+  const groupOrder = new Map();
+  const keyOf = (r) => `${r.strStore ?? ""}\u0001${r.strMajor ?? ""}\u0001${r.strSub ?? ""}`;
+  list.forEach((r) => {
+    const k = keyOf(r);
+    if (!groupOrder.has(k)) groupOrder.set(k, groupOrder.size);
+  });
+  return list
+    .map((r, i) => ({ r, i, g: groupOrder.get(keyOf(r)), d: sls0402DateKey(r.dtmDate) }))
+    .sort((a, b) => a.g - b.g || (a.d < b.d ? -1 : a.d > b.d ? 1 : 0) || a.i - b.i)
+    .map((x) => x.r);
+};
+/** 맨 아래 총합계(Σ) 행의 전주비·전년비 */
+const sls0402ApplyTotalRate = (gv) => {
+  if (!sls0402HasPreAmt()) return;
+  Object.entries(SLS0402_RATE_PRE).forEach(([field, preField]) => {
+    const col = gv.columnByField(field);
+    if (!col || !col.footer) return;
+    col.footer.valueCallback = () => sls0402Rate(rowData.value, preField);
+  });
+};
+const checkedReportTypes = new Set([0, 3, 4]);
 const checkedGift = ref(1);
 const checkedlngPrice = ref(0);
-const checkedlngPrint = ref(0);
+const checkedlngPrint = ref(1);
 const customOrder = ["strStore", "strMajor", "strSub", "dtmDate"];
 const checking = (e) => {
   if (e.target.id == "store") {
@@ -1499,10 +1773,12 @@ const checking = (e) => {
     if (e.target.checked) {
       ConditionSet.add(7);
       setRowGroupSpan.value = "strStore,strMajor,strSub";
+      checkedUnite.value = true;
       setGroupSumCustomLevel.value = 2;
     } else {
       ConditionSet.delete(7);
       setRowGroupSpan.value = "";
+      checkedUnite.value = false;
       setGroupSumCustomLevel.value = 1;
     }
 
@@ -1574,8 +1850,9 @@ const checkday = (e) => {
 <style scoped>
 .sls0402-search-panel {
   box-sizing: border-box;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
+  border: 1px solid #d5dbe3;
   padding-left: var(--sls0402-panel-pad-x, 2rem);
   padding-right: var(--sls0402-panel-pad-x, 2rem);
 }
@@ -1600,24 +1877,6 @@ const checkday = (e) => {
 .sls0402-search-layout > .sls0402-row {
   grid-column: 1;
   min-width: 0;
-}
-
-/* 조회·요일 묶음 — 2열 그리드로 콘텐츠 폭 공유, 공휴일 끝 = 셀병합 끝 */
-.sls0402-cond-stack {
-  grid-column: 1;
-  grid-row: 3 / span 2;
-  display: grid;
-  grid-template-columns: var(--sls0402-label-col, 5.5rem) max-content;
-  column-gap: 0.5rem;
-  row-gap: var(--sls0402-row-gap, 0.75rem);
-  align-items: center;
-  width: max-content;
-  max-width: 100%;
-  min-width: 0;
-}
-
-.sls0402-cond-stack > .sls0402-row {
-  display: contents;
 }
 
 .sls0402-row {
@@ -1732,7 +1991,8 @@ const checkday = (e) => {
 
 .sls0402-menu-fields {
   display: flex;
-  flex-wrap: wrap;
+  /* 줄바꿈하면 행 높이가 2배가 되므로 한 줄 유지, 콤보 폭만 줄어듦 */
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.5rem;
   min-width: 0;
@@ -1756,13 +2016,42 @@ const checkday = (e) => {
   max-width: 14.3rem;
 }
 
+/* 3행: 조회조건 — 전체 폭 */
+.sls0402-search-layout > .sls0402-row--cond {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  /* 위: 검색 조건(기간·메뉴·매장) / 아래: 보기 옵션 — 얇은 구분선 */
+  border-top: 1px solid #cfd6df;
+  padding-top: 0.5rem;
+}
+
+/* 4행 왼쪽: 펼침 단계 */
+.sls0402-search-layout > .sls0402-row--level {
+  grid-column: 1;
+  grid-row: 4;
+}
+
+/* 4행 오른쪽: 요일조건·공휴일 — 매장명 블록과 같은 시작선·폭 */
+.sls0402-right-cond {
+  grid-column: 2;
+  grid-row: 4;
+  justify-self: end;
+  width: 90.25%;
+  max-width: 90.25%;
+  min-width: 0;
+}
+
+.sls0402-right-cond .sls0402-checks--days {
+  flex: 1 1 auto;
+  width: auto;
+}
+
 .sls0402-holiday {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   margin-left: auto;
-  padding-left: 2.5rem;
-  min-height: 2rem;
+  padding-left: 1.5rem;
   flex-shrink: 0;
 }
 
@@ -1772,6 +2061,69 @@ const checkday = (e) => {
   line-height: 1.25;
   color: rgb(17 24 39);
   white-space: nowrap;
+}
+
+/* 펼침 단계 버튼 (선택 = 주황), 버튼 사이 › = 단계가 깊어지는 방향 */
+.sls0402-level-btns {
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  min-height: 2rem;
+}
+
+.sls0402-level-sep {
+  font-size: 1.125rem;
+  line-height: 1;
+  color: #94a3b8;
+  user-select: none;
+}
+
+.sls0402-level-btn {
+  box-sizing: border-box;
+  height: 2rem;
+  padding: 0 0.8rem;
+  font-size: 0.875rem;
+  line-height: 1;
+  color: #334155;
+  background: #fff;
+  border: 1px solid var(--sls0402-control-border, #cbd5e1);
+  border-radius: 0.375rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 버튼 색 = 그 단계 합계 행 색 (그리드 .sls0402-gf-* 와 동일) */
+.sls0402-level-btn--strSub:not(:disabled) {
+  background: #e0ecfb;
+  color: #1e3a8a;
+}
+.sls0402-level-btn--strMajor:not(:disabled) {
+  background: #dcf2e3;
+  color: #14532d;
+}
+.sls0402-level-btn--strStore:not(:disabled) {
+  background: #ebe5f8;
+  color: #3b0764;
+}
+.sls0402-level-btn--dtmDate:not(:disabled) {
+  background: #eef0f3;
+  color: #1f2937;
+}
+
+.sls0402-level-btn:hover:not(:disabled) {
+  border-color: #f97316;
+}
+
+/* 선택 = 주황 테두리(배경은 단계 색 유지) */
+.sls0402-level-btn.is-active:not(:disabled) {
+  border: 2px solid #f97316;
+  padding: 0 calc(0.8rem - 1px);
+  font-weight: 700;
+}
+
+.sls0402-level-btn:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+  cursor: not-allowed;
 }
 
 .sls0402-sg-select {
@@ -1941,8 +2293,7 @@ const checkday = (e) => {
     row-gap: var(--sls0402-row-gap, 0.75rem);
   }
 
-  .sls0402-search-layout > .sls0402-row,
-  .sls0402-cond-stack {
+  .sls0402-search-layout > .sls0402-row {
     grid-column: 1;
     grid-row: auto;
     width: 100%;
@@ -1952,6 +2303,20 @@ const checkday = (e) => {
   .sls0402-checks--single {
     width: auto;
     max-width: 100%;
+  }
+
+  /* 좁은 화면: 조회·요일 체크가 패널 밖으로 잘리지 않게 줄바꿈 */
+  .sls0402-checks--single,
+  .sls0402-checks--days {
+    flex-wrap: wrap;
+  }
+
+  .sls0402-right-cond {
+    grid-column: 1;
+    grid-row: auto;
+    width: 100%;
+    max-width: 100%;
+    justify-self: stretch;
   }
 
   .sls0402-right-store {
@@ -1970,6 +2335,34 @@ const checkday = (e) => {
 </style>
 
 <style>
+/* SLS04_002RPT 소계 행 (단계: 0=가장 안쪽 그룹, 숫자가 클수록 바깥 그룹) */
+.sls0402-gf {
+  font-weight: 700;
+  color: #1f2937;
+  border-top: 1px solid #94a3b8 !important;
+}
+/* 서브그룹 합계 — 연한 파랑 */
+.sls0402-gf-strSub {
+  background: #e0ecfb;
+  color: #1e3a8a;
+}
+/* 대그룹 합계 — 연한 초록 */
+.sls0402-gf-strMajor {
+  background: #dcf2e3;
+  color: #14532d;
+}
+/* 매장 합계 — 연한 보라 */
+.sls0402-gf-strStore {
+  background: #ebe5f8;
+  color: #3b0764;
+}
+/* 일자 합계 — 연한 회색 */
+.sls0402-gf-dtmDate,
+.sls0402-gf-etc {
+  background: #eef0f3;
+  color: #1f2937;
+}
+
 @media print {
   body * {
     visibility: hidden; /* 모든 요소 숨기기 */

@@ -205,6 +205,7 @@
             :progname="'MST44_052INS_VUE'"
             :progid="2"
             :rowData="MenuList"
+            :rowStateeditable="false"
             @selcetedrowData="selcetedrowData"
             :searchColId="'menuCd,menuNm'"
             :searchColId3="['majorGroupCd', 'subGroupCd']"
@@ -677,10 +678,11 @@ const handleStoreCd = async (newValue) => {
 
 
   //comsole.log(MenuList.value);
+  // 그리드 버튼 글자 — 오른쪽에서 고른 메뉴키 칸에 메뉴를 놓는 동작이라 "배치"
   MenuList.value = MenuList.value.map((item) => {
     return {
       ...item,
-      add: "추가",
+      add: "배치",
     };
   });
   const res5 = await getTLUList(groupCd.value, nowStoreCd.value);
@@ -688,7 +690,7 @@ const handleStoreCd = async (newValue) => {
   TLUList.value = TLUList.value.map((item) => {
     return {
       ...item,
-      add: "추가",
+      add: "배치",
     };
   });
 };
@@ -1287,7 +1289,14 @@ const clickedTLUNM = ref();
  */
 
 const selcetedrowData = (e) => {
-  if (clickedRealIndex.value == null) {
+  // 오른쪽 메뉴키에서 놓을 칸을 고르지 않았으면 (화면키를 마지막으로 누른 경우 포함) 안내만 하고 멈춤
+  if (clickedRealIndex.value == null || clickedScreenOrMenu.value !== true) {
+    Swal.fire({
+      title: "배치할 칸을 선택하세요",
+      html: "오른쪽 메뉴키에서 메뉴를 놓을 칸을 먼저 선택한 뒤<br>[배치] 버튼을 눌러 주세요.",
+      icon: "info",
+      confirmButtonText: "확인",
+    });
     return;
   }
   //comsole.log(e);

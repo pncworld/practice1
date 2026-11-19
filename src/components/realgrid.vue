@@ -7744,6 +7744,21 @@ watch(
     }
   }
 );
+/**
+ * 엑셀 파일명: "{메뉴명}_{YYYYMMDD_HHmmss}.xlsx" — 다시 받아도 이름이 겹치지 않게 내려받은 일시를 붙인다
+ *  - 메뉴명 끝의 마침표·공백 제거, 파일명에 쓸 수 없는 문자(\ / : * ? " < > |)는 _ 로 바꿈
+ */
+const rgExcelFileName = (name) => {
+  const base =
+    String(name || "export")
+      .replace(/[\\/:*?"<>|]/g, "_")
+      .replace(/[.\s]+$/, "")
+      .trim() || "export";
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, "0");
+  const stamp = `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+  return `${base}_${stamp}.xlsx`;
+};
 watch(
   () => props.exporttoExcel,
   (newVal) => {
@@ -7799,7 +7814,7 @@ watch(
         height: 80,
         styleName: "documentSubtitleStyle",
       },
-      fileName: excelNm + ".xlsx",
+      fileName: rgExcelFileName(excelNm),
       showProgress: props.exportShowProgress,
       progressMessage: "엑셀 Export중입니다.",
       indicator: true,
