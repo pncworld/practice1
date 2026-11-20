@@ -740,12 +740,12 @@ body.no-scroll {overflow:hidden;}
     .sidemenu .menu-header .toggle-ui::after {display: none;}
     .sidemenu .menu-header .toggle-wrap input:checked + .toggle-ui {background: var(--theme-from);}
     .sidemenu .menu-header .toggle-wrap input:checked + .toggle-ui::before {left: 16px;}
-    /* 메뉴 그룹: 폴더 아이콘 유지, 그룹 제목은 메뉴(14px)보다 크게 15px 굵게, 그룹 사이 옅은 선 */
+    /* 메뉴 그룹: 폴더 아이콘 유지, 그룹 제목은 14px 중간 굵기(600), 메뉴(14px 보통)보다 진하게, 그룹 사이 옅은 선 */
     .sidemenu .menu-group {padding-left: 12px !important; padding-right: 12px !important; padding-top: 6px !important;}
     .sidemenu .menu-section + .menu-section {border-top: 1px solid #f1f5f9;}
     .sidemenu .menu-section-head {padding: 13px 8px;}
     .sidemenu .menu-section-head:hover {opacity: 1; background: #f8fafc; border-radius: 6px;}
-    .sidemenu .menu-section .menu-section-title {gap: 8px; font-size: 15px; font-weight: 700; color: #334155; opacity: 1;}
+    .sidemenu .menu-section .menu-section-title {gap: 8px; font-size: 14px; font-weight: 600; color: #334155; opacity: 1;}
     .sidemenu .menu-section.open .menu-section-title {color: #111827;}
     /* 메뉴 항목 */
     .sidemenu .menu-list {padding-bottom: 8px;}
@@ -754,6 +754,67 @@ body.no-scroll {overflow:hidden;}
     .sidemenu .menu-list li a:hover {background: #f8fafc; color: #111827;}
     .sidemenu .menu-list li .menu-list-title {flex: 1; min-width: 0; justify-content: flex-start;}
     /* 선택된 메뉴: 연한 테마색 바탕 + 테마색 글자 + 왼쪽 짧은 막대 */
+    .sidemenu .menu-list li.active a, .sidemenu .menu-list li.active a:hover {background: color-mix(in srgb, var(--theme-from) 10%, #fff); color: var(--theme-from); font-weight: 700; box-shadow: none;}
+    .sidemenu .menu-list li.active a::before {content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 18px; margin-top: -9px; border-radius: 2px; background: var(--theme-from);}
+    .sidemenu .menu-list li.active a .ico-arrow {opacity: 0;}
+}
+
+
+/* ================================
+    좁은 화면 (1024px 이하) 정리 (2026-11-20)
+    - PC 디자인과 맞춤: 얇은 색 띠, 흰 본문 카드, 계정·검색·메뉴 모양
+    - 왼쪽 메뉴 접기/펴기 동작(.sidemenu.collapse = 펼침)은 그대로 둔다
+================================ */
+@media (max-width: 1024px) {
+    /* 색 띠는 메뉴 줄(60px)까지만, 본문 카드는 그 아래 12px 띄워 네 모서리 둥글게 (탭 줄이 없으므로) */
+    .po-layout .po-gradient {height: 60px;}
+    .po-layout .w-right > .po-router-view {margin-top: 12px; border-radius: 16px;}
+    /* 접힌 왼쪽 메뉴(50px)인데 본문이 250px 위치에서 시작하던 문제: 1440px 이하 규칙의 250px 고정을 풀어 준다 */
+    .po-layout .po-content > .w-left {max-width: none; flex-basis: auto;}
+    .po-layout .po-content > .w-left.sidemenu {width: 50px;}
+    .po-layout .po-content > .w-left.sidemenu.collapse {width: 240px;}
+    .po-layout .sidemenu {background: #fafbfc; border-right: 1px solid #e5eaf1;}
+    .po-layout .sidemenu.collapse {background: #fff; box-shadow: 4px 0 16px rgba(15, 23, 42, 0.08);}
+    /* 펼치기 버튼: 밝은 바탕용으로 회색 테두리 + 진한 아이콘 */
+    .po-layout .user-info {padding: 10px 6px 8px;}
+    .po-layout .user-info .btn-sidemenu-toggle {border-color: #cbd5e1; background: #fff;}
+    .po-layout .user-info .btn-sidemenu-toggle span {filter: brightness(0) opacity(0.6);}
+    /* 펼쳤을 때 계정: PC처럼 한 줄 (사람 아이콘 + 매장명·매장코드) */
+    .po-layout .sidemenu.collapse .user-info .inner.user-area-oval {flex-flow: row !important; align-items: center !important; gap: 10px !important; padding: 0 8px !important; height: 52px; border: 0 !important; background: transparent; color: #111827;}
+    .po-layout .sidemenu.collapse .user-area-oval .user-icon {display: flex; width: 34px; height: 34px; background: var(--gradient-primary);}
+    .po-layout .sidemenu.collapse .user-store.user-store--only {display: flex; flex-direction: column; text-align: left; line-height: 1.35;}
+    .po-layout .sidemenu.collapse .user-store-name {font-size: 14px; font-weight: 800; color: #111827; overflow: hidden; text-overflow: ellipsis;}
+    .po-layout .sidemenu.collapse .user-store-code {font-size: 12px; color: #64748b;}
+    .po-layout .sidemenu.collapse .user-store-code::before {content: "매장코드\00a0";}
+    .po-layout .sidemenu.collapse .user-store-paren {display: none;}
+    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-close {background: #fff !important; border-color: #cbd5e1 !important;}
+    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-close .ico {filter: brightness(0) opacity(0.6);}
+    /* 펼쳤을 때는 닫기(X) 버튼 하나만: 접기 버튼까지 두 개가 나란히 있어 매장명이 잘리던 것 정리 */
+    .po-layout .sidemenu.collapse .user-info .btn-sidemenu-toggle {display: none !important;}
+    /* 검색창 */
+    .sidemenu .search-box {padding: 4px 12px 0;}
+    .sidemenu .search-input {height: 40px; padding: 0 36px 0 38px; background: #fff; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 14px; color: #111827;}
+    .sidemenu .search-input::placeholder {color: #94a3b8;}
+    .sidemenu .search-btn {top: 4px; left: 12px; right: auto; width: 38px; height: 40px; opacity: 1; filter: brightness(0.55); background-size: 18px 18px; pointer-events: none;}
+    .sidemenu .search-clear-btn {top: 4px; right: 16px; height: 40px;}
+    /* 메뉴명 */
+    .sidemenu .menu-header {margin: 14px 12px 0; padding: 14px 8px 6px; border-top: 1px solid #eef2f7;}
+    .sidemenu .menu-header .menu-title-main {justify-content: flex-start; gap: 8px; font-size: 18px; font-weight: 800; letter-spacing: -0.4px; color: #111827;}
+    .sidemenu .menu-header .menu-title-main::before {content: ''; width: 4px; height: 18px; border-radius: 2px; background: var(--gradient-primary); flex-shrink: 0;}
+    .sidemenu .menu-top > div.active::after {background: var(--theme-from);}
+    /* 전체 열기: 메뉴명 줄 오른쪽 작은 스위치 (PC와 같음) */
+    .sidemenu .menu-header {display: flex; align-items: center; justify-content: space-between;}
+    .sidemenu .menu-header .menu-toggle {margin: 0; padding: 0; flex-shrink: 0;}
+    .sidemenu .menu-header .menu-toggle-control {padding: 0; border: 0; background: transparent; gap: 6px;}
+    .sidemenu .menu-header .menu-toggle .label {font-size: 12px; font-weight: 500; color: #64748b;}
+    .sidemenu .menu-header .toggle-wrap {width: 34px; height: 20px;}
+    .sidemenu .menu-header .toggle-ui::before {width: 16px; height: 16px; left: 2px;}
+    .sidemenu .menu-header .toggle-ui::after {display: none;}
+    .sidemenu .menu-header .toggle-wrap input:checked + .toggle-ui {background: var(--theme-from);}
+    .sidemenu .menu-header .toggle-wrap input:checked + .toggle-ui::before {left: 16px;}
+    /* 메뉴 그룹·항목·선택 메뉴 */
+    .sidemenu .menu-section .menu-section-title {gap: 8px; font-size: 14px; font-weight: 600; color: #334155; opacity: 1;}
+    .sidemenu .menu-list li a {position: relative; padding: 11px 8px 11px 16px; border-radius: 8px; color: #334155;}
     .sidemenu .menu-list li.active a, .sidemenu .menu-list li.active a:hover {background: color-mix(in srgb, var(--theme-from) 10%, #fff); color: var(--theme-from); font-weight: 700; box-shadow: none;}
     .sidemenu .menu-list li.active a::before {content: ""; position: absolute; left: 0; top: 50%; width: 3px; height: 18px; margin-top: -9px; border-radius: 2px; background: var(--theme-from);}
     .sidemenu .menu-list li.active a .ico-arrow {opacity: 0;}
