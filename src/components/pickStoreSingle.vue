@@ -362,14 +362,23 @@ defineExpose({ setStoreCode });
   align-items: center;
   column-gap: 0.5rem;
   row-gap: 0.375rem;
-  grid-template-columns: auto var(--pss-grp-col) minmax(5.5rem, 12rem) minmax(0, 1fr);
+  /*
+   * 매장명(마지막 열)이 가장 먼저 찌그러지지 않게: 매장명은 최소 min(14rem, 40%) 확보,
+   * 대신 그룹 콤보(항상 비활성)가 6rem까지 먼저 줄어든다. 넓은 화면에서는 기존과 같은 폭.
+   * (원복: auto var(--pss-grp-col) minmax(5.5rem, 12rem) minmax(0, 1fr) + .pss-col-grp min-width var(--pss-grp-col))
+   */
+  grid-template-columns:
+    auto
+    minmax(6rem, var(--pss-grp-col))
+    minmax(5.5rem, 12rem)
+    minmax(min(14rem, 40%), 1fr);
   grid-template-rows: auto auto;
 }
 
 .pss-col-grp {
-  width: var(--pss-grp-col);
-  min-width: var(--pss-grp-col);
-  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--pss-grp-col);
   box-sizing: border-box;
 }
 

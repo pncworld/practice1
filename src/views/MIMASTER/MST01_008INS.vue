@@ -825,6 +825,12 @@ const commitAlls = () => {
   border-radius: 0.375rem !important;
 }
 
+/* 매장명 콤보가 글자 폭만큼만 잡혀 이름이 잘리던 것: 최소 폭 확보 (2026-11-20) */
+.mst0108-pick-slot :deep(select) {
+  min-width: 14rem;
+  padding: 0 0.5rem;
+}
+
 .mst0108-section-head {
   display: flex;
   align-items: center;

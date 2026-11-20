@@ -109,7 +109,7 @@
       <div class="pd20 pl0 pt0 w-right">
         <!-- Tabs -->
         <div class="flex-between po-tabs">
-          <div class="flex po-tabs-inner" ref="scrollContainer">
+          <div class="flex po-tabs-inner" ref="scrollContainer" @wheel="onTabsWheel">
             <div
               v-for="tab in tabs"
               :key="tab.lngProgramID"
@@ -123,20 +123,20 @@
           </div>
 
           <div class="tab-actions">
-            <button class="btn-action prev" type="button" title="이전 탭" aria-label="이전 탭" @click="moveleft">
+            <button class="btn-action prev" type="button" aria-label="이전 탭" @click="moveleft">
               <i class="ico ico-prev"></i>
             </button>
-            <button class="btn-action next" type="button" title="다음 탭" aria-label="다음 탭" @click="moveright">
+            <button class="btn-action next" type="button" aria-label="다음 탭" @click="moveright">
               <i class="ico ico-next"></i>
             </button>
-            <button class="btn-action close" type="button" title="탭 모두 닫기" aria-label="탭 모두 닫기" @click="deleteAllTabs">
+            <button class="btn-action close" type="button" aria-label="탭 모두 닫기" @click="deleteAllTabs">
               <i class="ico ico-close"></i>
             </button>
-            <button class="btn-action refresh" type="button" title="현재 화면 새로고침" aria-label="현재 화면 새로고침" @click="reLoadToolbar">
+            <button class="btn-action refresh" type="button" aria-label="현재 화면 새로고침" @click="reLoadToolbar">
               <i class="ico ico-refresh"></i>
             </button>
             <div class="btn-menu-group">
-              <button class="btn-action menu" type="button" title="열린 탭 목록" aria-label="열린 탭 목록" @click.stop="showMenus">
+              <button class="btn-action menu" type="button" aria-label="열린 탭 목록" @click.stop="showMenus">
                 <i class="ico ico-menu"></i>
               </button>
               <div class="tab-menu-popup" :class="{ open: showmenus }">
@@ -151,8 +151,12 @@
                 </ul>
               </div>
             </div>
-            <button class="btn-action expand" type="button" title="화면 크게 보기 (왼쪽 메뉴 숨김)" aria-label="화면 크게 보기" @click="hideMenu">
+            <button class="btn-action expand" type="button" aria-label="화면 크게 보기" @click="hideMenu">
               <i class="ico ico-expand"></i>
+            </button>
+            <!-- 로그아웃: PC(1025px 이상)에서는 상단 메뉴 줄 대신 여기 (상단 메뉴를 넓게 쓰기 위해, 2026-11-20) -->
+            <button class="btn-action tab-logout" type="button" aria-label="로그아웃" @click="logout">
+              <img src="@/assets/images/logout.svg" alt="" class="tab-logout-ico" />
             </button>
           </div>
         </div>
@@ -208,6 +212,15 @@ const moveright = () => {
 const moveMaxright = () => {
   if (!scrollContainer.value) return;
   scrollContainer.value.scrollLeft = scrollContainer.value.scrollWidth + 2000;
+};
+/* 탭 줄: 스크롤 막대 대신 마우스 휠(세로 휠 → 가로 이동)로 넘김 */
+const onTabsWheel = (e) => {
+  const el = scrollContainer.value;
+  if (!el || el.scrollWidth <= el.clientWidth) return;
+  const d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  if (!d) return;
+  e.preventDefault();
+  el.scrollLeft += d;
 };
 const moveleft = () => {
   if (!scrollContainer.value) return;

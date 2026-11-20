@@ -257,9 +257,12 @@ function balanceSls011SearchGaps() {
   if (contentRight <= 0) return;
 
   const empty = storeCell.getBoundingClientRect().right - contentRight;
-  if (empty <= 0) return;
-
-  grid.style.setProperty("--sls011-mid-shift", `${Math.round(empty / 2)}px`);
+  /* 빈 공간이 없으면 0으로 되돌린다. (전에는 넓을 때 계산한 이동값이 남아,
+     창이 좁아지면 가운데 칸이 오른쪽 POS번호 칸을 덮었다) */
+  grid.style.setProperty(
+    "--sls011-mid-shift",
+    `${Math.max(0, Math.round(empty / 2))}px`
+  );
 }
 
 function scheduleBalanceSls011SearchGaps() {
@@ -844,6 +847,38 @@ const lngStoreAttrs = (e) => {
 
 .sls011-vselect-slot :deep(.custom-select .vs__selected) {
   font-size: 0.875rem !important;
+}
+
+/* 매장명 콤보 최소 폭: 어떤 폭에서도 다른 콤보보다 먼저 줄어들지 않게 (2026-11-20) */
+.sls011-pick-slot :deep(> div.flex > div:last-child) {
+  min-width: 10rem;
+}
+
+/* 1760px 이하: 3칸으로는 가운데 매장 칸이 좁아 매장명 콤보가 줄거나 겹치므로 2칸 배치로 바꾼다 (3칸에 필요한 최소 폭 기준)
+   (매출일자|매장 / POS번호|영수증번호 / 할인코드|지불코드). 매장명 콤보는 남는 폭을 모두 쓴다 */
+@media (max-width: 1760px) {
+  /* 2칸일 때 매장명 콤보가 지나치게 길어지지 않게 */
+  .sls011-pick-slot :deep(> div.flex > div:last-child) {
+    max-width: 18rem !important;
+  }
+  .sls011-search-panel {
+    --sls011-store-name-scale: 1 !important;
+    --sls011-col-gap: 1.5rem !important;
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+  .sls011-search-grid {
+    grid-template-columns: max-content minmax(0, 1fr);
+  }
+  .sls011-cell--mid {
+    transform: none;
+  }
+  .sls011-cell:nth-child(n) {
+    justify-self: start;
+  }
+  .sls011-cell--fill {
+    justify-self: stretch;
+  }
 }
 
 @media (max-width: 960px) {

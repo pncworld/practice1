@@ -1860,6 +1860,7 @@ const checkday = (e) => {
   padding-top: 0.625rem;
   padding-bottom: 0.625rem;
   border: 1px solid #d5dbe3;
+  container: sls0402-search / inline-size;
   padding-left: var(--sls0402-panel-pad-x, 2rem);
   padding-right: var(--sls0402-panel-pad-x, 2rem);
 }
@@ -2293,7 +2294,8 @@ const checkday = (e) => {
   max-width: min(42rem, 92vw);
 }
 
-@media (max-width: 1280px) {
+/* 화면 폭이 아니라 조회 AREA 폭 기준: 왼쪽 메뉴 펼침·접힘과 관계없이 매장 콤보가 잘리기 전에 1열로 바꾼다 */
+@container sls0402-search (max-width: 1240px) {
   .sls0402-search-layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: none;
