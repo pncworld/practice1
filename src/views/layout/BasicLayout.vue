@@ -109,7 +109,13 @@
       <div class="pd20 pl0 pt0 w-right">
         <!-- Tabs -->
         <div class="flex-between po-tabs">
-          <div class="flex po-tabs-inner" ref="scrollContainer" @wheel="onTabsWheel">
+          <div
+            class="flex po-tabs-inner"
+            :class="{ 'fade-left': tabsCanLeft, 'fade-right': tabsCanRight }"
+            ref="scrollContainer"
+            @wheel="onTabsWheel"
+            @scroll.passive="updateTabsOverflow"
+            @mouseenter="onTabsMouseEnter">
             <div
               v-for="tab in tabs"
               :key="tab.lngProgramID"
@@ -122,11 +128,15 @@
             </div>
           </div>
 
+          <div v-if="tabsHintShow" class="po-tabs-hint" role="status" @click="tabsHintShow = false">
+            탭이 많으면 탭 줄에서 마우스 휠을 굴리거나 &lt; &gt; 버튼으로 넘길 수 있습니다
+          </div>
+
           <div class="tab-actions">
-            <button class="btn-action prev" type="button" aria-label="이전 탭" @click="moveleft">
+            <button class="btn-action prev" :class="{ 'is-off': !tabsCanLeft }" type="button" aria-label="이전 탭" @click="moveleft">
               <i class="ico ico-prev"></i>
             </button>
-            <button class="btn-action next" type="button" aria-label="다음 탭" @click="moveright">
+            <button class="btn-action next" :class="{ 'is-off': !tabsCanRight }" type="button" aria-label="다음 탭" @click="moveright">
               <i class="ico ico-next"></i>
             </button>
             <button class="btn-action close" type="button" aria-label="탭 모두 닫기" @click="deleteAllTabs">
@@ -188,7 +198,7 @@ import router from "@/router";
 
 import Swal from "sweetalert2";
 import { v4 } from "uuid";
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useRoute } from "vue-router";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
@@ -226,6 +236,66 @@ const moveleft = () => {
   if (!scrollContainer.value) return;
   scrollContainer.value.scrollLeft -= 200;
 };
+
+/* 탭 줄 넘침 표시: 가려진 쪽 끝 흐림 + < > 활성/비활성 + 처음 한 번 안내 */
+const tabsCanLeft = ref(false);
+const tabsCanRight = ref(false);
+const tabsHintShow = ref(false);
+const TABS_HINT_KEY = "pncTabsScrollHintSeen";
+let tabsHintTimer = null;
+const showTabsHintOnce = () => {
+  let seen = false;
+  try {
+    seen = localStorage.getItem(TABS_HINT_KEY) === "1";
+  } catch (e) {
+    seen = false;
+  }
+  if (seen || tabsHintShow.value) return;
+  tabsHintShow.value = true;
+  try {
+    localStorage.setItem(TABS_HINT_KEY, "1");
+  } catch (e) {
+    /* 저장 불가 브라우저: 이번 접속에서만 한 번 */
+  }
+  clearTimeout(tabsHintTimer);
+  tabsHintTimer = setTimeout(() => {
+    tabsHintShow.value = false;
+  }, 5000);
+};
+/* 탭이 넘친 상태에서 탭 줄에 마우스를 올리면 잠시 안내 (같은 안내가 연달아 뜨지 않게 20초 간격) */
+let tabsHintHoverAt = 0;
+const onTabsMouseEnter = () => {
+  updateTabsOverflow();
+  if (!tabsCanLeft.value && !tabsCanRight.value) return;
+  const now = Date.now();
+  if (tabsHintShow.value || now - tabsHintHoverAt < 20000) return;
+  tabsHintHoverAt = now;
+  tabsHintShow.value = true;
+  clearTimeout(tabsHintTimer);
+  tabsHintTimer = setTimeout(() => {
+    tabsHintShow.value = false;
+  }, 2500);
+};
+const updateTabsOverflow = () => {
+  const el = scrollContainer.value;
+  if (!el) return;
+  const max = el.scrollWidth - el.clientWidth;
+  tabsCanLeft.value = max > 1 && el.scrollLeft > 1;
+  tabsCanRight.value = max > 1 && el.scrollLeft < max - 1;
+  if (max > 1) showTabsHintOnce();
+};
+let tabsResizeObserver = null;
+onMounted(() => {
+  nextTick(updateTabsOverflow);
+  if (typeof ResizeObserver !== "undefined" && scrollContainer.value) {
+    tabsResizeObserver = new ResizeObserver(() => updateTabsOverflow());
+    tabsResizeObserver.observe(scrollContainer.value);
+  }
+});
+onBeforeUnmount(() => {
+  if (tabsResizeObserver) tabsResizeObserver.disconnect();
+  clearTimeout(tabsHintTimer);
+});
 /**
  * 	화면 Load시 실행 스크립트
  */
@@ -413,6 +483,10 @@ watch(
 );
 
 const tabs = ref([]);
+watch(
+  () => tabs.value.length,
+  () => nextTick(updateTabsOverflow)
+);
 const emittab = async (e) => {
   tabs.value = e;
   await nextTick();

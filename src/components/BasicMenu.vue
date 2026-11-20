@@ -146,7 +146,7 @@
 
     <!-- 상단 페이지 타이틀 -->
     <div class="menu-header">
-      <div class="f30 fw700 fc-000 flex-center menu-title-main">
+      <div class="f30 fw700 fc-000 flex-center menu-title-main" :data-cat="menuIconKey(cMenu)">
         {{ cMenu }}
       </div>
       <!-- 전체 열기: 메뉴명 줄 오른쪽 (2026-11-20 왼쪽 정리안, 원래는 메뉴/즐겨찾기 탭 아래 별도 줄) -->
@@ -960,6 +960,25 @@ watch(
   }
 );
 const currentTab = ref();
+/* 왼쪽 메뉴 제목 앞 업무별 아이콘 키 (이름 기준, 모르는 업무는 기본 네 칸 아이콘) */
+const MENU_ICON_RULES = [
+  ["sales", /매출/],
+  ["money", /입출금|자금|정산/],
+  ["customer", /고객|CRM/i],
+  ["master", /마스터|기준/],
+  ["system", /시스템/],
+  ["stock", /자재|재고/],
+  ["purchase", /구매|발주/],
+  ["attend", /근태/],
+  ["hr", /인사/],
+  ["account", /회계/],
+  ["notice", /공지/],
+];
+const menuIconKey = (name) => {
+  const n = String(name || "");
+  const hit = MENU_ICON_RULES.find(([, re]) => re.test(n));
+  return hit ? hit[0] : "default";
+};
 const selectCategory = (strUrl, lngProgramID2, strTitle) => {
   //comsole.log(strUrl, lngProgramID2, strTitle);
   if (tabs.value.length >= 10) {
