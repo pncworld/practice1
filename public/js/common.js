@@ -39,9 +39,12 @@ $(function(){
 
 
     /* ===========================================
-        LNB 메뉴 클릭 시 탭 자동 생성
+        LNB 메뉴 클릭 시 탭 자동 생성 — 사용 안 함 (2026-11-20)
+        퍼블리싱 시안용 흉내 코드. 실제 탭은 Vue(BasicMenu.selectCategory)가 만든다.
+        이 코드가 살아 있으면 메뉴 글자(신규 'N' 포함)로 가짜 탭이 하나 더 붙는다.
     =========================================== */
-    $(document).on('click', '.menu-list li a', function(e){
+    const ENABLE_MOCK_TAB_CREATE = false;
+    if (ENABLE_MOCK_TAB_CREATE) $(document).on('click', '.menu-list li a', function(e){
         if ($(e.target).hasClass('btn-star')) return;
 
         const title = $(this).text().trim(); 
