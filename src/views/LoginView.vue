@@ -27,6 +27,8 @@
                   <input
                     type="text"
                     id="username"
+                    name="username"
+                    autocomplete="username"
                     class="input"
                     v-model="username"
                     placeholder="아이디를 입력해주세요."
@@ -36,6 +38,8 @@
                     <input
                       :type="passwordVisible ? 'text' : 'password'"
                       id="password"
+                      name="password"
+                      autocomplete="current-password"
                       class="input js-password"
                       v-model="password"
                       placeholder="비밀번호를 입력해주세요."
@@ -255,6 +259,13 @@ const login2 = async () => {
  */
 
 onMounted(async () => {
+  /* 저장 아이디는 토큰 확인(서버 호출) 전에 채운다.
+     응답 뒤에 채우면 그 사이 입력·브라우저 자동 입력한 아이디를 덮어써서
+     다른 아이디 + 입력한 비밀번호로 로그인돼 첫 시도가 실패한다 */
+  const savedId = localStorage.getItem("saveId") || "";
+  if (!username.value) username.value = savedId;
+  checkid.value = savedId !== "";
+
   store.state.loading = true;
   const persistedUser = store.state.userData;
   try {
@@ -333,16 +344,6 @@ onMounted(async () => {
   }
 
   store.state.inActiveBackGround = false;
-  //comsole.log(localStorage.getItem("saveID"));
-  if (localStorage.getItem("saveId") == "") {
-    //comsole.log(localStorage.getItem("username"));
-    username.value = "";
-    checkid.value = false;
-  } else {
-    username.value = localStorage.getItem("saveId");
-    //console.log(username.value);
-    checkid.value = true;
-  }
   store.state.loading2 = false;
   if (isIdleLogoutLanding()) {
     message.value = IDLE_LOGOUT_MESSAGE;
