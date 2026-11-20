@@ -123,20 +123,20 @@
           </div>
 
           <div class="tab-actions">
-            <button class="btn-action prev" @click="moveleft">
+            <button class="btn-action prev" type="button" title="이전 탭" aria-label="이전 탭" @click="moveleft">
               <i class="ico ico-prev"></i>
             </button>
-            <button class="btn-action next" @click="moveright">
+            <button class="btn-action next" type="button" title="다음 탭" aria-label="다음 탭" @click="moveright">
               <i class="ico ico-next"></i>
             </button>
-            <button class="btn-action close" @click="deleteAllTabs">
+            <button class="btn-action close" type="button" title="탭 모두 닫기" aria-label="탭 모두 닫기" @click="deleteAllTabs">
               <i class="ico ico-close"></i>
             </button>
-            <button class="btn-action refresh" @click="reLoadToolbar">
+            <button class="btn-action refresh" type="button" title="현재 화면 새로고침" aria-label="현재 화면 새로고침" @click="reLoadToolbar">
               <i class="ico ico-refresh"></i>
             </button>
             <div class="btn-menu-group">
-              <button class="btn-action menu" @click.stop="showMenus">
+              <button class="btn-action menu" type="button" title="열린 탭 목록" aria-label="열린 탭 목록" @click.stop="showMenus">
                 <i class="ico ico-menu"></i>
               </button>
               <div class="tab-menu-popup" :class="{ open: showmenus }">
@@ -151,7 +151,7 @@
                 </ul>
               </div>
             </div>
-            <button class="btn-action expand" @click="hideMenu">
+            <button class="btn-action expand" type="button" title="화면 크게 보기 (왼쪽 메뉴 숨김)" aria-label="화면 크게 보기" @click="hideMenu">
               <i class="ico ico-expand"></i>
             </button>
           </div>
@@ -240,6 +240,7 @@ const applySessionTopGradient = () => {
   const root = document.documentElement;
   if (!u || typeof u !== "object" || Array.isArray(u)) {
     root.style.removeProperty("--gradient-primary");
+    root.style.removeProperty("--theme-from");
     return;
   }
   const from = String(u.strTopFColor ?? u.strBackColor ?? "").trim();
@@ -249,8 +250,11 @@ const applySessionTopGradient = () => {
       "--gradient-primary",
       `linear-gradient(90deg, ${from} 0%, ${to} 100%)`
     );
+    /* 테마 단색(그라데이션 시작색): 탭처럼 단색이 필요한 곳에서 씀 */
+    root.style.setProperty("--theme-from", from);
   } else {
     root.style.removeProperty("--gradient-primary");
+    root.style.removeProperty("--theme-from");
   }
 };
 

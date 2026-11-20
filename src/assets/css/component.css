@@ -45,6 +45,7 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
     /*-------------- mstMiSkinV2 테이블에서  수정 --------------*/
     /* BRAND GRADIENT (HEADER / TAB BG) */
     --gradient-primary: linear-gradient(90deg, #318cec 0%, #41b6e7 100%);
+    --theme-from: #318cec; /* 테마 단색 기본값 (BasicLayout 이 브랜드 시작색으로 덮어씀) */
     /* gradient-primary: linear-gradient(90deg, #CF130C 0%, #DF5E54 100%); */
     /* BRAND BACKGROUND */
     --brand-bg: #f5f8fc;
@@ -272,6 +273,10 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
 /* 프로그램명 (디자인 시안 기준): 진한 검정, 자간 좁게. 크기는 .f24 반응형 그대로 */
 .page-title {color:#111827; letter-spacing:-0.6px; gap:6px;}
 .page-title .btn-star {width:20px; height:20px;}
+.page-title.f24 {font-size:22px; font-weight:800; line-height:28px;}
+/* 프로그램명 위 메뉴 경로 (대분류 › 중분류) */
+.page-path {display:flex; align-items:center; gap:4px; font-size:13px; font-weight:500; line-height:18px; color:#475569; letter-spacing:-0.2px; white-space:nowrap;}
+.page-path .page-path-sep {width:12px; height:12px; color:#94a3b8; flex-shrink:0;}
 
 
 /* =========================================

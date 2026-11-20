@@ -27,7 +27,9 @@
               :class="{ 'is-overflow': userStoreOverflow }"
               @mouseenter="onUserStoreEnter"
               @mouseleave="onUserStoreLeave">
-              {{ storeDisplayText }}
+              <!-- PC(1025px 이상)에서는 layout.css 가 매장명/코드를 두 줄로 나눠 보여 준다 -->
+              <span class="user-store-name">{{ storeName }}</span>
+              <span class="user-store-code"> <span class="user-store-paren">(</span>{{ lStoreCd }}<span class="user-store-paren">)</span></span>
             </span>
             <span
               v-show="userStoreTooltipVisible"
@@ -36,6 +38,9 @@
               {{ storeDisplayText }}
             </span>
           </span>
+          <svg class="user-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
         </div>
 
         <!-- 드롭다운 메뉴 -->
@@ -144,6 +149,16 @@
       <div class="f30 fw700 fc-000 flex-center menu-title-main">
         {{ cMenu }}
       </div>
+      <!-- 전체 열기: 메뉴명 줄 오른쪽 (2026-11-20 왼쪽 정리안, 원래는 메뉴/즐겨찾기 탭 아래 별도 줄) -->
+      <div class="pd20 flex menu-toggle">
+        <label class="menu-toggle-control" title="전체 열기 ON/OFF">
+          <span class="f14 fw500 label toggle-text">전체 열기</span>
+          <span class="toggle-wrap">
+            <input type="checkbox" id="toggleAll" aria-label="전체 열기">
+            <span class="toggle-ui"></span>
+          </span>
+        </label>
+      </div>
     </div>
 
     <!-- 메뉴 / 즐겨찾기 탭 (UI는 jQuery가 active 제어) -->
@@ -156,17 +171,6 @@
         <span class="ico-star-off"></span>
         <span class="label">즐겨찾기</span>
       </div>
-    </div>
-
-    <!-- 전체 열기: 라벨+스위치 왼쪽 한 세트 (원본은 label/wrap 분리 + menu-toggle justify end) -->
-    <div class="pd20 flex menu-toggle">
-      <label class="menu-toggle-control" title="전체 열기 ON/OFF">
-        <span class="f14 fw500 label toggle-text">전체 열기</span>
-        <span class="toggle-wrap">
-          <input type="checkbox" id="toggleAll" aria-label="전체 열기">
-          <span class="toggle-ui"></span>
-        </span>
-      </label>
     </div>
 
     <!-- 메뉴 그룹 -->
@@ -437,7 +441,6 @@ const userStoreOverflow = ref(false);
 const storeDisplayText = computed(
   () => `${storeName.value} (${lStoreCd.value})`
 );
-
 const isTextTruncated = (el) => {
   if (!el) return false;
   return el.scrollWidth > el.clientWidth + 1;
