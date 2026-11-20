@@ -269,6 +269,9 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
 ========================================= */
 .btn-star {width:18px; height: 18px; border:0; background:url('../images/ic_star_off.svg') no-repeat center / cover; cursor:pointer; opacity: 0.3;}
 .btn-star.active {background:url('../images/ic_star_on.svg') no-repeat center / cover; opacity: 1;}
+/* 프로그램명 (디자인 시안 기준): 진한 검정, 자간 좁게. 크기는 .f24 반응형 그대로 */
+.page-title {color:#111827; letter-spacing:-0.6px; gap:6px;}
+.page-title .btn-star {width:20px; height:20px;}
 
 
 /* =========================================

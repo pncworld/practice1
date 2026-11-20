@@ -12,6 +12,8 @@ body {overflow: hidden;}
 .po-layout .w-right {width: calc(100% - 300px); display: flex; flex-direction: column; min-height: 0;}
 .po-layout .w-right > .po-tabs {flex-shrink: 0;}
 .po-layout .w-right > .po-router-view {display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto;}
+/* 본문 흰 카드 (디자인 시안 기준): 탭 아래부터 흰 바탕. 제목·버튼 줄이 파란 배경 위에 놓이지 않게 한다 */
+.po-layout .w-right > .po-router-view {background: #fff; border-radius: 0 16px 16px 16px; padding: 8px 16px 10px; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);}
 /* 루트가 하나인 페이지만 높이 채움. 다중 루트(레거시)에 height:100% 주면 조회바·그리드가 각각 늘어나 레이아웃 깨짐 */
 .po-layout .w-right > .po-router-view > *:only-child {flex: 1 1 auto; min-height: 0; min-width: 0; height: 100%;}
 

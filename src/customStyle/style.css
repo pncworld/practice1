@@ -673,3 +673,49 @@ html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pr
 .vs__dropdown-menu::-webkit-scrollbar-thumb:hover {
   background: #4b5563 !important;
 }
+
+/* ================================
+    상단 버튼 (디자인 시안 기준, 2026-11-20)
+    진한 파랑 알약 모양 + 흰 아이콘 16px. 위쪽 .button.* 규칙을 덮어쓴다
+================================ */
+.button {
+  height: 34px;
+  padding: 0 16px;
+  gap: 6px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  box-shadow: 0 2px 4px rgba(11, 92, 173, 0.18);
+  transition: background-color 0.15s, box-shadow 0.15s, transform 0.05s;
+}
+.button.new, .button.save, .button.leave, .button.print, .button.chart,
+.button.delete, .button.copy, .button.edit, .button.primary, .button.search,
+.button.received, .button.sms, .button.excel {
+  background-color: #0b5cad;
+  color: #fff;
+  border-radius: 999px;
+}
+.button.new:before, .button.save:before, .button.leave:before, .button.print:before,
+.button.chart:before, .button.delete:before, .button.copy:before, .button.edit:before,
+.button.search:before, .button.received:before, .button.sms:before, .button.excel:before {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  background-size: contain;
+  background-position: center;
+  background-color: transparent;
+}
+.button:hover:not(:disabled) {
+  background-color: #084a8f;
+  box-shadow: 0 4px 10px rgba(11, 92, 173, 0.3);
+}
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.button:disabled {
+  background-color: #cbd5e1;
+  box-shadow: none;
+  cursor: not-allowed;
+}
