@@ -47,7 +47,8 @@
       :progid="1"
       :poskiosk="'getStoreAndPosList4'"
       :naming="'테이블POS번호'"
-      :blnBrandAdmin="isBrandAdmin">
+      :blnBrandAdmin="isBrandAdmin"
+      :newDesign="true">
     </DupliPopUp>
   </div>
   <!-- 화면키 수정 팝업 -->
@@ -1937,8 +1938,8 @@ const searchinit = (newvalue) => {
   grid-template-columns: minmax(320px, 1fr) minmax(0, 870px);
   grid-template-rows: minmax(0, 1fr);
   column-gap: 1.5rem;
-  /* 높이 = 오른쪽 키 영역 높이(왼쪽 그리드가 채워 아래 끝선 맞춤), 화면이 낮으면 안에서 스크롤 */
-  flex: 0 1 auto;
+  /* 높이 = 화면 아래 끝까지(왼쪽 그리드·오른쪽 메뉴키가 남는 높이를 채움), 화면이 낮으면 안에서 스크롤 */
+  flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
   margin-top: 0.75rem;
@@ -1995,6 +1996,8 @@ const searchinit = (newvalue) => {
   min-height: 200px;
 }
 .mst573-right-scroll {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
@@ -2006,12 +2009,20 @@ const searchinit = (newvalue) => {
   --mst573-key-w: 208px;
   --mst573-key-gap: 0.5rem;
   --mst573-keys-w: calc(var(--mst573-key-w) * 4 + var(--mst573-key-gap) * 3);
+  /* 키 높이 — 메뉴키 4줄이 화면 아래 끝까지 남는 높이를 나눠 가짐 (최소 64px ~ 최대 120px, MST44_052INS 와 동일).
+     화면키는 화면 높이에 맞춰 44~60px. 화면이 아주 낮으면 최소 높이에서 멈추고 안에서 스크롤 */
+  --mst573-screen-row: clamp(44px, calc((100vh - 475px) / 8.4), 60px);
+  --mst573-menu-row-min: 64px;
+  --mst573-menu-row-max: 120px;
 }
 .mst573-right > .mst573-panel-head {
   width: 100%;
   max-width: var(--mst573-keys-w);
 }
 .mst573-key-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
   width: max-content;
 }
 .mst573-hidden {
@@ -2021,7 +2032,7 @@ const searchinit = (newvalue) => {
 .mst573-screen-keys {
   display: grid;
   grid-template-columns: repeat(4, var(--mst573-key-w));
-  grid-template-rows: repeat(2, 60px);
+  grid-template-rows: repeat(2, var(--mst573-screen-row));
   gap: var(--mst573-key-gap);
   width: var(--mst573-keys-w);
 }
@@ -2151,6 +2162,9 @@ const searchinit = (newvalue) => {
 }
 /* 메뉴키 */
 .mst573-menu-keys-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
   margin-top: 0.625rem;
 }
 .mst573-open-screen {
@@ -2187,8 +2201,11 @@ const searchinit = (newvalue) => {
 .mst573-menu-keys {
   display: grid;
   grid-template-columns: repeat(4, var(--mst573-key-w));
-  /* 1080 높이 화면에서 4줄이 한 화면에 들어가도록 96px (이미지 64px + 이름) */
-  grid-template-rows: repeat(4, 96px);
+  /* 4줄이 남는 높이를 똑같이 나눔 — 최대 높이를 넘으면 그 아래는 여백 */
+  flex: 1 0 0;
+  min-height: calc(var(--mst573-menu-row-min) * 4 + var(--mst573-key-gap) * 3);
+  grid-template-rows: repeat(4, minmax(var(--mst573-menu-row-min), 1fr));
+  max-height: calc(var(--mst573-menu-row-max) * 4 + var(--mst573-key-gap) * 3);
   gap: var(--mst573-key-gap);
   width: var(--mst573-keys-w);
 }
@@ -2203,9 +2220,16 @@ const searchinit = (newvalue) => {
   font-size: 0.8125rem;
   cursor: pointer;
 }
+/* 이미지는 키 높이에서 이름 자리(약 2rem)를 뺀 만큼, 가로:세로 = 3:2 */
+.mst573-menu-key > span {
+  height: 100%;
+}
 .mst573-menu-key > span > span:first-child.h-20 {
-  height: 64px;
-  width: 96px;
+  height: calc(100% - 2.25rem);
+  min-height: 32px;
+  max-height: 84px;
+  width: auto;
+  aspect-ratio: 3 / 2;
   margin-top: 0.25rem;
 }
 .mst573-menu-key > span > span:last-child {

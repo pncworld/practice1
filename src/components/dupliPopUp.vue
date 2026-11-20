@@ -1,6 +1,7 @@
 <template>
+  <!-- 기존 모양 (newDesign 미지정 화면은 모두 이 모양 그대로) -->
   <div
-    v-if="isVisible"
+    v-if="isVisible && !newDesign"
     class="fixed flex top-0 left-0 w-full h-full bg-black bg-opacity-50 z-50 justify-center items-center">
     <div class="bg-white w-[30%] h-[80%] shadow-lg rounded-lg flex flex-col">
       <header class="popup-header flex justify-between pl-12 pt-5">
@@ -82,6 +83,67 @@
       </footer>
     </div>
   </div>
+  <!-- 새 모양 (newDesign 을 켠 화면만) — 기능·함수는 위와 같은 것을 그대로 사용 -->
+  <Teleport to="body">
+    <div v-if="isVisible && newDesign" class="dp-mask">
+      <div class="dp-pop" role="dialog" aria-modal="true">
+        <div class="dp-head">
+          <h2 class="dp-title">{{ naming2 }} 복사</h2>
+          <p class="dp-desc">기준 매장의 내용을 아래에서 체크한 매장에 복사합니다.</p>
+        </div>
+        <div class="dp-body">
+          <div class="dp-section-title">기준 매장</div>
+          <div class="dp-fields">
+            <span class="dp-label">기준매장</span>
+            <input
+              type="text"
+              class="dp-input"
+              :value="'[' + storeCd + ']' + storeNm"
+              disabled />
+            <span class="dp-label">{{ naming }}</span>
+            <input type="text" class="dp-input" :value="posNo" disabled />
+          </div>
+          <div class="dp-arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </div>
+          <div class="dp-section-title">대상 매장 선택</div>
+          <div class="dp-search">
+            <span class="dp-label">매장코드/명</span>
+            <input
+              type="text"
+              class="dp-input"
+              placeholder="입력 후 [조회]"
+              @input="handleKeyup"
+              @keyup.enter="showStoreList" />
+            <button type="button" class="pnc-sub-btn" @click="showStoreList">
+              <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2" /><path d="M16 16l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+              조회
+            </button>
+          </div>
+          <div class="dp-grid">
+            <realgrid
+              :progname="progname"
+              :progid="progid"
+              :rowData="rowData"
+              :showGrid="showGrid"
+              :showCheckBar="true"
+              @checkedRowData="selcetedrowData"></realgrid>
+          </div>
+        </div>
+        <div class="dp-foot">
+          <span class="dp-hint">대상 매장을 체크한 뒤 [복사]를 누르세요.</span>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--rose" @click="dupliStore">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.9" /><path d="M5 15V6a1 1 0 0 1 1-1h9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" /></svg>
+            복사
+          </button>
+          <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="close">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <script setup>
@@ -106,6 +168,7 @@ const {
   naming2,
   summary,
   blnBrandAdmin,
+  newDesign,
 } = defineProps({
   isVisible: { type: Boolean, default: false }, // 팝업 가시성 관리
   storeCd: { type: String, default: "" },
@@ -124,6 +187,8 @@ const {
       "선택하신 POS의 메뉴배치정보 및 화면정보가 모두 삭제 후 복사됩니다. 계속 진행하시겠습니까?",
   },
   blnBrandAdmin: { type: Boolean, default: false }, // 브랜드 관리자 여부 (조회 파라미터)
+  // 새 팝업 모양 사용 여부 (기본 false = 기존 모양). 켜는 화면: 메뉴키 설정 kiosk·테이블포스·(#)
+  newDesign: { type: Boolean, default: false },
 });
 const store = useStore(); // vuex store
 const userData = store.state.userData;
@@ -309,5 +374,125 @@ const dupliStore = async () => {
 }
 .popup-footer {
   text-align: right;
+}
+
+/* ===== 새 모양 (newDesign) — body 로 Teleport, 덮개 z-index 10050 ===== */
+.dp-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+.dp-pop {
+  display: flex;
+  flex-direction: column;
+  width: 36rem;
+  max-width: 100%;
+  height: min(46rem, calc(100vh - 2rem));
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+.dp-head {
+  padding: 1.125rem 1.5rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+.dp-head::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.125rem;
+  margin-right: 0.5rem;
+  border-radius: 2px;
+  background: #2563eb;
+  vertical-align: -2px;
+}
+.dp-title {
+  display: inline;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.dp-desc {
+  margin-top: 0.375rem;
+  font-size: 0.8125rem;
+  color: #64748b;
+}
+.dp-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+}
+.dp-section-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #334155;
+}
+.dp-fields,
+.dp-search {
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.375rem 0.75rem;
+}
+.dp-search {
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+}
+.dp-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+.dp-input {
+  height: 2rem;
+  padding: 0 0.625rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+  font-size: 0.875rem;
+}
+.dp-input:disabled {
+  background: #f1f5f9;
+  color: #334155;
+}
+.dp-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.dp-arrow {
+  display: flex;
+  justify-content: center;
+  color: #94a3b8;
+}
+.dp-arrow svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.dp-grid {
+  flex: 1 1 auto;
+  min-height: 200px;
+}
+.dp-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+.dp-hint {
+  margin-right: auto;
+  font-size: 0.8125rem;
+  color: #64748b;
 }
 </style>

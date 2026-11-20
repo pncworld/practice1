@@ -47,7 +47,8 @@
       :progname="'MST44_054INS_VUE'"
       :dupliapiname="'DUPLIPAYKEY'"
       :progid="2"
-      :naming="'POS번호'">
+      :naming="'POS번호'"
+      :newDesign="true">
     </DupliPopUp3>
   </div>
 
@@ -382,7 +383,7 @@
           </template>
           <template v-else>위에서 화면키를 선택하면 결제키가 표시됩니다.</template>
         </div>
-        <div>
+        <div class="mst54-menu-keys-box">
           <VueDraggableNext
             v-model="items"
             :move="onMove"
@@ -1882,11 +1883,11 @@ const searchinit = (newvalue) => {
   /* 우측은 키 영역 폭(약 790px)만큼, 좌측은 남는 폭(최소 320px). 더 좁으면 우측만 가로 스크롤 */
   grid-template-columns: minmax(320px, 1fr) minmax(0, 800px);
   column-gap: 1.5rem;
-  /* 높이 = 오른쪽 키 영역 높이(왼쪽 그리드가 채워 아래 끝선이 결제키 끝과 같아짐).
+  /* 높이 = 화면 아래 끝까지(왼쪽 그리드·오른쪽 결제키가 남는 높이를 채워 아래 끝선이 같아짐).
      화면이 낮으면 화면 안으로 줄어들고 키 영역만 안에서 스크롤 */
   --mst54-notes-h: 2.5rem;
   grid-template-rows: minmax(0, 1fr);
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
   margin-top: 0.75rem;
@@ -1933,6 +1934,8 @@ const searchinit = (newvalue) => {
   white-space: nowrap;
 }
 .mst54-right-scroll {
+  display: flex;
+  flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
@@ -1947,19 +1950,27 @@ const searchinit = (newvalue) => {
   --mst54-menu-key-gap: 0.375rem;
   --mst54-screen-key-gap: 0.5rem;
   --mst54-keys-w: calc(var(--mst54-menu-key-w) * 5 + var(--mst54-menu-key-gap) * 4);
+  /* 키 높이 — 결제키 6줄이 화면 아래 끝까지 남는 높이를 나눠 가짐 (최소 44px ~ 최대 84px, MST44_052INS 와 같은 방식).
+     화면키는 화면 높이에 맞춰 48~80px. 화면이 아주 낮으면 최소 높이에서 멈추고 안에서 스크롤 */
+  --mst54-screen-key-h: clamp(48px, calc((100vh - 470px) / 6.25), 80px);
+  --mst54-menu-key-min: 44px;
+  --mst54-menu-key-max: 84px;
 }
 .mst54-right > .mst54-panel-head {
   width: 100%;
   max-width: var(--mst54-keys-w);
 }
 .mst54-key-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
   width: max-content;
 }
 .mst54-screen-row {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  min-height: 80px;
+  min-height: var(--mst54-screen-key-h);
 }
 /* 조회 전: 안 보이고 클릭도 안 되지만 자리는 차지 */
 .mst54-hidden {
@@ -1997,7 +2008,7 @@ const searchinit = (newvalue) => {
 .mst54-screen-key {
   flex: 0 0 auto;
   width: calc((var(--mst54-keys-w) - var(--mst54-screen-key-gap) * 3) / 4);
-  height: 80px;
+  height: var(--mst54-screen-key-h);
 }
 /* 선택 셀 색 — 상단(현재 화면, 남색 계열) / 하단(선택 키, 주황 계열)을 서로 다른 색으로
    진한 단색 대신 옅은 바탕 + 2px 테두리 + 진한 글자 */
@@ -2133,12 +2144,25 @@ const searchinit = (newvalue) => {
   color: #3730a3;
 }
 .mst54-menu-keys-wrap {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
   margin-top: 0.875rem;
+}
+/* 결제키 묶음을 감싸는 상자 — 남는 높이를 아래 결제키 줄에 넘겨 줌 */
+.mst54-menu-keys-box {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
 }
 .mst54-menu-keys {
   display: grid;
   grid-template-columns: repeat(5, var(--mst54-menu-key-w));
-  grid-template-rows: repeat(6, 70px);
+  /* 6줄이 남는 높이를 똑같이 나눔 — 최대 높이를 넘으면 그 아래는 여백 */
+  flex: 1 0 0;
+  min-height: calc(var(--mst54-menu-key-min) * 6 + var(--mst54-menu-key-gap) * 5);
+  grid-template-rows: repeat(6, minmax(var(--mst54-menu-key-min), 1fr));
+  max-height: calc(var(--mst54-menu-key-max) * 6 + var(--mst54-menu-key-gap) * 5);
   gap: var(--mst54-menu-key-gap);
   width: max-content;
 }
