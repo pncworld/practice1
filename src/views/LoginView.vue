@@ -148,12 +148,15 @@ store.dispatch("convertLoading", false);
 const login2 = async () => {
   store.dispatch("convertLoading", true);
   store.state.selectedCategoryId = null;
+  /* 아이디·비밀번호 확인이 끝났는지. 끝난 뒤(로그 저장·메뉴 조회) 오류는 비밀번호 오류로 안내하지 않는다 */
+  let loginPassed = false;
   try {
     const response = await login(username.value, password.value);
 
-    const loginStatus = response.data.loginSession[0].strUserID;
+    const loginStatus = response.data.loginSession?.[0]?.strUserID;
 
     if (loginStatus != undefined) {
+      loginPassed = true;
       const sessionUser = mergeThemeLogoFromPersistedSession(
         response.data.loginSession[0],
         store.state.userData
@@ -162,12 +165,17 @@ const login2 = async () => {
       store.dispatch("setToken", response.data.loginSession[0].SessionToken);
       //comsole.log(response.data.loginSession[0]);
       //console.trace();
-      const res = await insertLoginLog(
-        username.value,
-        password.value,
-        response.data.loginSession[0].lngStoreGroup,
-        response.data.loginSession[0].lngPosition
-      );
+      /* 접속 로그(외부 IP 조회 포함) 저장 실패로 로그인이 막히지 않게 한다 */
+      try {
+        await insertLoginLog(
+          username.value,
+          password.value,
+          response.data.loginSession[0].lngStoreGroup,
+          response.data.loginSession[0].lngPosition
+        );
+      } catch (logError) {
+        console.warn("로그인 로그 저장 실패", logError);
+      }
 
       message.value = "로그인 성공";
 
@@ -247,8 +255,10 @@ const login2 = async () => {
       throw new Error("로그인 실패");
     }
   } catch (error) {
-    console.log(error);
-    message.value = "아이디 / 패스워드를 확인 해 주십시오.";
+    console.error("로그인 처리 오류", error);
+    message.value = loginPassed
+      ? "로그인 처리 중 오류가 발생했습니다. 다시 시도해 주십시오."
+      : "아이디 / 패스워드를 확인 해 주십시오.";
   } finally {
     store.dispatch("convertLoading", false);
   }
