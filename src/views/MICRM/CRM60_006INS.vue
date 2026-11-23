@@ -329,18 +329,18 @@
             <span class="crm6006-req" aria-hidden="true">*</span>거래처 그룹
           </div>
           <div class="crm6006-form-value">
-            <select
-              v-model="prsntGroupCd"
-              class="crm6006-control"
-              @change="onPrsntGroupChange">
-              <option value="0">선택</option>
-              <option
-                v-for="i in prsntGroupList"
-                :key="'pg-' + i.lngCode"
-                :value="i.lngCode">
-                {{ i.strName }}
-              </option>
-            </select>
+            <!-- 거래처 그룹: 입력해서 찾기(초성 포함). 값·변경 처리는 기존 prsntGroupCd / onPrsntGroupChange 그대로 -->
+            <v-select
+              v-model="prsntGroupPick"
+              :options="prsntGroupList"
+              label="strName"
+              :reduce="(g) => g.lngCode"
+              :filter-by="filterPrsntGroup"
+              placeholder="선택 (입력해서 찾기)"
+              append-to-body
+              class="crm6006-vs w-full min-w-0">
+              <template #no-options>일치하는 거래처 그룹이 없습니다</template>
+            </v-select>
           </div>
 
           <div class="crm6006-form-label crm6006-form-label--required">
@@ -405,6 +405,7 @@ import PageName from "@/components/pageName.vue";
 import PickStore from "@/components/pickStore.vue";
 import Realgrid from "@/components/realgrid.vue";
 import { insertPageLog } from "@/customFunc/customFunc";
+import { matchNameWithChoseong } from "@/utils/choseongFilter";
 import Swal from "sweetalert2";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { useStore } from "vuex";
@@ -762,6 +763,17 @@ const prsntGroupSelected = computed(() => {
   const v = prsntGroupCd.value;
   return !(v == null || v === "" || v === 0 || v === "0");
 });
+
+/** 거래처 그룹 검색 콤보용: "0"(선택 안 함)은 빈 값으로 보여 주고, 고르거나 지우면 기존 변경 처리 실행 */
+const prsntGroupPick = computed({
+  get: () => (prsntGroupSelected.value ? prsntGroupCd.value : null),
+  set: (v) => {
+    prsntGroupCd.value = v == null || v === "" ? "0" : v;
+    onPrsntGroupChange();
+  },
+});
+const filterPrsntGroup = (option, label, search) =>
+  matchNameWithChoseong(label, search);
 
 const resetPrsntForm = () => {
   prsntGroupCd.value = "0";
@@ -1496,6 +1508,55 @@ const excelList = (e) => {
   border-color: #3b82f6;
   outline: none;
   box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+
+/* 거래처 그룹 검색 콤보(v-select) — 옆 칸 select 와 같은 높이·테두리·글자 */
+.crm6006-vs {
+  height: var(--crm6006-form-control-h);
+  font-size: var(--crm6006-form-font);
+}
+.crm6006-vs :deep(.vs__dropdown-toggle) {
+  box-sizing: border-box;
+  height: var(--crm6006-form-control-h);
+  min-height: var(--crm6006-form-control-h);
+  padding: 0 0.25rem 0 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  background: #fff;
+}
+.crm6006-vs.vs--open :deep(.vs__dropdown-toggle),
+.crm6006-vs :deep(.vs__dropdown-toggle:focus-within) {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgb(59 130 246 / 0.25);
+}
+.crm6006-vs :deep(.vs__selected-options) {
+  flex-wrap: nowrap;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.crm6006-vs :deep(.vs__selected),
+.crm6006-vs :deep(.vs__search),
+.crm6006-vs :deep(.vs__search::placeholder) {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-size: var(--crm6006-form-font);
+  line-height: 1.25;
+  color: #1e293b;
+  white-space: nowrap;
+}
+.crm6006-vs :deep(.vs__search::placeholder) {
+  color: #94a3b8;
+}
+.crm6006-vs :deep(.vs__actions) {
+  padding: 0 0.25rem;
+}
+.crm6006-vs :deep(.vs__open-indicator) {
+  transform: scale(0.75);
+}
+.crm6006-vs.vs--open :deep(.vs__open-indicator) {
+  transform: scale(0.75) rotate(180deg);
 }
 
 .crm6006-control:disabled {
