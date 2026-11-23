@@ -730,9 +730,8 @@ body.no-scroll {overflow:hidden;}
     .po-layout .user-info-tooltip-host--store {padding-right: 0;}
     .po-layout .user-store.user-store--only {display: flex; flex-direction: column; text-align: left; line-height: 1.35; white-space: nowrap;}
     .po-layout .user-store-name {font-size: 15px; font-weight: 800; letter-spacing: -0.3px; color: #111827; overflow: hidden; text-overflow: ellipsis;}
-    .po-layout .user-store-code {font-size: 12px; font-weight: 400; color: #64748b;}
-    .po-layout .user-store-code::before {content: "매장코드\00a0";}
-    .po-layout .user-store-paren {display: none;}
+    .po-layout .user-store-greet {font-size: 12px; font-weight: 400; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+    .po-layout .user-store-greet strong {font-weight: 600; color: #334155;}
     .po-layout .user-chevron {display: block; width: 18px; height: 18px; flex-shrink: 0; color: #475569;}
     /* 검색창: 위 구분선 + 흰 칸 회색 테두리, 돋보기는 칸 안 왼쪽에 진하게 */
     .sidemenu .search-box {margin: 6px 12px 0; padding: 12px 0 0; border-top: 1px solid #eef2f7;}
@@ -806,9 +805,8 @@ body.no-scroll {overflow:hidden;}
     .po-layout .sidemenu.collapse .user-area-oval .user-icon {display: flex; width: 34px; height: 34px; background: var(--gradient-primary);}
     .po-layout .sidemenu.collapse .user-store.user-store--only {display: flex; flex-direction: column; text-align: left; line-height: 1.35;}
     .po-layout .sidemenu.collapse .user-store-name {font-size: 14px; font-weight: 800; color: #111827; overflow: hidden; text-overflow: ellipsis;}
-    .po-layout .sidemenu.collapse .user-store-code {font-size: 12px; color: #64748b;}
-    .po-layout .sidemenu.collapse .user-store-code::before {content: "매장코드\00a0";}
-    .po-layout .sidemenu.collapse .user-store-paren {display: none;}
+    .po-layout .sidemenu.collapse .user-store-greet {font-size: 12px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+    .po-layout .sidemenu.collapse .user-store-greet strong {font-weight: 600; color: #334155;}
     .po-layout .sidemenu.collapse .user-info .btn-sidemenu-close {background: #fff !important; border-color: #cbd5e1 !important;}
     .po-layout .sidemenu.collapse .user-info .btn-sidemenu-close .ico {filter: brightness(0) opacity(0.6);}
     /* 펼쳤을 때는 닫기(X) 버튼 하나만: 접기 버튼까지 두 개가 나란히 있어 매장명이 잘리던 것 정리 */

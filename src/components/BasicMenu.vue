@@ -27,9 +27,9 @@
               :class="{ 'is-overflow': userStoreOverflow }"
               @mouseenter="onUserStoreEnter"
               @mouseleave="onUserStoreLeave">
-              <!-- PC(1025px 이상)에서는 layout.css 가 매장명/코드를 두 줄로 나눠 보여 준다 -->
+              <!-- 매장명 아래 줄: 로그인 계정 환영 문구 (매장코드는 드롭다운 첫 줄로 이동, 2026-11-23) -->
               <span class="user-store-name">{{ storeName }}</span>
-              <span class="user-store-code"> <span class="user-store-paren">(</span>{{ lStoreCd }}<span class="user-store-paren">)</span></span>
+              <span class="user-store-greet"><strong>{{ loginName }}</strong>님 반갑습니다</span>
             </span>
             <span
               v-show="userStoreTooltipVisible"
@@ -50,13 +50,13 @@
           @click.stop
           @mouseenter="onUserMenuHostEnter"
           @mouseleave="onUserMenuHostLeave">
-          <!-- 환영 헤더 -->
+          <!-- 첫 줄: 매장코드 (환영 문구는 왼쪽 위 매장명 아래로 이동, 2026-11-23) -->
           <div class="user-account-dropdown__greeting">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:15px;height:15px;flex-shrink:0;color:#6b7280;">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                d="M3 9.5 4.5 4h15L21 9.5M3 9.5h18M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 12.5V20h14v-7.5M10 20v-4h4v4" />
             </svg>
-            <span><strong>{{ loginName }}</strong>님 반갑습니다.</span>
+            <span>매장코드 <strong>{{ lStoreCd }}</strong></span>
           </div>
           <div class="user-account-dropdown__divider"></div>
         <button type="button" class="user-account-dropdown__item" @click="openNoticeList">
