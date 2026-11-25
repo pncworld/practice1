@@ -1299,6 +1299,32 @@
     </div>
   </Teleport>
   <!-- 조회조건  END-->
+  <!-- PnC# AI 도우미에서 넘겨받은 메뉴 (2026-11-25): 조회 뒤 [AI로 이어서 등록]을 누르면 이 화면 AI 가 메뉴코드부터 이어서 진행 -->
+  <div
+    v-if="aiHandoff"
+    class="mx-4 mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md border border-lime-300 bg-lime-50 px-3 py-2 text-sm lg:mx-6">
+    <div class="min-w-0 font-semibold text-lime-800">
+      PnC# AI 도우미에서 넘겨받은 메뉴: {{ aiHandoff.NAME }} · {{ formatAiPrice(aiHandoff.PRICE) }}원 ·
+      {{ aiHandoff.MAIN_NM }} &gt; {{ aiHandoff.SUB_NM }} · {{ aiHandoff.TAX === "2" ? "면세" : "과세" }}
+      <span class="font-normal text-lime-700">
+        ({{ aiHandoffGuide }})
+      </span>
+    </div>
+    <div class="flex gap-2">
+      <button type="button" class="pnc-sub-btn" @click="continueAiHandoff">
+        <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        AI로 이어서 등록
+      </button>
+      <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" @click="clearAiHandoff">
+        <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        닫기
+      </button>
+    </div>
+  </div>
   <!-- 그리드영역 -->
   <div
     class="grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-4 px-4 pb-2 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-6 lg:px-6">
@@ -2660,7 +2686,8 @@ import { v4 as uuidv4 } from "uuid";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onActivated, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { AI_MENU_HANDOFF_KEY } from "@/components/salesAi/useSalesAi";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -7082,6 +7109,64 @@ const aiStoreGuardFails = () => {
   aiChatOpen.value = false;
   return true;
 };
+
+// ===== PnC# AI 도우미에서 넘겨받은 메뉴 (2026-11-25) =====
+// 통합 AI 가 메뉴명·판매가·분류·과세구분을 순서대로 받아 sessionStorage 에 넘긴다.
+// 이 화면에서 매장을 고르고 조회한 뒤 [AI로 이어서 등록]을 누르면, 받은 값을 한 문장으로 이 화면 AI 에 보내
+// 기존 등록 흐름(메뉴코드 → 주방출력·할인 → 이미지 → … → 저장)을 그대로 이어 간다. 기존 동작은 바꾸지 않는다
+const AI_HANDOFF_MAX_AGE_MS = 30 * 60 * 1000;
+const aiHandoff = ref(null);
+const readAiHandoff = () => {
+  try {
+    const raw = sessionStorage.getItem(AI_MENU_HANDOFF_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (!d || !d.NAME || !d.SUB_CD || Date.now() - Number(d.at || 0) > AI_HANDOFF_MAX_AGE_MS) {
+      sessionStorage.removeItem(AI_MENU_HANDOFF_KEY);
+      return;
+    }
+    aiHandoff.value = d;
+  } catch (e) {
+    aiHandoff.value = null;
+  }
+};
+const clearAiHandoff = () => {
+  aiHandoff.value = null;
+  try {
+    sessionStorage.removeItem(AI_MENU_HANDOFF_KEY);
+  } catch (e) {
+    // 저장소를 못 쓰면 화면 표시만 지운다
+  }
+};
+const aiHandoffGuide = computed(() => {
+  const d = aiHandoff.value;
+  if (!d) return "";
+  if (String(d.STORE_CD) !== "0") return `매장 '${d.STORE_NM}'을(를) 선택하고 조회한 뒤 눌러 주세요`;
+  return "조회한 뒤 눌러 주세요";
+});
+const continueAiHandoff = async () => {
+  const d = aiHandoff.value;
+  if (!d) return;
+  if (String(d.STORE_CD) !== "0" && String(nowStoreCd.value) !== String(d.STORE_CD)) {
+    Swal.fire({ title: "안내", text: `매장 '${d.STORE_NM}'을(를) 선택하고 조회해 주세요.`, icon: "warning", confirmButtonText: "확인" });
+    return;
+  }
+  if (!afterSearch.value) {
+    Swal.fire({ title: "안내", text: "조회를 먼저 진행해주세요.", icon: "warning", confirmButtonText: "확인" });
+    return;
+  }
+  // 작성 중인 AI 대화가 있으면 새로 시작한다 (넘겨받은 메뉴로 처음부터)
+  resetAiChat();
+  openAiChat();
+  if (!aiChatOpen.value) return;
+  await nextTick();
+  const tax = d.TAX === "2" ? "면세" : "과세";
+  aiChatText.value = `${d.NAME} ${d.PRICE}원, 대분류 ${d.MAIN_NM}, 소분류 ${d.SUB_NM}, ${tax} 메뉴 등록해줘`;
+  clearAiHandoff();
+  await sendAiChat();
+};
+onMounted(readAiHandoff);
+onActivated(readAiHandoff);
 
 const openAiChat = () => {
   if (aiDisabledGroup.value) return;

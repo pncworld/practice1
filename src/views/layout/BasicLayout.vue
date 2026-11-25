@@ -133,6 +133,16 @@
           </div>
 
           <div class="tab-actions">
+            <!-- AI 매출 도우미: 대시보드가 아닌 화면에서 언제든 연다. 탭 줄 맨 앞 (2026-11-25) -->
+            <button
+              v-if="salesAiRef && salesAiRef.enabled && !isDashboardRoute"
+              class="btn-action tab-sales-ai"
+              type="button"
+              aria-label="PnC# AI 도우미"
+              @click="salesAiRef.togglePanel()"
+            >
+              <span class="tab-sales-ai-ico" aria-hidden="true">AI</span>
+            </button>
             <button class="btn-action prev" :class="{ 'is-off': !tabsCanLeft }" type="button" aria-label="이전 탭" @click="moveleft">
               <i class="ico ico-prev"></i>
             </button>
@@ -185,11 +195,15 @@
         </div>
       </div>
     </div>
+    <!-- AI 매출 도우미 (전체 화면에 하나, keep-alive 밖이라 화면을 옮겨도 대화가 이어진다) -->
+    <DashboardSalesAi ref="salesAiRef" :show-fab="isDashboardRoute && isSalesAnalysisHome" />
   </div>
 </template>
 
 <script setup>
 import BasicMenu from "@/components/BasicMenu.vue";
+import DashboardSalesAi from "@/components/DashboardSalesAi.vue";
+import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
 import Loading from "@/components/loading.vue";
 import router from "@/router";
 /**
@@ -305,6 +319,14 @@ const closeOtherTab = () => {
 };
 const route = useRoute();
 const store = useStore();
+
+/** AI 매출 도우미 (DashboardSalesAi)
+ *  - 기본 대시보드: 화면 왼쪽에 AI 창이 붙어 있어 버튼 없음
+ *  - 1871 매출분석 대시보드: 오른쪽 아래 둥근 버튼
+ *  - 그 밖의 화면: 탭 줄 아이콘 */
+const salesAiRef = ref(null);
+const isDashboardRoute = computed(() => route.name === "homePage" || route.path === "/homePage");
+const isSalesAnalysisHome = computed(() => matchesSalesAnalysisHomeTempBypass(store.state.userData));
 /** 홈 대시보드로 이동 시 Vuex·insertPageLog 등이 기대하는 최소 탭 형태 (strUrl 없으면 strUrl.split 오류) */
 const ROUTE_HOME_TAB = Object.freeze({
   strUrl: "HOME::MainDashBoard_VUE.xml",
@@ -633,6 +655,26 @@ watch(
 </script>
 
 <style scoped>
+/* 탭 줄 AI 매출 도우미 아이콘 — 'AI' 글자 아이콘. 옆 아이콘과 같은 18px 상자, 흰 테두리·흰 글자. 이전 탭 버튼과 간격 */
+.tab-sales-ai {
+  color: #ffffff;
+  margin-right: 6px;
+}
+.tab-sales-ai-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.2px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .layout {
   display: flex;
   height: 100vh;

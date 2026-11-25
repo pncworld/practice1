@@ -17,10 +17,14 @@
 
       <div v-else class="pd24 pt0 mt30 grid-area" data-fixed>
         <!-- grid-area: 남은 화면 높이 전체 채움 / grid-fixed: 콘텐츠 높이만큼만 출력 -->
-        <div class="dashboard-content">
-          <section class="dashboard-top">
+        <!-- 2026-11-25 배치: 왼쪽 열 전체 = AI 매출 도우미(첫 화면에 KPI·과거vs현재), 오른쪽 = 전년 월누계 그래프 / 공지사항. 게시판 제거
+             AI 를 쓸 수 없는 계정은 왼쪽 열에 KPI·과거vs현재만 그대로 보인다 -->
+        <div class="hp-dash">
+          <section class="hp-dash-ai">
+            <DashboardSalesAiInline>
+              <template #home>
             <!-- KPI 2x2 -->
-            <div class="kpi-area" style="grid-column: 1 / 2; grid-row: 1 / 2;">
+            <div class="kpi-area">
               <div class="kpi-card">
                 <div class="f14 kpi-title">매출</div>
                 <div class="kpi-num">
@@ -50,35 +54,16 @@
                 </div>
               </div>
             </div>
-            <!-- 전년 월누계 대비실적 -->
-            <div class="board-box chart-box-wrap grid-area">
-              <div class="title-section-wrap">
-                <div class="title-section">
-                  <div class="icon"></div>
-                  <div class="f20 text">전년 월누계 대비실적</div>
-                </div>
-              </div>
-              <div class="chart-box">
-                <Chart
-                  class="!h-full !w-full"
-                  :type="'line'"
-                  :labels="labels"
-                  :label="label"
-                  :datas="datas"
-                  :showDataLabel="false"
-                ></Chart>
-              </div>
-            </div>
 
             <!-- 과거(이전달) vs 현재 매출현황 -->
-            <div class="board-box grid-box-wrap grid-area">
+            <div class="board-box hp-prev-box">
               <div class="title-section-wrap">
                 <div class="title-section">
                   <div class="icon"></div>
                   <div class="f20 text">과거(이전달) vs 현재 매출현황</div>
                 </div>
               </div>
-              <div class="rg-grid-area">
+              <div class="rg-grid-area hp-prev-grid">
                 <Realgrid
                   :progname="'MainDashBoard_VUE'"
                   :progid="2"
@@ -88,11 +73,32 @@
                 ></Realgrid>
               </div>
             </div>
+              </template>
+            </DashboardSalesAiInline>
           </section>
 
-          <section class="dashboard-board">
-            <!-- 공지사항 -->
-            <div class="board-box grid-area">
+          <!-- 전년 월누계 대비실적 -->
+          <section class="board-box chart-box-wrap grid-area hp-dash-chart">
+            <div class="title-section-wrap">
+              <div class="title-section">
+                <div class="icon"></div>
+                <div class="f20 text">전년 월누계 대비실적</div>
+              </div>
+            </div>
+            <div class="chart-box">
+              <Chart
+                class="!h-full !w-full"
+                :type="'line'"
+                :labels="labels"
+                :label="label"
+                :datas="datas"
+                :showDataLabel="false"
+              ></Chart>
+            </div>
+          </section>
+
+            <!-- 공지사항 (게시판 자리로 이동) -->
+            <div class="board-box grid-area hp-dash-notice">
               <div class="title-section-wrap">
                 <div class="title-section">
                   <div class="icon"></div>
@@ -115,29 +121,7 @@
                 ></Realgrid>
               </div>
             </div>
-
-            <!-- 게시판 -->
-            <div class="board-box grid-area">
-              <div class="title-section-wrap">
-                <div class="title-section">
-                  <div class="icon"></div>
-                  <div class="f20 text">게시판</div>
-                </div>
-                <!-- <a href="#" class="f13 btn-more">
-                  더보기 <i class="ic-more"></i>
-                </a> -->
-              </div>
-              <div class="rg-grid-area">
-                <Realgrid
-                  :progname="'MainDashBoard_VUE'"
-                  :progid="4"
-                  :rowStateeditable="false"
-                  :setStateBar="false"
-                  :rowData="rowData4"
-                ></Realgrid>
-              </div>
-            </div>
-          </section>
+          <!-- 게시판(progid 4)은 2026-11-25 대시보드 배치 변경으로 제거 (조회 데이터 rowData4 는 그대로 둠) -->
         </div>
       </div>
       <!-- grid-area, grid-fixed -->
@@ -179,6 +163,7 @@ import { MainDashBoard, MainDashBoard2, MainDashBoard3 } from "@/api/common";
 import { getNoticeList2 } from "@/api/minotice";
 import { getNoticeDocDetail } from "@/api/minotice";
 import SalesAnalysisDashboard from "@/components/SalesAnalysisDashboard.vue";
+import DashboardSalesAiInline from "@/components/salesAi/DashboardSalesAiInline.vue";
 import StoreGroupWelcomePopup from "@/components/StoreGroupWelcomePopup.vue";
 import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
@@ -534,6 +519,76 @@ const formatNumber = (num) => {
 </script>
 
 <style scoped>
+/* 2026-11-25 기본 대시보드 배치 — 왼쪽 열 전체: AI 매출 도우미(첫 화면 KPI·과거vs현재) / 오른쪽: 전년 월누계 그래프(위)·공지사항(아래)
+   main.css 공통 대시보드 규칙(.dashboard-*)은 건드리지 않고 이 화면 안에서만 배치한다 */
+.hp-dash {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 30px;
+  height: 100%;
+  min-height: 640px;
+}
+.hp-dash-ai {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hp-dash .hp-dash-chart {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hp-dash .hp-dash-notice {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.hp-prev-box {
+  background: var(--white);
+  border: 1px solid var(--black-10);
+  padding: 14px 20px 18px;
+  display: flex;
+  flex-direction: column;
+}
+.hp-prev-grid {
+  flex: none;
+  height: 200px;
+}
+@media (max-width: 1440px) {
+  .hp-dash {
+    height: auto;
+    grid-template-rows: 440px 320px;
+    gap: 20px;
+  }
+}
+@media (max-width: 1100px) {
+  .hp-dash {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 720px 400px 320px;
+  }
+  .hp-dash-ai {
+    grid-row: 1;
+  }
+  .hp-dash .hp-dash-chart {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .hp-dash .hp-dash-notice {
+    grid-column: 1;
+    grid-row: 3;
+  }
+}
+
 /* layout.css [data-fixed]{flex:none} 보다 우선 — 매출 분석 전용 확정 높이 */
 .sa-dash-fill {
   flex: 1 1 0 !important;
