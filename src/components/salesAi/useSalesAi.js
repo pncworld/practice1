@@ -293,6 +293,7 @@ export const SALES_AI_TOPIC_TEXT = {
   CREDIT: "외상",
   PREPAID: "선수금",
   STAFF: "직원 후불",
+  RECEIPT: "영수증 목록",
   ANALYZE: "원인 분석",
 };
 
@@ -311,6 +312,9 @@ const GROUP_BY_TEXT = {
   COMP: "사업장별",
   DEPT: "부서별",
   SUMMARY: "합계",
+  HIST: "거래 내역",
+  HIST_CHARGE: "충전 내역",
+  HIST_USE: "사용 내역",
 };
 
 const COMPARE_TEXT = { prevYear: "전년 비교", prevMonth: "전월 비교", prevPeriod: "직전 기간 비교" };

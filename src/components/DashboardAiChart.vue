@@ -1,6 +1,9 @@
 <template>
-  <div class="dac-wrap" :class="{ 'dac-wrap--pie': chart.TYPE === 'pie' }">
-    <canvas ref="canvasRef"></canvas>
+  <div>
+    <div class="dac-wrap" :class="{ 'dac-wrap--pie': chart.TYPE === 'pie' }">
+      <canvas ref="canvasRef"></canvas>
+    </div>
+    <p v-if="view.note" class="dac-note">{{ view.note }}</p>
   </div>
 </template>
 
@@ -9,13 +12,61 @@
  * AI 매출 도우미 결과 그래프 (chart.js)
  * chart: { TYPE: line|bar|pie, LABEL_KEY, VALUE_KEY, VALUE_TITLE, PREV_KEY, PREV_TITLE }
  */
-import { defineProps, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, defineProps, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
 const props = defineProps({
   chart: { type: Object, required: true },
   rows: { type: Array, required: true },
+  // 표 머리글 (막대를 줄일 때 표가 무엇 순으로 정렬됐는지 찾는 데 쓴다)
+  columns: { type: Array, default: () => [] },
+});
+
+/** 막대 그래프는 최대 15개만 그린다 (2026-11-25 요청). 표·엑셀은 전체 */
+const MAX_BARS = 15;
+
+/** 행이 이 열 기준으로 정렬돼 있으면 'desc' / 'asc', 아니면 '' */
+function sortDirection(rows, key) {
+  let desc = true;
+  let asc = true;
+  for (let i = 1; i < rows.length; i++) {
+    const a = num(rows[i - 1][key]);
+    const b = num(rows[i][key]);
+    if (b > a) desc = false;
+    if (b < a) asc = false;
+    if (!desc && !asc) return "";
+  }
+  if (desc && asc) return ""; // 값이 모두 같으면 기준으로 보지 않는다
+  return desc ? "desc" : "asc";
+}
+
+/**
+ * 그릴 행과 안내 문장
+ *  - 막대가 15개를 넘으면 표의 정렬 기준(그래프 값 열 → 나머지 숫자 열 순으로 찾음)을 그대로 따라 앞 15개만 그린다
+ *  - 정렬 기준을 찾지 못하면(시간대·요일처럼 순서가 의미인 목록) 자르지 않는다
+ */
+const view = computed(() => {
+  const c = props.chart || {};
+  const rows = props.rows || [];
+  if (c.TYPE !== "bar" || rows.length <= MAX_BARS) return { rows, note: "" };
+
+  const candidates = [];
+  if (c.VALUE_KEY) candidates.push({ KEY: c.VALUE_KEY, TITLE: c.VALUE_TITLE });
+  for (const col of props.columns) {
+    if (col.KEY !== c.VALUE_KEY && col.TYPE !== "text") candidates.push(col);
+  }
+  for (const col of candidates) {
+    const dir = sortDirection(rows, col.KEY);
+    if (dir) {
+      const title = col.TITLE || "값";
+      return {
+        rows: rows.slice(0, MAX_BARS),
+        note: `그래프는 ${title} ${dir === "desc" ? "상위" : "하위"} ${MAX_BARS}개입니다. 전체 ${rows.length}개는 표·엑셀에서 볼 수 있습니다.`,
+      };
+    }
+  }
+  return { rows, note: "" };
 });
 
 const canvasRef = ref(null);
@@ -56,14 +107,15 @@ function render() {
     instance = null;
   }
   const c = props.chart;
-  if (!canvasRef.value || !c || !props.rows.length) return;
+  const rows = view.value.rows;
+  if (!canvasRef.value || !c || !rows.length) return;
 
-  const labels = props.rows.map((r) => r[c.LABEL_KEY] ?? "");
+  const labels = rows.map((r) => r[c.LABEL_KEY] ?? "");
   const datasets = [];
   if (c.TYPE === "pie") {
     datasets.push({
       label: c.VALUE_TITLE,
-      data: props.rows.map((r) => num(r[c.VALUE_KEY])),
+      data: rows.map((r) => num(r[c.VALUE_KEY])),
       backgroundColor: PIE_COLORS,
       borderColor: PIE_BORDERS,
       borderWidth: 1,
@@ -71,7 +123,7 @@ function render() {
   } else {
     datasets.push({
       label: c.VALUE_TITLE,
-      data: props.rows.map((r) => num(r[c.VALUE_KEY])),
+      data: rows.map((r) => num(r[c.VALUE_KEY])),
       backgroundColor: c.TYPE === "line" ? "rgba(191, 219, 254, 0.35)" : MAIN_FILL,
       borderColor: MAIN_LINE,
       borderWidth: c.TYPE === "line" ? 2 : 1,
@@ -83,7 +135,7 @@ function render() {
     if (c.PREV_KEY) {
       datasets.push({
         label: c.PREV_TITLE || "비교 기간",
-        data: props.rows.map((r) => num(r[c.PREV_KEY])),
+        data: rows.map((r) => num(r[c.PREV_KEY])),
         backgroundColor: PREV_FILL,
         borderColor: PREV_LINE,
         borderWidth: c.TYPE === "line" ? 2 : 1,
@@ -98,8 +150,8 @@ function render() {
   // 수치 표시: 막대는 막대 위, 원형은 조각 안. 항목이 많거나(선 15개 초과·막대 24개 초과) 비교 막대는 겹쳐서 숨기고 툴팁으로
   const showLabels =
     c.TYPE === "pie" ||
-    (c.TYPE === "bar" && props.rows.length <= 24 && !c.PREV_KEY) ||
-    (c.TYPE === "line" && props.rows.length <= 15 && !c.PREV_KEY);
+    (c.TYPE === "bar" && rows.length <= 24 && !c.PREV_KEY) ||
+    (c.TYPE === "line" && rows.length <= 15 && !c.PREV_KEY);
 
   instance = new Chart(canvasRef.value, {
     type: c.TYPE === "pie" ? "doughnut" : c.TYPE,
@@ -152,7 +204,7 @@ function render() {
 }
 
 onMounted(render);
-watch(() => [props.chart, props.rows], render, { deep: true });
+watch(() => [props.chart, props.rows, props.columns], render, { deep: true });
 onBeforeUnmount(() => {
   if (instance) instance.destroy();
 });
@@ -167,5 +219,13 @@ onBeforeUnmount(() => {
 
 .dac-wrap--pie {
   height: 16rem;
+}
+
+/* 막대를 줄였을 때 기준 안내 */
+.dac-note {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: #475569;
+  text-align: right;
 }
 </style>

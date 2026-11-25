@@ -155,7 +155,7 @@
                 </button>
               </div>
 
-              <DashboardAiChart v-if="msg.chart && msg.view !== 'table'" :chart="msg.chart" :rows="msg.rows" />
+              <DashboardAiChart v-if="msg.chart && msg.view !== 'table'" :chart="msg.chart" :rows="msg.rows" :columns="msg.columns" />
 
               <div v-else class="sac-table-wrap">
                 <table class="sac-table">
