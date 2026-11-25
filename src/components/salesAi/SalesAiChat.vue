@@ -15,13 +15,13 @@
       </slot>
 
       <div v-if="state.messages.length === 0" class="sac-chips">
-        <!-- 조회 = 파란 서브 버튼, 등록 = 연두 버튼 (등록 연두·조회 파랑 규칙) -->
+        <!-- 매출 조회 = 파란 서브 버튼, 고객(CRM) 조회 = 보라 버튼, 등록 = 연두 버튼 (등록 연두·조회 파랑 규칙) -->
         <button
           v-for="ex in examples"
           :key="ex.text"
           type="button"
           class="pnc-sub-btn"
-          :class="{ 'sac-reg-btn': ex.kind === 'menu' }"
+          :class="{ 'sac-reg-btn': ex.kind === 'menu', 'sac-crm-btn': ex.kind === 'crm' }"
           :disabled="state.loading"
           @click="send(ex.text)">
           {{ ex.text }}
@@ -153,6 +153,19 @@
                   </svg>
                   엑셀
                 </button>
+                <!-- 고객 목록: 가린 휴대폰·카드번호 원본은 신청번호를 받아 담당자에게 신청 (고객 조회 = 보라) -->
+                <button
+                  v-if="msg.exportKey"
+                  type="button"
+                  class="pnc-sub-btn sac-crm-btn"
+                  :disabled="exportBusy"
+                  @click="askCustomerExport(msg)">
+                  <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                  원본 신청
+                </button>
               </div>
 
               <DashboardAiChart v-if="msg.chart && msg.view !== 'table'" :chart="msg.chart" :rows="msg.rows" :columns="msg.columns" />
@@ -192,7 +205,14 @@
       </div>
 
       <div v-if="state.loading" class="sac-row sac-row--ai">
-        <div class="sac-bubble sac-bubble--loading">조회하고 있습니다… (분석 질문은 30초 정도 걸릴 수 있습니다)</div>
+        <div class="sac-bubble sac-bubble--loading">
+          <span class="sac-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          {{ state.loadingKind === "customer" ? "고객 정보를 조회하고 있습니다" : "조회하고 있습니다" }}
+          <span class="sac-elapsed">{{ loadingSec }}초</span>
+          <div class="sac-loading-sub">
+            {{ state.loadingKind === "customer" ? "고객 정보 조회는 시간이 조금 더 걸립니다(약 20~30초)." : "분석 질문은 30초 정도 걸릴 수 있습니다." }}
+          </div>
+        </div>
       </div>
     </div>
 
@@ -233,9 +253,11 @@
 </template>
 
 <script setup>
-import { defineExpose, nextTick, ref, watch } from "vue";
+import { defineExpose, nextTick, onBeforeUnmount, ref, watch } from "vue";
 import { utils, writeFile } from "xlsx-js-style";
+import Swal from "sweetalert2";
 import DashboardAiChart from "@/components/DashboardAiChart.vue";
+import { requestCustomerExport } from "@/api/dashboardAi";
 import { SALES_AI_TOPIC_TEXT, salesAiConditionText, useSalesAi } from "@/components/salesAi/useSalesAi";
 
 const { state, examples, sendText, cancelMenu, handoffMenu } = useSalesAi();
@@ -261,6 +283,64 @@ function scrollToBottom() {
     if (el) el.scrollTop = el.scrollHeight;
   });
 }
+
+/**
+ * 고객 원본 신청: 먼저 신청번호를 받을지 묻고, 받으면 대화창에 번호와 신청 방법을 남긴다 (2026-11-25)
+ * 원본 자료(가리지 않은 휴대폰·카드번호)는 화면으로 내려오지 않는다. 담당자가 신청번호로 따로 추출한다
+ */
+const exportBusy = ref(false);
+async function askCustomerExport(msg) {
+  if (!msg.exportKey || exportBusy.value) return;
+  const ok = await Swal.fire({
+    title: "원본 자료 신청",
+    text: "가린 휴대폰·카드번호가 들어간 원본 자료가 필요하신가요? 신청번호를 발급해 드립니다. 신청번호로 담당자에게 메일로 신청해 주세요. (신청번호는 24시간 동안 유효합니다)",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "신청번호 받기",
+    cancelButtonText: "취소",
+  });
+  if (!ok.isConfirmed) return;
+  exportBusy.value = true;
+  try {
+    const res = await requestCustomerExport(msg.exportKey);
+    const data = res?.data || {};
+    if (data.RESULT_CD !== "00" || !data.REQ_NO) {
+      state.messages.push({ role: "ai", text: data.RESULT_NM || "원본 자료 신청 중 오류가 발생했습니다.", error: true });
+      return;
+    }
+    state.messages.push({
+      role: "ai",
+      text:
+        `신청번호: ${data.REQ_NO}\n` +
+        `이 번호로 담당자에게 메일로 원본 자료를 신청해 주세요.\n` +
+        `신청번호는 24시간 동안 유효합니다${data.EXPIRE_DT ? ` (${data.EXPIRE_DT} 까지)` : ""}.`,
+    });
+  } catch (e) {
+    console.error("[salesAi] export", e);
+    state.messages.push({ role: "ai", text: "서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.", error: true });
+  } finally {
+    exportBusy.value = false;
+    scrollToBottom();
+  }
+}
+
+/** 로딩 중 경과 초 (진행 중인지 알 수 있게 1초마다 올린다) */
+const loadingSec = ref(0);
+let loadingTimer = null;
+function stopLoadingTimer() {
+  if (loadingTimer) clearInterval(loadingTimer);
+  loadingTimer = null;
+}
+watch(
+  () => state.loading,
+  (on) => {
+    stopLoadingTimer();
+    loadingSec.value = 0;
+    if (on) loadingTimer = setInterval(() => (loadingSec.value += 1), 1000);
+  },
+  { immediate: true }
+);
+onBeforeUnmount(stopLoadingTimer);
 
 /** 다른 화면(팝업↔대시보드)에서 대화가 늘어도 아래로 */
 watch(
@@ -555,7 +635,57 @@ function downloadExcel(msg) {
 }
 
 .sac-bubble--loading {
-  color: #64748b !important;
+  color: #334155 !important;
+}
+
+.sac-loading-sub {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.sac-elapsed {
+  margin-left: 0.35rem;
+  font-variant-numeric: tabular-nums;
+  color: #ea580c;
+  font-weight: 600;
+}
+
+/* 진행 중 표시: 점 3개가 차례로 움직인다 */
+.sac-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.sac-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f97316;
+  animation: sac-dot 1s infinite ease-in-out;
+}
+
+.sac-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.sac-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes sac-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(0);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
 }
 
 .sac-text {
@@ -628,6 +758,19 @@ function downloadExcel(msg) {
 .pnc-sub-btn.sac-reg-btn:hover:not(:disabled) {
   background-color: #ecfccb;
   border-color: #84cc16;
+}
+
+/* 고객(CRM) 예시: 매출 조회(파랑)·등록(연두)·선택(주황)과 구분되는 보라 (2026-11-25 요청) */
+.pnc-sub-btn.sac-crm-btn {
+  color: #6d28d9;
+  border-color: #c4b5fd;
+  background-color: #f5f3ff;
+  box-shadow: 0 1px 2px 0 rgb(124 58 237 / 0.12);
+}
+
+.pnc-sub-btn.sac-crm-btn:hover:not(:disabled) {
+  background-color: #ede9fe;
+  border-color: #a78bfa;
 }
 
 .sac-menu-card {

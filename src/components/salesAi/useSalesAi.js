@@ -27,7 +27,11 @@ const state = reactive({
   canRegisterMenu: false,
   /** 메뉴 등록을 할 수 없는 이유 (서버 안내: RMS·I-FRESH 에서 등록, 매장 계정 공통 메뉴 등) */
   menuRegMsg: "",
+  /** 멤버십 사용 브랜드(가입 회원 있음)면 고객 예시 질문을 보여 준다. 고객 조회 허용 판단은 서버가 다시 한다 */
+  useCrm: false,
   loading: false,
+  /** 로딩 말풍선 안내 종류 ("customer" = 고객 조회, 그 외 빈 값) */
+  loadingKind: "",
   testMode: false,
   popupOpen: false,
   /** 화면 표시용 메시지 (오류 포함) */
@@ -54,6 +58,7 @@ function resetAll() {
   state.storeNm = "";
   state.canRegisterMenu = false;
   state.menuRegMsg = "";
+  state.useCrm = false;
   state.testMode = false;
   state.popupOpen = false;
   state.messages = [];
@@ -88,6 +93,7 @@ export function loadSalesAiScope() {
         // 서버 허용 여부만 기억한다. 메뉴코드등록 화면 권한은 왼쪽 메뉴가 늦게 불러와질 수 있어 등록 요청 때 확인한다
         state.canRegisterMenu = data.MENU_REG_YN === "Y";
         state.menuRegMsg = data.MENU_REG_MSG || "";
+        state.useCrm = data.CRM_YN === "Y";
         state.enabled = true;
       }
     } catch (e) {
@@ -108,6 +114,11 @@ export function resetSalesAiChat() {
   state.menu = null;
 }
 
+/** 고객 질문 안내용(대략). 실제로 사내 AI 로 보낼지는 서버(SLS00_002AI IsCustomerQuestion)가 정한다 */
+const CUSTOMER_HINT = /(고객(?!\s?수)|회원|멤버십|연락처|전화번호|휴대폰|핸드폰|카드번호|탈퇴|휴면|구매\s?이력|방문\s?이력|마일리지|01[016789][-\s]?\d{3,4}[-\s]?\d{4})/;
+
+const SALES_TOPIC_HINT = /(매출|메뉴|영수증|취소|정산|외상|선수금|후불|매장 목록|매장 정보|결제수단|카드사|할인|시간대)/;
+
 export async function sendSalesAiText(text) {
   const question = String(text || "").trim();
   if (!question || state.loading || !state.enabled) return false;
@@ -122,6 +133,13 @@ export async function sendSalesAiText(text) {
 
   const recent = state.history.slice(-MAX_HISTORY_PAIRS * 2);
   const payload = [...recent, { role: "user", content: question }];
+
+  // 고객 질문은 오래 걸린다 → 로딩 말풍선 한 개에 안내를 함께 보여 준다 (판단은 서버가 하고, 여기는 안내만)
+  const lastAi = [...recent].reverse().find((m) => m.role === "assistant");
+  // 고객 답 뒤 이어지는 질문도 고객으로 보되, 매출 등 업무 단어가 있으면 아니다 (서버 IsCustomerRoute·SALES_TOPIC_WORDS 와 같음)
+  const customerFollowUp =
+    lastAi && String(lastAi.content).startsWith("[고객]") && !SALES_TOPIC_HINT.test(question);
+  state.loadingKind = state.useCrm && (CUSTOMER_HINT.test(question) || customerFollowUp) ? "customer" : "";
 
   state.loading = true;
   try {
@@ -160,7 +178,9 @@ export async function sendSalesAiText(text) {
     }
 
     state.testMode = data.RESULT_NM === "TEST_MODE";
-    const reply = data.REPLY || "";
+    // 고객 답은 서버가 '[고객]'으로 시작한다. 화면에는 떼고 보여 주고, 기록에는 남겨 서버가 다음 질문을 사내 AI 로 보낼지·Claude 대화에서 뺄지 판단하게 한다
+    const isCustomer = String(data.REPLY || "").startsWith("[고객]") || data.CONDITION?.TOPIC === "CUSTOMER";
+    const reply = String(data.REPLY || "").replace(/^\[고객\]\s*/, "");
     state.messages.push({
       role: "ai",
       text: reply,
@@ -171,13 +191,14 @@ export async function sendSalesAiText(text) {
       prevTotal: data.PREV_TOTAL || null,
       chart: data.CHART || null,
       sections: Array.isArray(data.SECTIONS) ? data.SECTIONS : null,
+      exportKey: data.EXPORT_KEY || "",
       view: "chart",
     });
 
     // 다음 질문이 조건을 이어받을 수 있게 조회 조건을 답 뒤에 붙여 기록한다
     const condLine = data.CONDITION ? "\n[조회 조건] " + salesAiConditionText(data.CONDITION) : "";
     state.history.push({ role: "user", content: question });
-    state.history.push({ role: "assistant", content: (reply || "(답변 없음)") + condLine });
+    state.history.push({ role: "assistant", content: (isCustomer ? "[고객] " : "") + (reply || "(답변 없음)") + condLine });
   } catch (e) {
     console.error("[salesAi] chat", e);
     state.messages.push({
@@ -199,6 +220,7 @@ async function sendMenuRegister(question) {
   const recent = menu.history.slice(-MAX_HISTORY_PAIRS * 2);
   const payload = [...recent, { role: "user", content: question }];
 
+  state.loadingKind = "";
   state.loading = true;
   try {
     const res = await chatDashboardMenuRegister(payload, menu.draft);
@@ -294,6 +316,7 @@ export const SALES_AI_TOPIC_TEXT = {
   PREPAID: "선수금",
   STAFF: "직원 후불",
   RECEIPT: "영수증 목록",
+  CUSTOMER: "고객",
   ANALYZE: "원인 분석",
 };
 
@@ -315,6 +338,7 @@ const GROUP_BY_TEXT = {
   HIST: "거래 내역",
   HIST_CHARGE: "충전 내역",
   HIST_USE: "사용 내역",
+  KIND: "구분별",
 };
 
 const COMPARE_TEXT = { prevYear: "전년 비교", prevMonth: "전월 비교", prevPeriod: "직전 기간 비교" };
@@ -346,7 +370,11 @@ export function useSalesAi() {
   });
 
   const examples = computed(() => {
-    const common = ["이번 달 매출", "어제 시간대별 매출", "지난주 메뉴 TOP 10", "이번 달 결제수단별 매출", "어제 매출취소 내역"];
+    // 멤버십 사용 브랜드는 매출 예시를 2개 줄이고 그 뒤에 고객 예시 2개를 붙인다 (2026-11-25 요청)
+    const common = state.useCrm
+      ? ["이번 달 매출", "지난주 메뉴 TOP 10", "어제 매출취소 내역"]
+      : ["이번 달 매출", "어제 시간대별 매출", "지난주 메뉴 TOP 10", "이번 달 결제수단별 매출", "어제 매출취소 내역"];
+    const customer = state.useCrm ? ["이번 달 신규 가입 회원 수", "이번 달 고객 가입 리스트"] : [];
     // 현재 상황을 전제로 한 질문(예: '객단가가 왜 낮아졌어?')은 예시에 넣지 않는다 (2026-11-25 요청)
     const sales =
       state.scopeType === "STORE"
@@ -355,7 +383,12 @@ export function useSalesAi() {
     // 메뉴 등록 예시는 항상 보여 준다. 등록할 수 없는 계정·브랜드는 누르면 이유(RMS·I-FRESH 에서 등록 등)를 안내한다
     const menu = ["새 메뉴 등록", "아이스 아메리카노 4500원 메뉴 추가", "커피에 바닐라라떼 등록"];
     // kind: sales = 조회(파란 서브 버튼) / menu = 등록(연두 버튼). 등록 연두·조회 파랑 규칙
-    return [...sales.map((text) => ({ text, kind: "sales" })), ...menu.map((text) => ({ text, kind: "menu" }))];
+    // kind crm = 고객(CRM) 조회(보라 버튼)
+    return [
+      ...sales.map((text) => ({ text, kind: "sales" })),
+      ...customer.map((text) => ({ text, kind: "crm" })),
+      ...menu.map((text) => ({ text, kind: "menu" })),
+    ];
   });
 
   return {

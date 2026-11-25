@@ -9,7 +9,7 @@ import store from "@/store";
  */
 const api2 = axios.create({
   baseURL: commonUrl2, // API 기본 URL
-  timeout: 120000, // AI 호출 2회(해석·요약) + 조회
+  timeout: 300000, // AI 호출 2회(해석·요약) + 조회. 고객 질문은 사내 로컬 AI(CPU)라 더 오래 걸릴 수 있다 (2026-11-25)
 });
 
 api2.interceptors.request.use(
@@ -55,6 +55,16 @@ export const getDashboardAiScope = () => {
 export const chatDashboardSales = (messages) => {
   return api2.post("/MISALES/SLS00_002AI.asmx/chatSales", {
     MESSAGES: JSON.stringify(messages),
+  });
+};
+
+/**
+ * 고객 원본 자료 신청: 신청번호(24시간 유효)를 받는다. 원본 자료는 내려오지 않고 담당자가 따로 추출한다
+ * @param {string} exportKey 고객 목록 응답의 EXPORT_KEY
+ */
+export const requestCustomerExport = (exportKey) => {
+  return api2.post("/MISALES/SLS00_002AI.asmx/requestCustomerExport", {
+    EXPORT_KEY: exportKey,
   });
 };
 
