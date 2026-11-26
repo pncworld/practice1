@@ -12,6 +12,12 @@
           <SalesAiRobot />
           <span>무엇을 도와드릴까요? 질문이나 요청을 입력해 주세요.</span>
         </div>
+        <!-- AI 오답 안내·제보 (2026-11-26 요청) -->
+        <div class="sai-notice">
+          AI는 실수를 할 수 있습니다. 중요한 숫자는 해당 메뉴 화면에서 한 번 더 확인해 주세요.<br />
+          답변이 틀렸거나 수정 사항이 있으시면 화면을 캡처해 브랜드명과 함께
+          <a href="mailto:sungwoo@pncworld.com">sungwoo@pncworld.com</a> 으로 보내 주세요.
+        </div>
       </div>
       <button
         v-if="state.messages.length > 0"
@@ -85,6 +91,16 @@ onMounted(() => {
   font-size: 0.95rem;
   font-weight: 700;
   color: #ea580c;
+}
+.sai-notice {
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #64748b;
+}
+.sai-notice a {
+  color: #475569;
+  text-decoration: underline;
 }
 
 .dai-home {

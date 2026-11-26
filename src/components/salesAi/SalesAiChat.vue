@@ -3,7 +3,7 @@
   <div class="sac-root">
     <div v-if="state.testMode" class="sac-test">테스트 모드: AI를 호출하지 않고 이번 달 합계로 조회한 결과입니다.</div>
 
-    <div ref="logRef" class="sac-log">
+    <div ref="logRef" class="sac-log" @scroll.passive="rememberLogScroll">
       <!-- 첫 화면: 대시보드는 KPI·표(slot), 팝업은 안내 문구 -->
       <slot name="intro">
         <div v-if="state.messages.length === 0" class="sac-guide">
@@ -73,46 +73,8 @@
           <template v-if="hasResult(msg)">
             <div class="sac-cond">{{ conditionText(msg.condition) }}</div>
 
-            <!-- 일일정산레포트처럼 영역이 여러 개인 결과: 영역마다 제목 + 표 -->
-            <template v-if="msg.sections && msg.sections.length">
-              <div class="sac-tools">
-                <button type="button" class="pnc-sub-btn sac-excel" @click="downloadSectionsExcel(msg)">
-                  <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path
-                      d="M12 4v11M7 10l5 5 5-5M5 19h14"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round" />
-                  </svg>
-                  엑셀
-                </button>
-              </div>
-              <div v-for="(sec, sIdx) in msg.sections" :key="sIdx" class="sac-section">
-                <div class="sac-sec-title">{{ sec.TITLE }}</div>
-                <div v-if="!sec.ROWS || sec.ROWS.length === 0" class="sac-sec-empty">자료 없음</div>
-                <div v-else class="sac-table-wrap sac-table-wrap--sec">
-                  <table class="sac-table">
-                    <thead>
-                      <tr>
-                        <th v-for="col in sec.COLUMNS" :key="col.KEY">{{ col.TITLE }}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr v-for="(row, rIdx) in sec.ROWS" :key="rIdx">
-                        <td v-for="col in sec.COLUMNS" :key="col.KEY" :class="col.TYPE === 'text' ? 'sac-td-text' : ''">
-                          {{ cellText(col, row) }}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </template>
-
-            <!-- 합계만 있는 결과: 숫자 카드 -->
-            <div v-else-if="isKpiResult(msg)" class="sac-kpis">
+            <!-- 합계만 있는 결과: 숫자 카드 (매출 합계는 아래에 매출세부내역 영역이 함께 온다) -->
+            <div v-if="isKpiResult(msg)" class="sac-kpis">
               <div v-for="col in valueColumns(msg)" :key="col.KEY" class="sac-kpi">
                 <span>{{ col.TITLE }}</span>
                 <b>{{ cellText(col, msg.total) }}</b>
@@ -123,7 +85,8 @@
               </div>
             </div>
 
-            <template v-else>
+            <!-- 표·그래프. 도구 사용 방식은 아래 영역(추가 조회 결과)과 함께 나올 수 있다 -->
+            <template v-if="!isKpiResult(msg) && (!msg.sections || !msg.sections.length || (msg.rows && msg.rows.length))">
               <div class="sac-tools">
                 <div v-if="msg.chart" class="sac-tabs" role="tablist">
                   <button
@@ -178,13 +141,16 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(row, rIdx) in msg.rows" :key="rIdx">
-                      <td
-                        v-for="col in msg.columns"
-                        :key="col.KEY"
-                        :class="[col.TYPE === 'text' ? 'sac-td-text' : '', col.KEY === 'DIFF_RATE' ? rateClass(row[col.KEY]) : '']">
-                        {{ cellText(col, row) }}
-                      </td>
+                    <tr v-for="(row, rIdx) in tableRows(msg)" :key="rIdx">
+                      <!-- 화면 조회 결과는 화면처럼 같은 값이 이어지는 칸을 합친다 (rowspan 0 = 위 칸에 합쳐져 그리지 않음) -->
+                      <template v-for="(col, cIdx) in msg.columns" :key="col.KEY">
+                        <td
+                          v-if="mergeSpan(msg, rIdx, cIdx) > 0"
+                          :rowspan="mergeSpan(msg, rIdx, cIdx)"
+                          :class="[col.TYPE === 'text' ? 'sac-td-text' : '', col.KEY === 'DIFF_RATE' ? rateClass(row[col.KEY]) : '', mergeSpan(msg, rIdx, cIdx) > 1 ? 'sac-td-merged' : '']">
+                          {{ cellText(col, row) }}
+                        </td>
+                      </template>
                     </tr>
                   </tbody>
                   <tfoot v-if="msg.total && msg.rows.length > 1">
@@ -198,6 +164,44 @@
                     </tr>
                   </tfoot>
                 </table>
+              </div>
+            </template>
+
+            <!-- 일일정산레포트처럼 영역이 여러 개인 결과: 영역마다 제목 + 표 -->
+            <template v-if="msg.sections && msg.sections.length">
+              <div class="sac-tools">
+                <button type="button" class="pnc-sub-btn sac-excel" @click="downloadSectionsExcel(msg)">
+                  <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path
+                      d="M12 4v11M7 10l5 5 5-5M5 19h14"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round" />
+                  </svg>
+                  엑셀
+                </button>
+              </div>
+              <div v-for="(sec, sIdx) in msg.sections" :key="sIdx" class="sac-section">
+                <div class="sac-sec-title">{{ sec.TITLE }}</div>
+                <div v-if="!sec.ROWS || sec.ROWS.length === 0" class="sac-sec-empty">자료 없음</div>
+                <div v-else class="sac-table-wrap sac-table-wrap--sec">
+                  <table class="sac-table">
+                    <thead>
+                      <tr>
+                        <th v-for="col in sec.COLUMNS" :key="col.KEY">{{ col.TITLE }}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="(row, rIdx) in sec.ROWS" :key="rIdx">
+                        <td v-for="col in sec.COLUMNS" :key="col.KEY" :class="col.TYPE === 'text' ? 'sac-td-text' : ''">
+                          {{ cellText(col, row) }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </template>
           </template>
@@ -253,11 +257,11 @@
 </template>
 
 <script setup>
-import { defineExpose, nextTick, onBeforeUnmount, ref, watch } from "vue";
+import { defineExpose, nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from "vue";
 import { utils, writeFile } from "xlsx-js-style";
 import Swal from "sweetalert2";
 import DashboardAiChart from "@/components/DashboardAiChart.vue";
-import { requestCustomerExport } from "@/api/dashboardAi";
+import { getCustomerExportRows, requestCustomerExport } from "@/api/dashboardAi";
 import { SALES_AI_TOPIC_TEXT, salesAiConditionText, useSalesAi } from "@/components/salesAi/useSalesAi";
 
 const { state, examples, sendText, cancelMenu, handoffMenu } = useSalesAi();
@@ -342,6 +346,31 @@ watch(
 );
 onBeforeUnmount(stopLoadingTimer);
 
+/**
+ * 대화 위치 기억 (2026-11-26: 다른 화면에 갔다가 홈으로 오면 대화가 맨 위로 감)
+ *  keep-alive 로 화면을 숨겼다 다시 붙이면 브라우저가 스크롤을 0 으로 돌린다 → 스크롤할 때마다 위치를 적어 두고 돌아올 때 되돌린다
+ *  (떠나는 시점 onDeactivated 에는 이미 화면에서 떨어져 0 이라 그때 읽으면 안 됨. 팝업 창은 keep-alive 밖이라 onActivated 가 불리지 않음)
+ */
+let savedLogScroll = -1;
+let logDetached = false;
+function rememberLogScroll() {
+  const el = logRef.value;
+  if (!el || !el.isConnected || logDetached) return;
+  savedLogScroll = el.scrollTop;
+}
+onDeactivated(() => {
+  logDetached = true;
+});
+onActivated(() => {
+  logDetached = false;
+  if (savedLogScroll < 0) return;
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      if (logRef.value) logRef.value.scrollTop = savedLogScroll;
+    });
+  });
+});
+
 /** 다른 화면(팝업↔대시보드)에서 대화가 늘어도 아래로 */
 watch(
   () => [state.messages.length, state.loading],
@@ -384,6 +413,57 @@ function hasResult(msg) {
 /** 합계(TOTAL) 1행 결과는 표 대신 숫자 카드 */
 function isKpiResult(msg) {
   return msg.condition && msg.condition.GROUP_BY === "TOTAL" && msg.condition.TOPIC !== "ANALYZE";
+}
+
+/** 화면 표에 그리는 최대 행 수. 그 이상(고객 목록 최대 20,000명 등)은 엑셀로 받는다 (서버 CUSTOMER_SCREEN_ROWS 와 같게) */
+const MAX_TABLE_ROWS = 500;
+
+function tableRows(msg) {
+  const rows = msg.rows || [];
+  return rows.length > MAX_TABLE_ROWS ? rows.slice(0, MAX_TABLE_ROWS) : rows;
+}
+
+/**
+ * 셀 병합: 화면 조회 결과(TOPIC=SCREEN) 또는 서버가 MERGE=Y 로 준 열만.
+ * 왼쪽 열부터 같은 값이 이어지고 그 왼쪽 열들도 같은 묶음일 때만 합친다 (예: 같은 매장·같은 테이블의 메뉴 줄)
+ * 결과: spans[r][c] = 1 이상이면 그 칸의 rowspan, 0 이면 위 칸에 합쳐져 그리지 않음. 메시지마다 한 번 계산해 둔다
+ */
+const mergeCache = new WeakMap();
+function mergeSpans(msg) {
+  const rows = tableRows(msg);
+  const key = msg;
+  if (mergeCache.has(key)) return mergeCache.get(key);
+  const cols = msg.columns || [];
+  const screen = msg.condition && msg.condition.TOPIC === "SCREEN";
+  const mergeable = cols.map((c) => screen || c.MERGE === "Y");
+  const spans = rows.map(() => cols.map(() => 1));
+  // sameAsPrev[r] = 지금까지 왼쪽 열들이 모두 윗줄과 같은지
+  const sameAsPrev = rows.map((_, r) => r > 0);
+  for (let c = 0; c < cols.length; c++) {
+    if (!mergeable[c]) {
+      for (let r = 0; r < rows.length; r++) sameAsPrev[r] = false;
+      continue;
+    }
+    let start = 0;
+    for (let r = 1; r <= rows.length; r++) {
+      const same =
+        r < rows.length && sameAsPrev[r] && String(rows[r][cols[c].KEY] ?? "") === String(rows[r - 1][cols[c].KEY] ?? "");
+      if (r < rows.length) sameAsPrev[r] = same;
+      if (!same) {
+        spans[start][c] = r - start;
+        for (let k = start + 1; k < r; k++) spans[k][c] = 0;
+        start = r;
+      }
+    }
+  }
+  mergeCache.set(key, spans);
+  return spans;
+}
+
+function mergeSpan(msg, rIdx, cIdx) {
+  if (!(msg.condition && msg.condition.TOPIC === "SCREEN") && !(msg.columns || []).some((c) => c.MERGE === "Y")) return 1;
+  const spans = mergeSpans(msg);
+  return spans[rIdx] ? spans[rIdx][cIdx] : 1;
 }
 
 function valueColumns(msg) {
@@ -499,15 +579,38 @@ function excelValue(col, row) {
   return Number.isFinite(n) ? n : v;
 }
 
-function downloadExcel(msg) {
+async function downloadExcel(msg) {
+  // 고객 목록처럼 화면에 일부만 받은 결과는 버튼을 누를 때 서버에서 전체를 받는다 (2026-11-26)
+  let rows = msg.rows;
+  const allCnt = Number(msg.condition?.ROW_TOTAL_CNT) || 0;
+  if (msg.exportKey && allCnt > rows.length) {
+    if (exportBusy.value) return;
+    exportBusy.value = true;
+    Swal.fire({ title: "엑셀 준비 중", text: allCnt.toLocaleString() + "명 전체를 조회하고 있습니다.", allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    try {
+      const res = await getCustomerExportRows(msg.exportKey);
+      const data = res?.data || {};
+      if (data.RESULT_CD !== "00") {
+        Swal.fire({ icon: "warning", text: data.RESULT_NM || "엑셀을 받지 못했습니다." });
+        return;
+      }
+      rows = Array.isArray(data.List) ? data.List : [];
+      Swal.close();
+    } catch (e) {
+      Swal.fire({ icon: "error", text: "엑셀을 받지 못했습니다. 잠시 후 다시 시도해 주세요." });
+      return;
+    } finally {
+      exportBusy.value = false;
+    }
+  }
   const cols = msg.columns;
   const aoa = [];
   aoa.push(["PnC# AI 도우미 · " + state.groupNm]);
   aoa.push(["조회 조건", conditionText(msg.condition)]);
   aoa.push([]);
   aoa.push(cols.map((c) => c.TITLE));
-  msg.rows.forEach((r) => aoa.push(cols.map((c) => excelValue(c, r))));
-  if (msg.total && msg.rows.length > 1) {
+  rows.forEach((r) => aoa.push(cols.map((c) => excelValue(c, r))));
+  if (msg.total && rows.length > 1) {
     aoa.push(cols.map((c, i) => (i === 0 ? totalLabel(msg) : c.TYPE === "text" || c.KEY === "SHARE" ? "" : excelValue(c, msg.total))));
   }
 
@@ -859,6 +962,30 @@ function downloadExcel(msg) {
   overflow: auto;
   border: 1px solid #e2e8f0;
   border-radius: 0.375rem;
+}
+/* 합친 칸: 화면 그리드처럼 위쪽에 맞추고 옅은 배경 */
+.sac-td-merged {
+  vertical-align: top;
+  background: #fffbeb;
+}
+/* 결과 표 스크롤 막대: 얇아서 잡기 어려워 16px 로 키운다 (콤보 펼침 목록 공통 막대와 같은 굵기) — 2026-11-26 요청 */
+.sac-table-wrap::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+.sac-table-wrap::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.sac-table-wrap::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 8px;
+  border: 3px solid #f1f5f9;
+}
+.sac-table-wrap::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+.sac-table-wrap::-webkit-scrollbar-corner {
+  background: #f1f5f9;
 }
 
 .sac-table {

@@ -63,13 +63,14 @@
                   <div class="f20 text">과거(이전달) vs 현재 매출현황</div>
                 </div>
               </div>
-              <div class="rg-grid-area hp-prev-grid">
+              <div ref="prevGridBox" class="rg-grid-area hp-prev-grid">
                 <Realgrid
                   :progname="'MainDashBoard_VUE'"
                   :progid="2"
                   :rowData="rowData2"
                   :rowStateeditable="false"
                   :setStateBar="false"
+                  @realgridname="onPrevGridName"
                 ></Realgrid>
               </div>
             </div>
@@ -169,7 +170,47 @@ import { USER_ADMIN_ID_SUPPLIER_ACCOUNT } from "@/constants/sessionUser";
 import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
 import Chart from "@/components/chart.vue";
 import Realgrid from "@/components/realgrid.vue";
-import { computed, onMounted, ref } from "vue";
+import { rgGetInstance } from "@/components/realgridInstanceRegistry.js";
+import { computed, nextTick, onActivated, onBeforeUnmount, onMounted, ref } from "vue";
+
+/**
+ * 과거(이전달) vs 현재 그리드 다시 그리기 (2026-11-26: 다른 화면에 갔다가 홈으로 오면 그리드가 빈 회색 칸으로 보임)
+ *  - 그리드 칸 크기가 0 이었다가 다시 보이면(숨김·탭 이동·AI 창 안 스크롤) 그 그리드만 resetSize
+ *  - 홈으로 돌아올 때(keep-alive onActivated)도 한 번 더
+ *  공통 그리드(realgrid.vue)는 고치지 않고 이 화면 그리드만 맞춘다
+ */
+const prevGridBox = ref(null);
+const prevGridName = ref("");
+let prevGridObserver = null;
+const onPrevGridName = (name) => {
+  prevGridName.value = name;
+};
+const redrawPrevGrid = () => {
+  nextTick(() => {
+    requestAnimationFrame(() => {
+      try {
+        const el = prevGridBox.value;
+        if (!el || !el.isConnected) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) return;
+        rgGetInstance(prevGridName.value)?.gridView?.resetSize?.();
+      } catch (_) {
+        /* ignore */
+      }
+    });
+  });
+};
+onMounted(() => {
+  if (typeof ResizeObserver !== "undefined" && prevGridBox.value) {
+    prevGridObserver = new ResizeObserver(() => redrawPrevGrid());
+    prevGridObserver.observe(prevGridBox.value);
+  }
+});
+onActivated(redrawPrevGrid);
+onBeforeUnmount(() => {
+  prevGridObserver?.disconnect();
+  prevGridObserver = null;
+});
 
 const WELCOME_POPUP_GROUP = 3071;
 /**
@@ -556,13 +597,29 @@ const formatNumber = (num) => {
 .hp-prev-box {
   background: var(--white);
   border: 1px solid var(--black-10);
-  padding: 14px 20px 18px;
+  padding: 12px 20px 12px;
   display: flex;
   flex-direction: column;
 }
+/* 5행(매출·고객수·고객AVG·영수증수·영수증AVG)만 보이면 되므로 빈 아래 여백을 줄인다 (2026-11-26 요청) */
 .hp-prev-grid {
   flex: none;
-  height: 200px;
+  height: 172px;
+}
+/* KPI 4칸: 이 화면 AI 창 안에서만 높이·글자를 줄인다 (main.css 공통 .kpi-* 는 그대로) — 2026-11-26 요청 */
+.hp-dash-ai .kpi-area {
+  gap: 12px;
+}
+.hp-dash-ai .kpi-card {
+  padding: 10px 16px 8px;
+}
+.hp-dash-ai .kpi-value {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+.hp-dash-ai .kpi-title,
+.hp-dash-ai .kpi-rate {
+  font-size: 0.8125rem;
 }
 @media (max-width: 1440px) {
   .hp-dash {

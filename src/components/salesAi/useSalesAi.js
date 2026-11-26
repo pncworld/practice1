@@ -7,7 +7,12 @@
  */
 import { computed, reactive } from "vue";
 import store from "@/store";
-import { chatDashboardMenuRegister, chatDashboardSales, getDashboardAiScope } from "@/api/dashboardAi";
+import {
+  chatDashboardMenuRegister,
+  chatDashboardSales,
+  chatDashboardSalesTool,
+  getDashboardAiScope,
+} from "@/api/dashboardAi";
 
 /** 공급사 계정 (서버도 차단하지만 화면에서 먼저 호출하지 않는다) */
 const USER_ADMIN_ID_SUPPLIER_ACCOUNT = 60;
@@ -29,6 +34,8 @@ const state = reactive({
   menuRegMsg: "",
   /** 멤버십 사용 브랜드(가입 회원 있음)면 고객 예시 질문을 보여 준다. 고객 조회 허용 판단은 서버가 다시 한다 */
   useCrm: false,
+  /** 도구 사용 방식(chatSalesTool)으로 질문한다. 켜는 계정은 서버 설정(Web.config AiToolMode)이 정한다 */
+  useTool: false,
   loading: false,
   /** 로딩 말풍선 안내 종류 ("customer" = 고객 조회, 그 외 빈 값) */
   loadingKind: "",
@@ -59,6 +66,7 @@ function resetAll() {
   state.canRegisterMenu = false;
   state.menuRegMsg = "";
   state.useCrm = false;
+  state.useTool = false;
   state.testMode = false;
   state.popupOpen = false;
   state.messages = [];
@@ -94,6 +102,7 @@ export function loadSalesAiScope() {
         state.canRegisterMenu = data.MENU_REG_YN === "Y";
         state.menuRegMsg = data.MENU_REG_MSG || "";
         state.useCrm = data.CRM_YN === "Y";
+        state.useTool = data.TOOL_YN === "Y";
         state.enabled = true;
       }
     } catch (e) {
@@ -139,11 +148,13 @@ export async function sendSalesAiText(text) {
   // 고객 답 뒤 이어지는 질문도 고객으로 보되, 매출 등 업무 단어가 있으면 아니다 (서버 IsCustomerRoute·SALES_TOPIC_WORDS 와 같음)
   const customerFollowUp =
     lastAi && String(lastAi.content).startsWith("[고객]") && !SALES_TOPIC_HINT.test(question);
-  state.loadingKind = state.useCrm && (CUSTOMER_HINT.test(question) || customerFollowUp) ? "customer" : "";
+  // 선수금·외상 거래처(고객)는 매출 쪽 조회라 고객 안내를 띄우지 않는다 (서버 IsAccountCustomerWord 와 같음)
+  const accountCust = /선수금|외상|미수|후불|선결제|거래처/.test(question);
+  state.loadingKind = state.useCrm && !accountCust && (CUSTOMER_HINT.test(question) || customerFollowUp) ? "customer" : "";
 
   state.loading = true;
   try {
-    const res = await chatDashboardSales(payload);
+    const res = state.useTool ? await chatDashboardSalesTool(payload) : await chatDashboardSales(payload);
     const data = res?.data || {};
 
     if (data.RESULT_CD !== "00") {
@@ -318,6 +329,7 @@ export const SALES_AI_TOPIC_TEXT = {
   RECEIPT: "영수증 목록",
   CUSTOMER: "고객",
   ANALYZE: "원인 분석",
+  SCREEN: "화면 조회",
 };
 
 const GROUP_BY_TEXT = {
@@ -341,7 +353,7 @@ const GROUP_BY_TEXT = {
   KIND: "구분별",
 };
 
-const COMPARE_TEXT = { prevYear: "전년 비교", prevMonth: "전월 비교", prevPeriod: "직전 기간 비교" };
+const COMPARE_TEXT = { prevYear: "전년 비교", prevMonth: "전월 비교", prevWeek: "전주 같은 요일 비교", prevPeriod: "직전 기간 비교" };
 
 export function salesAiConditionText(c) {
   if (!c) return "";

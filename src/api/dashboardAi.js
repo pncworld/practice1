@@ -59,9 +59,30 @@ export const chatDashboardSales = (messages) => {
 };
 
 /**
+ * 매출 질문 — 도구 사용 방식 (2026-11-26). 입력·응답 형식은 chatDashboardSales 와 같다
+ * 서버 getAiScope 의 TOOL_YN 이 Y 인 계정만 부른다. 고객 질문·오류는 서버가 기존 방식(chatSales)으로 처리한다
+ * @param {Array<{role: "user"|"assistant", content: string}>} messages 대화 기록 (user 로 시작·끝)
+ */
+export const chatDashboardSalesTool = (messages) => {
+  return api2.post("/MISALES/SLS00_002AI.asmx/chatSalesTool", {
+    MESSAGES: JSON.stringify(messages),
+  });
+};
+
+/**
  * 고객 원본 자료 신청: 신청번호(24시간 유효)를 받는다. 원본 자료는 내려오지 않고 담당자가 따로 추출한다
  * @param {string} exportKey 고객 목록 응답의 EXPORT_KEY
  */
+/**
+ * 고객 목록 엑셀: 화면에 일부만 받은 고객 목록을 버튼을 누를 때 서버가 같은 조건으로 전체 다시 조회해 준다 (2026-11-26)
+ * @param {string} exportKey 고객 목록 응답의 EXPORT_KEY
+ */
+export const getCustomerExportRows = (exportKey) => {
+  return api2.post("/MISALES/SLS00_002AI.asmx/getCustomerExportRows", {
+    EXPORT_KEY: exportKey,
+  });
+};
+
 export const requestCustomerExport = (exportKey) => {
   return api2.post("/MISALES/SLS00_002AI.asmx/requestCustomerExport", {
     EXPORT_KEY: exportKey,
