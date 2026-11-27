@@ -168,7 +168,8 @@
           <div class="att01-form-label att01-form-label--required">*근무장소</div>
           <div class="att01-form-value">
             <select name="lngAreaCode" @change="changeInfo" :disabled="disableGrid" v-model="gridvalue10" class="att01-control">
-              <option value="0">선택</option>
+              <!-- 근무장소코드 0 인 근무장소가 있어 '선택'은 빈 값으로 구분 -->
+              <option value="">선택</option>
               <option :value="i.lngAreaCode" v-for="i in dataList" :key="'a-' + i.lngAreaCode">{{ i.strArea }}</option>
             </select>
           </div>
@@ -357,7 +358,7 @@ const resetDetailForm = () => {
   gridvalue7.value = true;
   gridvalue8.value = "0";
   gridvalue9.value = "0";
-  gridvalue10.value = "0";
+  gridvalue10.value = "";
   gridvalue11.value = "";
   gridvalue12.value = "";
   gridvalue13.value = "0";
@@ -530,7 +531,8 @@ const addButton = () => {
     storeNm +
     "," +
     newCode +
-    ",,,,,,,,,재직,,,, , , , , ,,0,0,0, ,0,0,0,0,,,,,,0,0,0";
+    // lngAreaCode(25번째)는 빈 값 = 미선택 (0 은 실제 근무장소코드일 수 있음)
+    ",,,,,,,,,재직,,,, , , , , ,,0,0,, ,0,0,0,0,,,,,,0,0,0";
   addRow.value = !addRow.value;
 };
 /**
@@ -565,9 +567,9 @@ const clickedRowData = (newValue) => {
   gridvalue8.value = newValue[23];
   gridvalue9.value = newValue[24];
   gridvalue10.value =
-    newValue[25] == null || newValue[25] === "" || isNaN(newValue[25])
-      ? "0"
-      : newValue[25];
+    newValue[25] == null || String(newValue[25]).trim() === "" || isNaN(newValue[25])
+      ? ""
+      : String(newValue[25]);
   gridvalue11.value = newValue[16].split(" ")[0];
   gridvalue12.value = newValue[15];
   gridvalue13.value = newValue[29];
@@ -676,7 +678,8 @@ const changeInfo = (e) => {
     }
     setTimeout(() => {
       // console.log(rowValue);
-      if (rowValue == null || rowValue == "null" || rowValue == "0") {
+      // '선택'(빈 값)일 때만 미선택. 근무장소코드 0 은 실제 근무장소
+      if (rowValue == null || rowValue == "null" || rowValue === "") {
         changeValue2.value = "선택";
         changeColid.value = "strAreaName";
 
@@ -906,13 +909,14 @@ const saveButton = async () => {
     return;
   }
 
+  // 근무장소코드 0 도 실제 근무장소일 수 있으므로, 목록에 있는 코드인지로 판단
   const validateRow6 = rowsToSave.filter(
     (item) =>
       item.lngAreaCode == null ||
-      item.lngAreaCode === "" ||
-      item.lngAreaCode == "0" ||
-      item.lngAreaCode == 0 ||
-      isNaN(item.lngAreaCode)
+      String(item.lngAreaCode).trim() === "" ||
+      !dataList.value.some(
+        (area) => String(area.lngAreaCode) === String(item.lngAreaCode).trim()
+      )
   ).length;
   if (validateRow6 > 0) {
     Swal.fire({
