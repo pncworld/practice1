@@ -3565,12 +3565,14 @@ const clickedRowData = async (newvalue) => {
   const firstarr = newvalue[32] != undefined ? newvalue[32].split(";") : [];
   duplilfirstarr.value = firstarr;
   
-  // 할인선택 원본 데이터 저장 (변경 감지용)
+  // 할인선택 원본 데이터 저장 (변경 감지용) — 조회 후 처음 클릭할 때만.
+  // 다시 클릭할 때 newvalue[32]는 이미 바꾼 값일 수 있으므로 덮어쓰지 않고,
+  // 다른 메뉴를 클릭해도 앞서 바꾼 할인선택이 저장 대상에서 빠지지 않게 플래그를 유지한다.
   const currentMenuCode = newvalue[0]?.toString();
-  if (currentMenuCode) {
+  if (currentMenuCode && originalDiscountData.value[currentMenuCode] === undefined) {
     originalDiscountData.value[currentMenuCode] = newvalue[32] || "";
-    discountChanged.value = false; // 행 클릭 시 변경 플래그 초기화
   }
+  discountBaseCodes.value = splitDiscCodes(newvalue[32]);
   if (rowData2.value.length > 0) {
     let dupliarr = JSON.parse(JSON.stringify(rowData2.value));
     dupliarr.sort((a, b) => {
@@ -3932,31 +3934,87 @@ const changeNow = ref(false);
  * 체크된 데이터 갱신
  */
 
+const normalizeDiscCode = (v) => {
+  const s = String(v ?? "").trim();
+  return s !== "" && !isNaN(Number(s)) ? String(Number(s)) : s;
+};
+const splitDiscCodes = (value) =>
+  value == null || value === ""
+    ? []
+    : String(value)
+        .split(";")
+        .map(normalizeDiscCode)
+        .filter((v) => v !== "");
+const sameDiscCodeSet = (a, b) => {
+  const sa = new Set(a);
+  const sb = new Set(b);
+  if (sa.size !== sb.size) return false;
+  for (const v of sa) if (!sb.has(v)) return false;
+  return true;
+};
+/** 할인선택 그리드에서 결제코드/명 검색으로 화면에 보이는 결제코드. 못 찾으면 null */
+const getVisibleDiscCodes = () => {
+  const el = realgrid2Name.value
+    ? document.getElementById(realgrid2Name.value)
+    : null;
+  if (!el) return null;
+  try {
+    const gv = RealGrid.getGridInstance(el);
+    if (!gv) return null;
+    const dp = gv.getDataSource();
+    const out = new Set();
+    const count = gv.getItemCount();
+    for (let i = 0; i < count; i++) {
+      const dataRow = gv.getDataRow(i);
+      if (dataRow >= 0) out.add(normalizeDiscCode(dp.getValue(dataRow, "lngCode")));
+    }
+    return out;
+  } catch (_) {
+    return null;
+  }
+};
+// 선택한 메뉴에 지금 적용된 결제코드(할인선택) 목록
+const discountBaseCodes = ref([]);
+// 할인선택을 바꾼 메뉴코드 (다른 메뉴를 클릭해도 저장 대상에서 빠지지 않게)
+const discountChangedMenus = new Set();
+
 const checkedRowData2 = (e) => {
-  changeColid.value = "strAmtCodeList";
-  //comsole.log(updateRow.value);
-  //comsole.log(e);
-  const newDiscountValue = e
+  // e 는 화면에 보이는 체크 행만 들어온다(검색으로 숨은 결제코드 제외).
+  // 숨은 결제코드의 기존 적용 상태는 그대로 두고, 보이는 코드만 체크 결과로 바꾼다.
+  const checkedVisible = e
     .filter((item) => item.lngMenu !== "0")
-    .map((item2) => Number(item2.lngCode))
-    .join(";");
-  
+    .map((item2) => normalizeDiscCode(item2.lngCode));
+  const visible = getVisibleDiscCodes();
+  const merged = visible
+    ? [
+        ...discountBaseCodes.value.filter((cd) => !visible.has(cd)),
+        ...checkedVisible,
+      ]
+    : checkedVisible;
+  const next = [...new Set(merged)];
+
+  // 값이 그대로면 쓰지 않는다 (행 클릭 시 그리드 재로딩 이벤트로 메뉴가 '수정됨'이 되는 것 방지)
+  if (sameDiscCodeSet(next, discountBaseCodes.value)) return;
+  discountBaseCodes.value = next;
+
+  const newDiscountValue = next.join(";");
+  changeColid.value = "strAmtCodeList";
   changeValue2.value = newDiscountValue;
 
-  // 할인선택 변경 감지: 원본 데이터와 비교
+  // 할인선택 변경 감지: 원본 데이터와 비교 (순서 무관)
   const currentMenuCode = gridvalue3.value?.toString();
   if (currentMenuCode && originalDiscountData.value[currentMenuCode] !== undefined) {
-    const originalValue = originalDiscountData.value[currentMenuCode] || "";
-    if (originalValue !== newDiscountValue) {
-      discountChanged.value = true;
+    const original = splitDiscCodes(originalDiscountData.value[currentMenuCode]);
+    if (sameDiscCodeSet(next, original)) {
+      discountChangedMenus.delete(currentMenuCode);
     } else {
-      // 원본과 동일하면 변경 없음으로 표시
-      discountChanged.value = false;
+      discountChangedMenus.add(currentMenuCode);
     }
   } else {
     // 원본 데이터가 없으면 변경된 것으로 간주
-    discountChanged.value = true;
+    discountChangedMenus.add(currentMenuCode ?? "");
   }
+  discountChanged.value = discountChangedMenus.size > 0;
 
   //changeValue2.value = e.changeRow.value = rowIndex.value;
   changeNow.value = !changeNow.value;
@@ -8671,6 +8729,7 @@ const saveButton = (options = {}) => {
                 originalDiscountData.value[menuCode] = item.strAmtCodeList || "";
               }
             });
+            discountChangedMenus.clear();
             discountChanged.value = false;
           } catch (error) {
             // console.error("할인선택 저장 실패:", error);
@@ -8953,7 +9012,9 @@ const initAll = () => {
   uploadImagesCd.value = [];
   // 할인선택 관련 초기화
   originalDiscountData.value = {};
+  discountChangedMenus.clear();
   discountChanged.value = false;
+  discountBaseCodes.value = [];
 };
 
 const searchPayCd = (e) => {

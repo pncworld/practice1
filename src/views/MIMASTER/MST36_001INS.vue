@@ -893,10 +893,19 @@ const discountMenuShow = ref(false);
 const rowData4 = ref([]);
 const rowData5 = ref([]);
 const showPopUp = async () => {
-  let checkRowDataArr = clickedrowdata.value.split(",");
+  if (isNew.value || gridvalue5.value === "" || gridvalue5.value == null) {
+    Swal.fire({
+      title: "경고",
+      text: "결제코드를 먼저 저장한 뒤 복사해주세요.",
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+    return;
+  }
+  const checkRowDataArr = currentCheckedMenus.value.map((cd) => String(cd));
   ////console.log(rowData2.value);
   rowData4.value = rowData2.value.filter((item) =>
-    checkRowDataArr.includes(item.menuCd)
+    checkRowDataArr.includes(String(item.menuCd))
   );
 
   const res3 = await getPayCodeListbyCode(groupCd.value, gridvalue5.value);
@@ -942,7 +951,7 @@ onMounted(async () => {
 
   const res = await getMenuDiscCount(store.state.userData.lngStoreGroup);
 
-  if (res.data.List[0].count == "0") {
+  if (res?.data?.List?.[0]?.count == "0") {
     disableWithMenuDisc.value = true;
   } else {
     disableWithMenuDisc.value = false;
@@ -962,18 +971,72 @@ onMounted(async () => {
 //   }, 100);
 // });
 
-watch(selectedMenu, () => {
-  const reagrid2 = document.getElementById(realgrid2Name.value);
-  setTimeout(() => {
-    RealGrid.getGridInstance(reagrid2).resetSize();
-    RealGrid.getGridInstance(reagrid2).refresh(true);
-  }, 100);
+const getGridView = (gridName) => {
+  if (!gridName) return null;
+  const el = document.getElementById(gridName);
+  if (!el) return null;
+  try {
+    return RealGrid.getGridInstance(el) || null;
+  } catch (_) {
+    return null;
+  }
+};
 
-  const realgrid3 = document.getElementById(realgrid3Name.value);
+const refreshGrid = (gridName) => {
   setTimeout(() => {
-    RealGrid.getGridInstance(realgrid3).resetSize();
-    RealGrid.getGridInstance(realgrid3).refresh(true);
+    const gv = getGridView(gridName);
+    if (!gv) return;
+    try {
+      gv.resetSize();
+      gv.refresh(true);
+    } catch (_) {
+      void 0;
+    }
   }, 100);
+};
+
+/**
+ * 필터(메뉴분류·검색어)로 화면에 보이는 행의 값 목록.
+ * RealGrid getCheckedRows()는 필터로 숨은 행을 빼고 주기 때문에,
+ * 숨은 행의 체크 상태를 유지하려면 무엇이 보이는지 알아야 한다.
+ * 그리드를 못 찾으면 null.
+ */
+const getVisibleValues = (gridName, field) => {
+  const gv = getGridView(gridName);
+  if (!gv) return null;
+  try {
+    const dp = gv.getDataSource();
+    const out = new Set();
+    const count = gv.getItemCount();
+    for (let i = 0; i < count; i++) {
+      const dataRow = gv.getDataRow(i);
+      if (dataRow >= 0) out.add(String(dp.getValue(dataRow, field)));
+    }
+    return out;
+  } catch (_) {
+    return null;
+  }
+};
+
+const splitCodes = (value, sep) =>
+  value == null || value === ""
+    ? []
+    : String(value)
+        .split(sep)
+        .map((v) => v.trim())
+        .filter((v) => v !== "");
+
+const sameCodeSet = (a, b) => {
+  const sa = new Set(a.map(String));
+  const sb = new Set(b.map(String));
+  if (sa.size !== sb.size) return false;
+  for (const v of sa) if (!sb.has(v)) return false;
+  return true;
+};
+
+watch(selectedMenu, () => {
+  refreshGrid(realgrid2Name.value);
+  refreshGrid(realgrid3Name.value);
 });
 const labelingColumns = ref("payDistinct,blnInactive");
 const gridvalue1 = ref(0);
@@ -1015,8 +1078,13 @@ const clickedRowData = (newvalue) => {
   //console.log(newvalue);
   forsearchMain.value = -1;
   forsearchSub.value = -1;
+  // 화면의 분류 선택은 '전체'로 돌리면서 그리드 필터는 남아 있던 문제 → 필터도 같이 해제
+  searchValue2.value = [-1, -1];
   searchWord2.value = "";
   searchWord3.value = "";
+  // 이 결제코드에 현재 적용된 메뉴 / 복합결제 비허용 코드 (그리드 체크 이벤트에서 기준값으로 사용)
+  currentCheckedMenus.value = splitCodes(newvalue[27], ",");
+  currentUncheckCodes.value = splitCodes(newvalue[28], ";");
   if (!(newvalue[4] == "1" && newvalue[6] == "0")) {
     if (selectedMenu.value == 3) {
       selectedMenu.value = 1;
@@ -1026,7 +1094,7 @@ const clickedRowData = (newvalue) => {
   if (newvalue[4] == "1") {
     if (newvalue[21] != "0") {
     } else {
-      if ((selectedMenu.value = 2)) {
+      if (selectedMenu.value == 2) {
         selectedMenu.value = 1;
       }
     }
@@ -1035,7 +1103,7 @@ const clickedRowData = (newvalue) => {
       newvalue[2] == undefined ? false : newvalue[2].toString().startsWith("24")
     ) {
     } else {
-      if ((selectedMenu.value = 2)) {
+      if (selectedMenu.value == 2) {
         selectedMenu.value = 1;
       }
     }
@@ -1094,7 +1162,7 @@ const clickedRowData = (newvalue) => {
 
   if (newvalue[30] == true) {
     isNew.value = true;
-    clickaddrowSeq.value = rowData.value[newvalue.index].sequence;
+    clickaddrowSeq.value = rowData.value[newvalue.index]?.sequence;
   } else {
     isNew.value = false;
   }
@@ -1253,6 +1321,13 @@ const searchButton = async () => {
   items.value = [];
 
   store.state.loading = true;
+  // 재조회 중에는 이전에 선택한 행 번호로 그리드 값이 써지지 않게 초기화
+  afterClickrow.value = true;
+  changeRow.value = -1;
+  changeRow2.value = -1;
+  currentCheckedMenus.value = [];
+  currentUncheckCodes.value = [];
+  searchValue2.value = [-1, -1];
   try {
     initAll();
     clickrowData2.value = [];
@@ -1457,10 +1532,13 @@ const searchMenuList = (e) => {
 };
 const changeColid = ref("checkedMenu");
 const changeValue2 = ref("");
-const changeRow = ref();
+const changeRow = ref(-1);
 const changeNow = ref(false);
 
-const changeRow2 = ref();
+const changeRow2 = ref(-1);
+// 선택한 결제코드의 할인대상메뉴(menuCd) / 복합결제 비허용 코드(lngCode)
+const currentCheckedMenus = ref([]);
+const currentUncheckCodes = ref([]);
 const changeValue3 = ref(true);
 const changeColid2 = ref("checkbox");
 const changeNow2 = ref(false);
@@ -1469,9 +1547,30 @@ const changeNow2 = ref(false);
  */
 
 const checkedRowData = async (e) => {
-  const temp = e.map((item) => item.menuCd);
+  // 결제코드를 선택하기 전(조회 직후 등)에는 쓰지 않는다
+  if (afterClickrow.value || changeRow.value == null || changeRow.value < 0) {
+    return;
+  }
+  // e 는 화면에 보이는 체크 행만 들어온다(필터로 숨은 행 제외).
+  // 숨은 메뉴의 기존 적용 상태는 그대로 두고, 보이는 메뉴만 체크 결과로 바꾼다.
+  const checkedVisible = e.map((item) => String(item.menuCd));
+  const visible = getVisibleValues(realgrid2Name.value, "menuCd");
+  const merged = visible
+    ? [
+        ...currentCheckedMenus.value.filter((cd) => !visible.has(String(cd))),
+        ...checkedVisible,
+      ]
+    : checkedVisible;
+  const next = [...new Set(merged.map(String))].sort(
+    (a, b) => Number(a) - Number(b)
+  );
+
+  // 값이 그대로면 행을 '수정됨'으로 만들지 않는다 (행 클릭·재조회 시 그리드 재로딩 이벤트)
+  if (sameCodeSet(next, currentCheckedMenus.value)) return;
+
+  currentCheckedMenus.value = next;
   changeColid.value = "checkedMenu";
-  changeValue2.value = temp.join(",");
+  changeValue2.value = next.join(",");
   changeNow.value = !changeNow.value;
 
   await nextTick();
@@ -1481,16 +1580,32 @@ const checkedRowData = async (e) => {
  */
 
 const checkedRowData2 = async (e) => {
+  if (afterClickrow.value || changeRow.value == null || changeRow.value < 0) {
+    return;
+  }
+  const checkedVisible = new Set(e.map((item) => String(item.lngCode)));
+  const visible = getVisibleValues(realgrid3Name.value, "lngCode");
+  const selfCode = String(gridvalue5.value);
+  let next;
+  if (visible) {
+    // 숨은 코드는 기존 비허용 상태 유지, 보이는 코드는 체크 안 된 것만 비허용
+    next = [
+      ...currentUncheckCodes.value.filter((cd) => !visible.has(String(cd))),
+      ...[...visible].filter((cd) => !checkedVisible.has(cd)),
+    ];
+  } else {
+    next = rowData3.value
+      .filter((item) => String(item.lngCode) != selfCode)
+      .filter((item) => !checkedVisible.has(String(item.lngCode)))
+      .map((item) => String(item.lngCode));
+  }
+  next = [...new Set(next.map(String))].filter((cd) => cd !== selfCode);
+
+  if (sameCodeSet(next, currentUncheckCodes.value)) return;
+
+  currentUncheckCodes.value = next;
   changeColid.value = "unchecklngCode";
-  const arr = e.map((item) => Number(item.lngCode));
-  //comsole.log(arr);
-  const filtered2 = rowData3.value
-    .filter((item) => item.lngCode != gridvalue5.value)
-    .filter((item) => !arr.includes(Number(item.lngCode)))
-    .map((item) => item.lngCode);
-  // ////console.log(filtered2);
-  // ////console.log(arr);
-  changeValue2.value = filtered2.join(";");
+  changeValue2.value = next.join(";");
   changeNow.value = !changeNow.value;
 
   await nextTick();
@@ -1894,17 +2009,11 @@ const updatedRowData2 = (newvalue) => {
 
 const updatedRowData3 = (newvalue) => {
   for (var i = 0; i < newvalue.length; i++) {
-    if (newvalue[i].checkbox == true) {
-      const findrow = filteredrowData3.value.find(
-        (item) => item.lngCode == newvalue[i].lngCode
-      );
-      findrow.checkbox = true;
-    } else {
-      const findrow = filteredrowData3.value.find(
-        (item) => item.lngCode == newvalue[i].lngCode
-      );
-      findrow.checkbox = false;
-    }
+    const findrow = filteredrowData3.value.find(
+      (item) => item.lngCode == newvalue[i].lngCode
+    );
+    if (!findrow) continue;
+    findrow.checkbox = newvalue[i].checkbox == true;
   }
   filteredrowData3.value = [...filteredrowData3.value];
 
