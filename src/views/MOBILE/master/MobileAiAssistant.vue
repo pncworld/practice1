@@ -43,7 +43,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import store from "@/store";
 import SalesAiChat from "@/components/salesAi/SalesAiChat.vue";
@@ -58,7 +58,7 @@ const chatRef = ref(null);
 const versionText = computed(() => salesAiVersionText(state.aiVer));
 
 // 키보드가 올라오면 마지막 답변이 보이게 (모바일 메뉴 AI 와 같음)
-useChatKeyboard(() => chatRef.value?.scrollToBottom());
+useChatKeyboard(() => chatRef.value?.scrollToAnswer());
 
 onMounted(async () => {
   store.state.mobileSelectProgName = "PnC# AI 도우미";
@@ -71,8 +71,7 @@ onMounted(async () => {
     ? [m.strMajorName, m.strSubName, m.strTitle || m.strProgramName].map((v) => String(v || "").trim()).filter((v) => v).join(" > ")
     : "";
   await loadSalesAiScope(access.user || {});
-  await nextTick();
-  chatRef.value?.focusInput();
+  // 화면을 열 때 키보드를 띄우지 않는다 (모바일 메뉴 관리 AI 와 같음: 입력창을 누를 때만 키보드)
 });
 
 onBeforeUnmount(() => {
@@ -81,7 +80,6 @@ onBeforeUnmount(() => {
 
 const onReset = () => {
   resetChat();
-  nextTick(() => chatRef.value?.focusInput());
 };
 
 const goBack = () => {

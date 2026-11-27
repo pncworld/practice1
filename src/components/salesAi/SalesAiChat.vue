@@ -348,6 +348,7 @@ import {
   useSalesAi,
 } from "@/components/salesAi/useSalesAi";
 import { choiceIndexFromSpeech, useVoiceChat } from "@/components/salesAi/useVoiceChat";
+import { scrollToLatest } from "@/views/MOBILE/master/mobileChatKeyboard";
 
 const props = defineProps({
   // 이 대화 영역이 어디에 있는지: inline = 기본 대시보드 AI 창 / popup = 상단 AI 팝업 / mobile = 모바일 통합 AI 화면
@@ -391,7 +392,7 @@ watch(menuMode, (on) => {
 // 메뉴 관리 도우미의 말풍선이 늘면 아래로
 watch(
   () => menuInfo.value.count,
-  () => scrollToBottom()
+  () => scrollToAnswer()
 );
 const inputBusy = computed(() => state.loading || (menuMode.value && menuInfo.value.busy));
 const inputPlaceholder = computed(() =>
@@ -558,10 +559,22 @@ onMounted(() => {
   setTimeout(scrollToBottom, 300);
 });
 
-/** 다른 화면(팝업↔대시보드)에서 대화가 늘어도 아래로 */
+// ===== 모바일 키보드·포커스 (2026-11-27: ChatGPT·Claude 모바일 앱처럼) =====
+//  - 키보드는 입력창을 누를 때만 올라온다. 보내면 키보드를 내리고, 답이 와도 커서를 다시 넣지 않는다 (키보드가 결과를 가리지 않게)
+//  - 답이 오면 맨 아래 대신 내가 보낸 말풍선부터 보이게 (긴 답의 앞부분을 지나치지 않게)
+const isMobile = props.surface === "mobile";
+function scrollToAnswer() {
+  if (!isMobile) {
+    scrollToBottom();
+    return;
+  }
+  nextTick(() => scrollToLatest(logRef.value, ".sac-row--user, .mst003-chat-row--user"));
+}
+
+/** 다른 화면(팝업↔대시보드)에서 대화가 늘어도 아래로. 모바일은 답이 오면 내 말풍선부터 */
 watch(
   () => [state.messages.length, state.loading],
-  () => scrollToBottom()
+  () => (state.loading ? scrollToBottom() : scrollToAnswer())
 );
 
 async function send(text, fromVoice = false) {
@@ -569,13 +582,15 @@ async function send(text, fromVoice = false) {
   if (!q || inputBusy.value) return;
   // 음성 대화 중 버튼(예시·선택지)이나 보내기를 누르면 음성 대화를 멈추고 그 입력으로 진행
   if (!fromVoice && voiceChat) voiceChat.stop();
+  // 모바일: 보내면 키보드를 내린다 (답을 읽을 수 있게)
+  if (isMobile) inputRef.value?.blur();
   inputText.value = "";
   scrollToBottom();
   if (menuMode.value) await sendToMenu(q);
   else await sendText(q);
-  scrollToBottom();
-  // 음성 대화 중에는 입력창에 커서를 두지 않는다 (휴대폰 키보드가 올라오지 않게)
-  if (!voiceChat || !voiceChat.voice.on) nextTick(() => inputRef.value?.focus());
+  scrollToAnswer();
+  // 웹(PC)은 바로 이어 쓰게 커서를 되돌린다. 모바일·음성 대화 중에는 두지 않는다 (키보드가 올라와 결과를 가리지 않게)
+  if (!isMobile && (!voiceChat || !voiceChat.voice.on)) nextTick(() => inputRef.value?.focus());
 }
 
 // ===== 모바일 음성 대화 (2026-11-27, voice 를 켠 화면만) =====
@@ -679,9 +694,22 @@ watch(
 );
 
 function onKeydown(e) {
-  if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
+  if (e.key !== "Enter" || e.shiftKey) return;
+  const composing = e.isComposing || e.keyCode === 229;
+  if (!composing) {
     e.preventDefault();
     send(inputText.value);
+    return;
+  }
+  // 모바일: 한글 조합 중 Enter 는 조합을 확정한 뒤 바로 보낸다 (Enter 를 두 번 누르지 않게). 보내면 키보드는 내려간 채로
+  if (isMobile) {
+    e.preventDefault();
+    const el = e.target;
+    el.blur();
+    setTimeout(() => {
+      inputText.value = el.value;
+      send(el.value);
+    }, 0);
   }
 }
 
@@ -689,7 +717,7 @@ function focusInput() {
   nextTick(() => inputRef.value?.focus());
 }
 
-defineExpose({ focusInput, scrollToBottom });
+defineExpose({ focusInput, scrollToBottom, scrollToAnswer });
 
 // ===== 결과 표시 =====
 

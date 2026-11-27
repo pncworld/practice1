@@ -53,26 +53,29 @@ function sortDirection(rows, key) {
 const view = computed(() => {
   const c = props.chart || {};
   const rows = props.rows || [];
-  // 원그래프: 조각이 많으면 값 큰 순 상위 PIE_TOP 개 + 나머지를 '기타' 한 조각으로 (2026-11-27 원그래프 요청)
-  if (c.TYPE === "pie" && rows.length > PIE_TOP + 1 && c.VALUE_KEY) {
-    const sorted = [...rows].sort((a, b) => num(b[c.VALUE_KEY]) - num(a[c.VALUE_KEY]));
-    const rest = sorted.slice(PIE_TOP);
-    const etc = { [c.LABEL_KEY]: `기타 ${rest.length}개`, [c.VALUE_KEY]: rest.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0) };
-    return {
-      rows: [...sorted.slice(0, PIE_TOP), etc],
-      note: `원그래프는 상위 ${PIE_TOP}개와 나머지 ${rest.length}개(기타)입니다. 전체는 표·엑셀에서 볼 수 있습니다.`,
-    };
-  }
-  // 원그래프: 'TOP 5'처럼 서버가 줄여 보낸 결과면 전체 합계에서 나머지를 '기타' 한 조각으로 (조각 합 = 전체)
-  if (c.TYPE === "pie" && c.VALUE_KEY && props.total && rows.length >= 2) {
-    const all = num(props.total[c.VALUE_KEY]);
-    const shown = rows.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0);
-    if (all > 0 && all - shown > all * 0.001) {
+  // 원그래프 (2026-11-27)
+  //  - 조각이 많으면 값 큰 순 상위 PIE_TOP 개만 그린다
+  //  - 나머지를 '기타' 조각으로 그리는 것은 사용자가 기타·나머지를 말했을 때만(서버 chart.ETC = 'Y'). 'TOP 5'만 물으면 5개만
+  //  - 조각 안 % 는 답 글의 비중과 같게 전체 합계 대비 (기타를 안 그리면 조각 % 합이 100 이 아닐 수 있음)
+  if (c.TYPE === "pie" && c.VALUE_KEY) {
+    const sorted = rows.length > PIE_TOP + 1 ? [...rows].sort((a, b) => num(b[c.VALUE_KEY]) - num(a[c.VALUE_KEY])) : rows;
+    const shownRows = sorted.slice(0, rows.length > PIE_TOP + 1 ? PIE_TOP : rows.length);
+    const shown = shownRows.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0);
+    const all = props.total ? num(props.total[c.VALUE_KEY]) : rows.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0);
+    const restAmt = all - shown;
+    const hasRest = all > 0 && restAmt > all * 0.001;
+    if (c.ETC === "Y" && hasRest) {
       return {
-        rows: [...rows, { [c.LABEL_KEY]: "기타", [c.VALUE_KEY]: all - shown }],
-        note: `기타는 위 ${rows.length}개를 뺀 나머지 합계입니다.`,
+        rows: [...shownRows, { [c.LABEL_KEY]: "기타", [c.VALUE_KEY]: restAmt }],
+        base: all,
+        note: `기타는 위 ${shownRows.length}개를 뺀 나머지 합계입니다.`,
       };
     }
+    return {
+      rows: shownRows,
+      base: all > 0 ? all : shown,
+      note: hasRest ? `원그래프는 ${shownRows.length}개만 그렸습니다. 조각 안 % 는 전체 대비 비중입니다.` : "",
+    };
   }
   if (c.TYPE !== "bar" || rows.length <= MAX_BARS) return { rows, note: "" };
 
@@ -215,7 +218,7 @@ function render() {
           formatter: (v, ctx) => {
             if (num(v) === 0) return "";
             if (c.TYPE !== "pie") return fmtNum(v);
-            const total = ctx.dataset.data.reduce((s, x) => s + num(x), 0);
+            const total = view.value.base || ctx.dataset.data.reduce((s, x) => s + num(x), 0);
             const pct = total ? (num(v) / total) * 100 : 0;
             return pct < 3 ? "" : `${pct.toFixed(1)}%`;
           },
