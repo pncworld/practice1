@@ -21,6 +21,8 @@ const props = defineProps({
   rows: { type: Array, required: true },
   // 표 머리글 (막대를 줄일 때 표가 무엇 순으로 정렬됐는지 찾는 데 쓴다)
   columns: { type: Array, default: () => [] },
+  // 전체 합계 행 (원그래프에서 'TOP N' 으로 줄인 결과의 나머지를 '기타'로 그리는 데 쓴다, 2026-11-27)
+  total: { type: Object, default: null },
 });
 
 /** 막대 그래프는 최대 15개만 그린다 (2026-11-25 요청). 표·엑셀은 전체 */
@@ -60,6 +62,17 @@ const view = computed(() => {
       rows: [...sorted.slice(0, PIE_TOP), etc],
       note: `원그래프는 상위 ${PIE_TOP}개와 나머지 ${rest.length}개(기타)입니다. 전체는 표·엑셀에서 볼 수 있습니다.`,
     };
+  }
+  // 원그래프: 'TOP 5'처럼 서버가 줄여 보낸 결과면 전체 합계에서 나머지를 '기타' 한 조각으로 (조각 합 = 전체)
+  if (c.TYPE === "pie" && c.VALUE_KEY && props.total && rows.length >= 2) {
+    const all = num(props.total[c.VALUE_KEY]);
+    const shown = rows.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0);
+    if (all > 0 && all - shown > all * 0.001) {
+      return {
+        rows: [...rows, { [c.LABEL_KEY]: "기타", [c.VALUE_KEY]: all - shown }],
+        note: `기타는 위 ${rows.length}개를 뺀 나머지 합계입니다.`,
+      };
+    }
   }
   if (c.TYPE !== "bar" || rows.length <= MAX_BARS) return { rows, note: "" };
 
@@ -103,6 +116,10 @@ function localPlugins() {
   }
 }
 
+function isEtc(label) {
+  return /^기타(\s|$)/.test(String(label || ""));
+}
+
 function fmtNum(v) {
   const n = num(v);
   return n.toLocaleString("ko-KR");
@@ -128,8 +145,9 @@ function render() {
     datasets.push({
       label: c.VALUE_TITLE,
       data: rows.map((r) => num(r[c.VALUE_KEY])),
-      backgroundColor: PIE_COLORS,
-      borderColor: PIE_BORDERS,
+      // '기타'(나머지 합계) 조각은 항상 회색 (뜻 없는 묶음이라 다른 조각과 구분)
+      backgroundColor: rows.map((r, i) => (isEtc(r[c.LABEL_KEY]) ? "#e2e8f0" : PIE_COLORS[i % (PIE_COLORS.length - 1)])),
+      borderColor: rows.map((r, i) => (isEtc(r[c.LABEL_KEY]) ? "#64748b" : PIE_BORDERS[i % (PIE_BORDERS.length - 1)])),
       borderWidth: 1,
     });
   } else {
