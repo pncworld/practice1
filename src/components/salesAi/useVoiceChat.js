@@ -14,7 +14,20 @@ const recognitionCtor = () => (typeof window !== "undefined" ? window.SpeechReco
 const ttsSupported = typeof window !== "undefined" && "speechSynthesis" in window && "SpeechSynthesisUtterance" in window;
 
 /** 한국어 목소리 고르기: 휴대폰마다 다르므로 자연스러운 쪽(Google·Yuna 등 여성 신경망 음성)을 먼저 */
-const PREFERRED_VOICE = [/google/i, /yuna/i, /sunhi/i, /heami/i, /sora/i, /유나|해미|선희/];
+// 1) 신경망(자연스러운) 음성: Edge 의 'Microsoft SunHi Online (Natural)', iPhone 의 향상된(Enhanced/Premium) 음성
+// 2) 그다음 Google·유나 등 일반 음성, 마지막에 Windows 기본(Heami, 로봇 느낌)
+const PREFERRED_VOICE = [
+  /sunhi.*(natural|online)/i,
+  /(natural|neural)/i,
+  /(yuna|유나).*(premium|enhanced|향상|고급)/i,
+  /(premium|enhanced|향상|고급)/i,
+  /online/i,
+  /google/i,
+  /yuna|유나/i,
+  /sunhi|선희/i,
+  /sora/i,
+  /heami|해미/i,
+];
 function pickKoreanVoice() {
   if (!ttsSupported) return null;
   const list = window.speechSynthesis.getVoices().filter((v) => /^ko/i.test(v.lang || ""));
