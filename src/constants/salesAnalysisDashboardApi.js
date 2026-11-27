@@ -41,7 +41,7 @@ export const SALES_GOAL_REGISTRATION_TAB = {
  * 홈에서 매출 분석 대시보드 카드를 띄울 규칙.
  * - 마키노차야(1871): `lngUserAdminID` 가 10, 30, 또는 90 이상
  *   (`lngUserAdminID === lngStoreGroup` 그룹관리자는 홈·API에서 이미 스킵, 1871=1871 포함)
- * - 테스트(5001): 기존과 동일, 92만
+ * - 테스트(5001): 2026-11-27 부터 미사용 (일반 대시보드)
  * - 그 외 그룹: 이 대시보드 미사용
  * 신규 대시보드 5개 API 호출 여부는 `SalesAnalysisDashboard`의 `shouldSkipSalesAnalysisDashApis`만 따르며, 홈에 카드를 띄울지와는 별개(컴포넌트가 마운트될 때만 해당 API 실행).
  * (제거 시 `homePage2`·`SalesAnalysisDashboard` 분기 함께 정리)
@@ -70,9 +70,10 @@ export function matchesSalesAnalysisHomeTempBypass(u) {
   if (grp === SALES_ANALYSIS_HOME_GROUP_1871) {
     return aid === 10 || aid === 30 || aid >= 90;
   }
-  // 2026-11-10 테스트(5001, 데모 브랜드): 권한값과 관계없이 표시 (공급사 60·그룹관리자 제외). 운영 포함, 별도 요청 전까지 유지
+  // 2026-11-27 요청: 테스트(5001, 데모 브랜드)도 일반 대시보드(기본 대시보드 + AI 창)로 본다. 매출 분석 홈은 띄우지 않는다
+  //  (이전 2026-11-10: 권한값과 관계없이 매출 분석 홈 표시)
   if (grp === SALES_ANALYSIS_HOME_GROUP_TEST) {
-    return aid !== 60;
+    return false;
   }
   return SALES_ANALYSIS_HOME_TEMP_BYPASS_RULES.some(
     (r) => r.lngStoreGroup === grp && r.lngUserAdminIDs.includes(aid)

@@ -9,15 +9,8 @@
       class="dsa-fab"
       title="PnC# AI 도우미에게 물어보세요"
       @click="openPanel">
-      <svg class="dsa-fab__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path
-          d="M4 5h16v11H9l-5 4z"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linejoin="round" />
-        <path d="M8 10h8M8 13h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
+      <!-- 아이콘: 도우미 창과 같은 로봇 (2026-11-27 요청) -->
+      <SalesAiRobot :size="28" />
       PnC# AI 도우미
     </button>
 
@@ -58,7 +51,7 @@
             </div>
           </div>
 
-          <SalesAiChat ref="chatRef" />
+          <SalesAiChat ref="chatRef" surface="popup" />
         </div>
       </div>
     </Teleport>
@@ -146,11 +139,6 @@ defineExpose({
 .dsa-fab:hover {
   background: rgb(219 234 254);
   border-color: rgb(96 165 250);
-}
-
-.dsa-fab__icon {
-  width: 1.15rem;
-  height: 1.15rem;
 }
 
 .dsa-mask {

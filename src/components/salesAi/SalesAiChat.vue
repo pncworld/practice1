@@ -28,13 +28,25 @@
         </button>
       </div>
 
+      <template v-for="(msg, idx) in state.messages" :key="idx">
       <div
-        v-for="(msg, idx) in state.messages"
-        :key="idx"
         class="sac-row"
         :class="msg.role === 'user' ? 'sac-row--user' : 'sac-row--ai'">
-        <div class="sac-bubble" :class="{ 'sac-bubble--error': msg.error, 'sac-bubble--wide': hasResult(msg) }">
+        <div
+          class="sac-bubble"
+          :class="{ 'sac-bubble--error': msg.error, 'sac-bubble--wide': hasResult(msg) }">
           <div class="sac-text">{{ msg.text }}</div>
+          <!-- 메뉴 관리 도우미로 못 하는 요청: 메뉴코드등록 화면 열기 (2026-11-27) -->
+          <button
+            v-if="msg.menuScreenLink"
+            type="button"
+            class="pnc-sub-btn sac-screen-btn"
+            @click="onOpenMenuScreen">
+            <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            메뉴코드등록 화면 열기
+          </button>
 
           <!-- 메뉴 등록: 받은 값 확인 카드 -->
           <div v-if="msg.menuDraft" class="sac-menu-card">
@@ -148,7 +160,9 @@
                           v-if="mergeSpan(msg, rIdx, cIdx) > 0"
                           :rowspan="mergeSpan(msg, rIdx, cIdx)"
                           :class="[col.TYPE === 'text' ? 'sac-td-text' : '', col.KEY === 'DIFF_RATE' ? rateClass(row[col.KEY]) : '', mergeSpan(msg, rIdx, cIdx) > 1 ? 'sac-td-merged' : '']">
-                          {{ cellText(col, row) }}
+                          <!-- 합친 칸은 표를 내려도 이름이 헤더 아래에 남게 한다 (2026-11-27) -->
+                          <span v-if="mergeSpan(msg, rIdx, cIdx) > 1" class="sac-merged-label">{{ cellText(col, row) }}</span>
+                          <template v-else>{{ cellText(col, row) }}</template>
                         </td>
                       </template>
                     </tr>
@@ -207,6 +221,26 @@
           </template>
         </div>
       </div>
+      <!-- 메뉴 관리 (2026-11-26, 2026-11-27 입력창 하나로): 메뉴 관리 도우미의 대화를 이 대화에 이어 붙인다.
+           입력은 아래 입력창이 메뉴 관리 도우미로 넘긴다. 홈 창·팝업 중 보이는 한 곳에만 펼친다 -->
+      <!-- 메뉴 관리 칸이 닫힐 때(팝업 닫기·창 이동·끝내기) 남긴 대화 화면 (보기만, 2026-11-27) -->
+      <div
+        v-if="msg.menuPanelId && state.menuSnapshots[msg.menuPanelId]"
+        class="sac-menu-snapshot mst003-chat-popup--bare"
+        v-html="state.menuSnapshots[msg.menuPanelId]"></div>
+      <SalesAiMenuPanel
+        v-if="isLiveMenuPanel(msg)"
+        :ref="setMenuPanelRef"
+        :question="state.menuPanel.sentKey === state.menuPanel.key ? '' : state.menuPanel.question"
+        :question-key="state.menuPanel.key"
+        :read-only-text="state.menuPanel.readOnlyText"
+        @sent="markMenuPanelSent"
+        @close="closeMenuPanel"
+        @menu-state="onMenuState"
+        @screen-only="pushMenuScreenGuide"
+        @focus-menu="onFocusMenuInScreen"
+        @snapshot="(h) => saveMenuSnapshot(msg.menuPanelId, h)" />
+      </template>
 
       <div v-if="state.loading" class="sac-row sac-row--ai">
         <div class="sac-bubble sac-bubble--loading">
@@ -232,6 +266,18 @@
       </button>
     </div>
 
+    <!-- 메뉴 관리 중 표시 (2026-11-27): 이때 입력은 메뉴 관리 도우미가 받는다 -->
+    <div v-if="menuMode" class="sac-menu-bar">
+      <span>메뉴 관리 중 · 입력하신 내용은 메뉴 관리 도우미가 답합니다</span>
+      <button type="button" class="pnc-sub-btn pnc-sub-btn--gray" :disabled="menuInfo.busy" @click="endMenuMode">
+        <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="8.25" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        메뉴 관리 끝내기
+      </button>
+    </div>
+
     <div class="sac-input">
       <textarea
         ref="inputRef"
@@ -239,13 +285,13 @@
         class="sac-textarea"
         rows="2"
         maxlength="500"
-        placeholder="예: 지난달 매장별 매출 TOP 5 (Enter 보내기, Shift+Enter 줄바꿈)"
-        :disabled="state.loading"
+        :placeholder="inputPlaceholder"
+        :disabled="inputBusy"
         @keydown="onKeydown"></textarea>
       <button
         type="button"
         class="pnc-sub-btn sac-send"
-        :disabled="state.loading || !inputText.trim()"
+        :disabled="inputBusy || !inputText.trim()"
         @click="send(inputText)">
         <svg class="pnc-sub-btn__icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
           <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -257,14 +303,97 @@
 </template>
 
 <script setup>
-import { defineExpose, nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from "vue";
+import { computed, defineExpose, defineProps, nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from "vue";
+import SalesAiMenuPanel from "@/components/salesAi/SalesAiMenuPanel.vue";
 import { utils, writeFile } from "xlsx-js-style";
 import Swal from "sweetalert2";
 import DashboardAiChart from "@/components/DashboardAiChart.vue";
 import { getCustomerExportRows, requestCustomerExport } from "@/api/dashboardAi";
-import { SALES_AI_TOPIC_TEXT, salesAiConditionText, useSalesAi } from "@/components/salesAi/useSalesAi";
+import {
+  SALES_AI_TOPIC_TEXT,
+  openMenuScreen,
+  openMenuScreenAt,
+  pushMenuScreenGuide,
+  saveMenuSnapshot,
+  salesAiConditionText,
+  useSalesAi,
+} from "@/components/salesAi/useSalesAi";
 
-const { state, examples, sendText, cancelMenu, handoffMenu } = useSalesAi();
+const props = defineProps({
+  // 이 대화 영역이 어디에 있는지: inline = 기본 대시보드 AI 창 / popup = 상단 AI 팝업 (메뉴 관리 칸을 보이는 한 곳에만 펼친다)
+  surface: { type: String, default: "inline" },
+});
+
+const { state, examples, sendText, cancelMenu, handoffMenu, markMenuPanelSent, closeMenuPanel } = useSalesAi();
+
+/** 이 메시지 아래에 메뉴 관리 칸을 펼칠지 (열린 칸의 메시지 + 지금 보이는 곳: 팝업이 열려 있으면 팝업, 아니면 홈 창) */
+function isLiveMenuPanel(msg) {
+  if (!msg.menuPanelId || !state.menuPanel || state.menuPanel.id !== msg.menuPanelId) return false;
+  return (state.popupOpen ? "popup" : "inline") === props.surface;
+}
+
+// ===== 메뉴 관리 중: 입력창 하나로 (2026-11-27) =====
+// 메뉴 관리 칸이 이 대화 영역에 펼쳐져 있으면 입력창의 말은 메뉴 관리 도우미가 받는다
+const menuMode = computed(() => !!state.menuPanel && (state.popupOpen ? "popup" : "inline") === props.surface);
+const EMPTY_MENU_INFO = { ready: false, busy: false, placeholder: "", count: 0 };
+const menuInfo = ref({ ...EMPTY_MENU_INFO });
+let menuPanelRef = null;
+function setMenuPanelRef(el) {
+  menuPanelRef = el;
+}
+function onMenuState(s) {
+  menuInfo.value = { ...EMPTY_MENU_INFO, ...s };
+}
+watch(menuMode, (on) => {
+  if (!on) menuInfo.value = { ...EMPTY_MENU_INFO };
+});
+// 메뉴 관리 도우미의 말풍선이 늘면 아래로
+watch(
+  () => menuInfo.value.count,
+  () => scrollToBottom()
+);
+const inputBusy = computed(() => state.loading || (menuMode.value && menuInfo.value.busy));
+const inputPlaceholder = computed(() =>
+  menuMode.value
+    ? `메뉴 관리: ${menuInfo.value.placeholder || "원하시는 작업을 입력해 주세요."} (Enter 보내기)`
+    : "예: 지난달 매장별 매출 TOP 5 (Enter 보내기, Shift+Enter 줄바꿈)"
+);
+// 메뉴 관리 결과에서 메뉴를 누름: 메뉴코드등록 화면을 열고 그 메뉴 줄을 선택한다 (2026-11-27)
+function onFocusMenuInScreen(target) {
+  if (!openMenuScreenAt(target)) {
+    state.messages.push({
+      role: "ai",
+      text: "메뉴코드등록 화면을 열 수 없습니다. 왼쪽 메뉴에서 메뉴코드등록 화면 권한을 확인해 주세요.",
+      error: true,
+    });
+  }
+}
+function onOpenMenuScreen() {
+  if (!openMenuScreen()) {
+    state.messages.push({
+      role: "ai",
+      text: "메뉴코드등록 화면을 열 수 없습니다. 왼쪽 메뉴에서 메뉴코드등록 화면 권한을 확인해 주세요.",
+      error: true,
+    });
+  }
+}
+function endMenuMode() {
+  closeMenuPanel();
+  focusInput();
+}
+// 입력창의 말을 메뉴 관리 도우미로 넘긴다. 아직 준비 전(매장 선택 전·불러오는 중)이면 안내한다
+async function sendToMenu(q) {
+  const ok = menuPanelRef ? await menuPanelRef.sendText(q) : false;
+  if (!ok) {
+    inputText.value = q;
+    state.messages.push({
+      role: "ai",
+      text: menuInfo.value.ready
+        ? "메뉴 관리 도우미가 답을 쓰는 중입니다. 잠시 후 다시 보내 주세요."
+        : "메뉴 관리 칸이 아직 준비되지 않았습니다. 매장을 고르거나 메뉴 목록을 불러온 뒤 다시 보내 주세요.",
+    });
+  }
+}
 
 /** 확인이 끝난 메뉴를 메뉴코드등록 화면으로 넘긴다 */
 function goMenuScreen(draft) {
@@ -379,10 +508,11 @@ watch(
 
 async function send(text) {
   const q = String(text || "").trim();
-  if (!q || state.loading) return;
+  if (!q || inputBusy.value) return;
   inputText.value = "";
   scrollToBottom();
-  await sendText(q);
+  if (menuMode.value) await sendToMenu(q);
+  else await sendText(q);
   scrollToBottom();
   nextTick(() => inputRef.value?.focus());
 }
@@ -466,8 +596,13 @@ function mergeSpan(msg, rIdx, cIdx) {
   return spans[rIdx] ? spans[rIdx][cIdx] : 1;
 }
 
+/** 비중 열: 실매출 비중(SHARE)과 정렬 기준 비중(SORT_SHARE, 예: 판매수량 비중) — 2026-11-27 */
+function isShareKey(key) {
+  return key === "SHARE" || key === "SORT_SHARE";
+}
+
 function valueColumns(msg) {
-  return msg.columns.filter((c) => c.TYPE !== "text" && c.KEY !== "SHARE" && !c.KEY.startsWith("PREV_") && c.KEY !== "DIFF_RATE");
+  return msg.columns.filter((c) => c.TYPE !== "text" && !isShareKey(c.KEY) && !c.KEY.startsWith("PREV_") && c.KEY !== "DIFF_RATE");
 }
 
 function totalLabel(msg) {
@@ -496,13 +631,13 @@ function cellText(col, row) {
   const v = row ? row[col.KEY] : "";
   if (col.TYPE === "text") return v == null || v === "" ? "-" : v;
   if (col.TYPE === "num") return v === "" || v == null ? "-" : fmt(v);
-  if (col.TYPE === "rate") return col.KEY === "SHARE" ? (v === "" || v == null ? "-" : Number(v).toFixed(1) + "%") : rateText(v);
+  if (col.TYPE === "rate") return isShareKey(col.KEY) ? (v === "" || v == null ? "-" : Number(v).toFixed(1) + "%") : rateText(v);
   return fmt(v);
 }
 
 /** 합계 행: 글자 열·비중은 비우고 숫자·비교만 */
 function totalCellText(col, total) {
-  if (col.TYPE === "text" || col.KEY === "SHARE") return "";
+  if (col.TYPE === "text" || isShareKey(col.KEY)) return "";
   if (total[col.KEY] === undefined) return "";
   return cellText(col, total);
 }
@@ -611,7 +746,7 @@ async function downloadExcel(msg) {
   aoa.push(cols.map((c) => c.TITLE));
   rows.forEach((r) => aoa.push(cols.map((c) => excelValue(c, r))));
   if (msg.total && rows.length > 1) {
-    aoa.push(cols.map((c, i) => (i === 0 ? totalLabel(msg) : c.TYPE === "text" || c.KEY === "SHARE" ? "" : excelValue(c, msg.total))));
+    aoa.push(cols.map((c, i) => (i === 0 ? totalLabel(msg) : c.TYPE === "text" || isShareKey(c.KEY) ? "" : excelValue(c, msg.total))));
   }
 
   const ws = utils.aoa_to_sheet(aoa);
@@ -798,6 +933,15 @@ async function downloadExcel(msg) {
   line-height: 1.7;
 }
 
+.sac-screen-btn {
+  margin-top: 0.5rem;
+}
+
+/* 메뉴 관리 칸이 닫힐 때 남긴 대화 화면: 보기만 (버튼·메뉴 누르기는 동작하지 않으므로 막는다) */
+.sac-menu-snapshot {
+  pointer-events: none;
+}
+
 .sac-cond {
   margin-top: 0.4rem;
   font-size: 0.75rem;
@@ -968,23 +1112,34 @@ async function downloadExcel(msg) {
   vertical-align: top;
   background: #fffbeb;
 }
+.sac-merged-label {
+  position: sticky;
+  top: 2.1rem;
+  display: block;
+}
 /* 결과 표 스크롤 막대: 얇아서 잡기 어려워 16px 로 키운다 (콤보 펼침 목록 공통 막대와 같은 굵기) — 2026-11-26 요청 */
-.sac-table-wrap::-webkit-scrollbar {
+/* 대화 영역(.sac-log) 세로 막대도 같은 16px 로 (2026-11-27 요청: 가늘어서 잡기 어려움) */
+.sac-table-wrap::-webkit-scrollbar,
+.sac-log::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
-.sac-table-wrap::-webkit-scrollbar-track {
+.sac-table-wrap::-webkit-scrollbar-track,
+.sac-log::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
-.sac-table-wrap::-webkit-scrollbar-thumb {
+.sac-table-wrap::-webkit-scrollbar-thumb,
+.sac-log::-webkit-scrollbar-thumb {
   background: #94a3b8;
   border-radius: 8px;
   border: 3px solid #f1f5f9;
 }
-.sac-table-wrap::-webkit-scrollbar-thumb:hover {
+.sac-table-wrap::-webkit-scrollbar-thumb:hover,
+.sac-log::-webkit-scrollbar-thumb:hover {
   background: #64748b;
 }
-.sac-table-wrap::-webkit-scrollbar-corner {
+.sac-table-wrap::-webkit-scrollbar-corner,
+.sac-log::-webkit-scrollbar-corner {
   background: #f1f5f9;
 }
 
@@ -994,12 +1149,19 @@ async function downloadExcel(msg) {
   font-size: 0.8rem;
 }
 
+/* 구분선: 행·열 모두 보이게 (2026-11-27 요청, 예전 #f1f5f9 는 거의 안 보임) */
 .sac-table th,
 .sac-table td {
   padding: 0.35rem 0.55rem;
-  border-bottom: 1px solid #f1f5f9;
+  border-bottom: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
   text-align: right;
   white-space: nowrap;
+}
+
+.sac-table th:last-child,
+.sac-table td:last-child {
+  border-right: 0;
 }
 
 .sac-table th {
@@ -1009,6 +1171,7 @@ async function downloadExcel(msg) {
   color: #334155;
   font-weight: 600;
   text-align: center;
+  border-bottom: 1px solid #cbd5e1;
 }
 
 .sac-table .sac-td-text {

@@ -8,7 +8,8 @@ import store from "@/store";
  * - 조회 범위(매장)는 서버가 토큰의 사용자 기준으로 정한다. 화면에서 그룹·매장 코드를 보내지 않는다.
  */
 const api2 = axios.create({
-  baseURL: commonUrl2, // API 기본 URL
+  // API 기본 URL. 로컬 검증: .env.development.local 에 VUE_APP_AI_API_BASE 가 있으면 개발 서버에서만 그 주소(로컬 ASMX)로 보낸다 (운영 빌드는 읽지 않음)
+  baseURL: process.env.VUE_APP_AI_API_BASE || commonUrl2,
   timeout: 300000, // AI 호출 2회(해석·요약) + 조회. 고객 질문은 사내 로컬 AI(CPU)라 더 오래 걸릴 수 있다 (2026-11-25)
 });
 

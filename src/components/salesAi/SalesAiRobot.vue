@@ -3,7 +3,8 @@
        흰 둥근 머리에 검은 화면. 둥둥 떠다니며 고개를 살짝 기울이고, 표정이 바뀐다
        (평소 눈 → 깜박임 → 웃는 눈 ^^ + 미소 + 볼 → 윙크). 주황 안테나 불빛이 깜박인다.
        움직임 줄이기 설정이면 멈춘다 -->
-  <span class="sar-bot" aria-hidden="true">
+  <!-- size(px): 넣으면 그 크기로 줄여 그린다 (상단 탭 줄·오른쪽 아래 버튼, 2026-11-27). 없으면 기본 36px 그대로 -->
+  <span class="sar-bot" :style="size ? { zoom: size / 36 } : null" aria-hidden="true">
     <span class="sar-ant"></span>
     <span class="sar-head"></span>
     <span class="sar-screen">
@@ -17,6 +18,14 @@
     </span>
   </span>
 </template>
+
+<script setup>
+import { defineProps } from "vue";
+
+defineProps({
+  size: { type: Number, default: 0 },
+});
+</script>
 
 <style scoped>
 .sar-bot {

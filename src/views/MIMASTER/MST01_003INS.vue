@@ -2686,8 +2686,8 @@ import { v4 as uuidv4 } from "uuid";
  * 공통 표준  Function
  */
 
-import { computed, nextTick, onActivated, onBeforeUnmount, onMounted, ref, watch } from "vue";
-import { AI_MENU_HANDOFF_KEY } from "@/components/salesAi/useSalesAi";
+import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, watch } from "vue";
+import { AI_MENU_FOCUS_EVENT, AI_MENU_FOCUS_KEY, AI_MENU_HANDOFF_KEY } from "@/components/salesAi/useSalesAi";
 /**
  *  Vuex 상태관리 및 로그인세션 관련 라이브러리
  */
@@ -4291,7 +4291,7 @@ const aiChatDisplayMessages = computed(() => {
   // 마지막 말풍선이 사용자 말이거나 표·버튼이 있는 말풍선이면 따로 선택지 말풍선을 붙인다
   if (
     !aiChatLoading.value &&
-    ["main", "sub", "optionGroup", "settingRef", "editSub"].includes(aiChatStep.value) &&
+    ["main", "sub", "optionGroup", "settingRef", "editMain", "editSub"].includes(aiChatStep.value) &&
     aiChatGroupChoices.value.length > 0
   ) {
     const last = list[list.length - 1];
@@ -4349,7 +4349,9 @@ const aiChatStep = ref("intent");
 const AI_CHAT_STEP_TEXT = {
   intent: "원하시는 작업",
   editPick: "수정할 메뉴 선택",
+  editMain: "대분류 선택",
   editSub: "소분류 선택",
+  editValue: "바꿀 값",
   editConfirm: "수정 확인 (수정 저장 / 취소)",
   name: "메뉴명",
   price: "판매가",
@@ -5399,8 +5401,12 @@ const aiChatGroupChoices = computed(() => {
       .filter((i) => main !== "" && String(i.sublngMajor) === main)
       .map((i) => ({ code: String(i.GroupCd), name: i.subGroupNm }));
   }
+  if (aiChatStep.value === "editMain") {
+    return (MenuGroup.value || []).map((i) => ({ code: String(i.GroupCd), name: i.majorGroupNm }));
+  }
   if (aiChatStep.value === "editSub") {
-    const main = aiEditPending.value?.changes?.lngMainGroup || "";
+    // 대분류를 바꾸면 새 대분류의 소분류, 소분류만 바꾸면 지금 대분류의 소분류 (subMain, 2026-11-27)
+    const main = aiEditPending.value?.changes?.lngMainGroup || aiEditPending.value?.subMain || "";
     return (SubMenuGroup.value || [])
       .filter((i) => main !== "" && String(i.sublngMajor) === main)
       .map((i) => ({ code: String(i.GroupCd), name: i.subGroupNm }));
@@ -5423,10 +5429,44 @@ const aiChatGroupChoices = computed(() => {
 
 const chooseAiChatGroup = (g) => {
   if (aiChatLoading.value) return;
+  // 메뉴 수정에서 '대분류'만 말한 뒤의 대분류 선택 (2026-11-27). 지금과 같은 대분류면 그 안의 소분류를 고르게 한다
+  if (aiChatStep.value === "editMain") {
+    const pending = aiEditPending.value;
+    if (!pending || !pending.row) return;
+    pushAiChatLocal("user", `대분류: [${g.code}] ${g.name}`);
+    let summary;
+    if (g.code === String(pending.row.lngMainGroup)) {
+      pending.subMain = g.code;
+      aiChatStep.value = "editSub";
+      pushAiChatLocal("assistant", "지금과 같은 대분류입니다. 바꿀 소분류를 선택해 주세요.");
+      summary = `[수정 준비] [${pending.row.lngCode}] ${pending.row.strName}: 같은 대분류, 소분류 선택 대기`;
+    } else {
+      summary = prepareAiEdit(pending.row, { lngMainGroup: g.code });
+    }
+    aiAssistHistory.value = [
+      ...aiAssistHistory.value,
+      { role: "user", content: `대분류 [${g.code}] ${g.name} 선택` },
+      { role: "assistant", content: summary },
+    ].slice(-(AI_ASSIST_MAX_MESSAGES - 1));
+    scrollAiChatLog();
+    focusAiChatInput();
+    return;
+  }
   // 메뉴 수정에서 대분류를 바꿀 때의 소분류 선택
   if (aiChatStep.value === "editSub") {
     if (!aiEditPending.value) return;
     pushAiChatLocal("user", `소분류: [${g.code}] ${g.name}`);
+    // 소분류만 바꾸는데 지금과 같은 소분류를 고르면 바꿀 것이 없다고 알리고 다시 고르게 한다 (2026-11-27)
+    const editRow = aiEditPending.value.row;
+    if (
+      editRow &&
+      !aiEditPending.value.changes.lngMainGroup &&
+      g.code === String(editRow.lngSubGroup)
+    ) {
+      pushAiChatLocal("assistant", "지금과 같은 소분류입니다. 다른 소분류를 선택해 주세요.", true);
+      scrollAiChatLog();
+      return;
+    }
     aiEditPending.value.changes.lngSubGroup = g.code;
     const summary = showAiEditConfirm();
     aiAssistHistory.value = [
@@ -5602,7 +5642,11 @@ const runAiSearch = async (cond) => {
         dateType === "insert" ? d.dtmInsertTime : d.dtmUpdateTime,
       ])
     );
-    dateDesc = `${fromText === toText ? fromText : `${fromText} ~ ${toText}`} ${dateType === "insert" ? "등록" : "수정"}`;
+    // 기간 없이 '최근 등록 10개'처럼 물으면(시작일 2000-01-01 이하) 기간 대신 '등록일 최근 순'으로 보여 준다 (2026-11-27)
+    dateDesc =
+      fromText <= "2000-01-01"
+        ? `${dateType === "insert" ? "등록일" : "수정일"} 최근 순`
+        : `${fromText === toText ? fromText : `${fromText} ~ ${toText}`} ${dateType === "insert" ? "등록" : "수정"}`;
   }
   const prevScope = aiPreviousScope(cond);
   const rows = aiMenuRows().filter((r) => {
@@ -6337,10 +6381,28 @@ const prepareAiEdit = (row, changes) => {
   if (notes.length > 0) pushAiChatLocal("assistant", notes.join(" "), true);
 
   if (Object.keys(c).length === 0) {
+    // 지금과 같은 대분류만 말하면 그 대분류 안에서 소분류를 바꾸려는 뜻으로 보고 소분류를 고르게 한다 (2026-11-27)
+    const sameMain =
+      changes.lngMainGroup !== undefined &&
+      String(changes.lngMainGroup) === String(row.lngMainGroup) &&
+      !changes.lngSubGroup &&
+      notes.length === 0;
+    if (sameMain) {
+      aiEditPending.value.subMain = String(row.lngMainGroup);
+      aiChatStep.value = "editSub";
+      pushAiChatLocal(
+        "assistant",
+        `지금도 '${aiMainName(row.lngMainGroup)}' 대분류입니다. 바꿀 소분류를 선택해 주세요. (지금: ${aiEditFieldText("lngSubGroup", row)})`
+      );
+      return `[수정 준비] ${title}: 같은 대분류, 소분류 선택 대기`;
+    }
     aiChatStep.value = "intent";
+    // 말한 값이 모두 지금 값과 같으면 그렇다고 알린다 (같은 질문만 되풀이하지 않게)
+    const askedSame = Object.keys(changes || {}).length > 0 && notes.length === 0;
     pushAiChatLocal(
       "assistant",
-      `${title} 메뉴에서 바꿀 내용을 말씀해 주세요. (메뉴명·판매가·대분류·소분류·과세구분·사용여부)`
+      (askedSame ? "말씀하신 값이 지금 값과 같습니다. " : "") +
+        `${title} 메뉴에서 바꿀 내용을 말씀해 주세요. (메뉴명·판매가·대분류·소분류·과세구분·사용여부)`
     );
     return `[수정 준비] ${title}: 바꿀 내용 대기`;
   }
@@ -6486,6 +6548,113 @@ const saveAiEdit = async () => {
 };
 
 // 화면에서 끝낼 수 있는 입력(수정 메뉴 선택·소분류 선택·수정 저장/취소)은 AI를 부르지 않는다
+// 수정할 항목 이름만 말했는지 (값이 없는 말). '과세'·'사용'·'미사용'처럼 값 자체인 말은 AI 가 처리한다 (2026-11-27)
+const AI_EDIT_FIELD_WORDS = [
+  { re: /^(메뉴명|메뉴이름|이름)$/, field: "strName" },
+  { re: /^(판매가|가격|단가)$/, field: "lngPrice" },
+  { re: /^(대분류|분류)$/, field: "lngMainGroup" },
+  { re: /^소분류$/, field: "lngSubGroup" },
+  { re: /^(과세구분|과세여부|면세여부)$/, field: "lngTax" },
+  { re: /^사용여부$/, field: "blnInactive" },
+];
+const aiEditFieldOnly = (text) => {
+  const base = String(text || "")
+    .replace(/\s+/g, "")
+    .replace(/[.!?~]+$/, "");
+  // 뒤에 붙은 '변경해줘' 등을 뗀 말, 거기서 조사까지 뗀 말 순으로 본다 ('판매가'의 '가'를 조사로 떼지 않게 원래 말부터)
+  const noVerb = base.replace(/(변경|수정|바꾸기|바꿀래|바꿔|바꿔줘|바꿔주세요|변경해줘|수정해줘|바꾸고싶어|바꾸려고)(요)?$/, "");
+  const plain = noVerb.replace(/요$/, "");
+  const candidates = [base, noVerb, plain, plain.replace(/(을|를|은|는|이|가)$/, "")];
+  for (const t of candidates) {
+    const hit = AI_EDIT_FIELD_WORDS.find((w) => w.re.test(t));
+    if (hit) return hit.field;
+  }
+  return "";
+};
+const askAiEditField = (pending, field, text) => {
+  const row = pending.row;
+  const title = `[${row.lngCode}] ${row.strName}`;
+  const label = (AI_EDIT_FIELDS.find((f) => f.key === field) || {}).label || field;
+  const now = aiEditFieldText(field, row);
+  pushAiChatLocal("user", text);
+  if (field === "lngMainGroup") {
+    aiChatStep.value = "editMain";
+    pushAiChatLocal("assistant", `바꿀 대분류를 선택해 주세요. (지금: ${now})`);
+  } else if (field === "lngSubGroup") {
+    pending.subMain = String(row.lngMainGroup);
+    aiChatStep.value = "editSub";
+    pushAiChatLocal("assistant", `바꿀 소분류를 선택해 주세요. (지금: ${now})`);
+  } else {
+    pending.askField = field;
+    aiChatStep.value = "editValue";
+    const ask = {
+      strName: "새 메뉴명을 입력해 주세요.",
+      lngPrice: "새 판매가를 숫자로 입력해 주세요. (예: 12000)",
+      lngTax: "과세 또는 면세로 입력해 주세요.",
+      blnInactive: "사용 또는 미사용으로 입력해 주세요.",
+    }[field];
+    pushAiChatLocal("assistant", `${ask} (지금: ${now})`);
+  }
+  aiAssistHistory.value = [
+    ...aiAssistHistory.value,
+    { role: "user", content: text },
+    { role: "assistant", content: `[수정 준비] ${title}: ${label} 값 대기` },
+  ].slice(-(AI_ASSIST_MAX_MESSAGES - 1));
+  scrollAiChatLog();
+  focusAiChatInput();
+};
+// editValue 단계 답: 값을 읽어 변경 전/후 확인으로 넘긴다. 읽지 못하면 다시 묻는다
+const parseAiEditPrice = (text) => {
+  const t = String(text || "").replace(/[\s,원]/g, "");
+  if (/^\d+$/.test(t)) return Number(t);
+  const m = t.match(/^(?:(\d+)만)?(?:(\d+)천)?$/);
+  if (m && (m[1] || m[2])) return Number(m[1] || 0) * 10000 + Number(m[2] || 0) * 1000;
+  return -1;
+};
+const answerAiEditValue = (pending, text) => {
+  const field = pending.askField;
+  const t = String(text || "").trim();
+  let changes = null;
+  if (field === "strName" && t !== "") changes = { strName: t.slice(0, 50) };
+  if (field === "lngPrice") {
+    const p = parseAiEditPrice(t);
+    if (p >= 0) changes = { lngPrice: String(p) };
+  }
+  if (field === "lngTax") {
+    if (/면세/.test(t)) changes = { lngTax: "2" };
+    else if (/과세/.test(t)) changes = { lngTax: "0" };
+  }
+  if (field === "blnInactive") {
+    if (/미사용|사용\s*안/.test(t)) changes = { blnInactive: "1" };
+    else if (/^사용/.test(t)) changes = { blnInactive: "0" };
+  }
+  if (!changes && /^(취소|그만|아니)/.test(t)) {
+    pushAiChatLocal("user", t);
+    aiEditPending.value = null;
+    aiChatStep.value = "intent";
+    aiAssistHistory.value = [];
+    pushAiChatLocal("assistant", "수정을 취소했습니다. 원하시는 작업을 입력해 주세요.", true);
+    scrollAiChatLog();
+    return true;
+  }
+  pushAiChatLocal("user", t);
+  if (!changes) {
+    pushAiChatLocal("assistant", "알아듣지 못했습니다. 다시 입력해 주세요. (그만두려면 '취소')", true);
+    scrollAiChatLog();
+    return true;
+  }
+  delete pending.askField;
+  const summary = prepareAiEdit(pending.row, changes);
+  aiAssistHistory.value = [
+    ...aiAssistHistory.value,
+    { role: "user", content: t },
+    { role: "assistant", content: summary },
+  ].slice(-(AI_ASSIST_MAX_MESSAGES - 1));
+  scrollAiChatLog();
+  focusAiChatInput();
+  return true;
+};
+
 const handleAiEditLocalInput = (text) => {
   const pending = aiEditPending.value;
   if (!pending) return false;
@@ -6498,12 +6667,34 @@ const handleAiEditLocalInput = (text) => {
       return true;
     }
   }
-  if (aiChatStep.value === "editSub") {
+  // 분류를 고르는 중 '취소' (2026-11-27)
+  if ((aiChatStep.value === "editMain" || aiChatStep.value === "editSub") && /^(취소|그만)/.test(text)) {
+    pushAiChatLocal("user", text);
+    aiEditPending.value = null;
+    aiChatStep.value = "intent";
+    aiAssistHistory.value = [];
+    pushAiChatLocal("assistant", "수정을 취소했습니다. 원하시는 작업을 입력해 주세요.", true);
+    scrollAiChatLog();
+    return true;
+  }
+  if (aiChatStep.value === "editMain" || aiChatStep.value === "editSub") {
     const g = aiChatGroupChoices.value.find(
       (c) => c.code === text || normAiText(c.name) === normAiText(text)
     );
     if (g) {
       chooseAiChatGroup(g);
+      return true;
+    }
+  }
+  if (aiChatStep.value === "editValue" && pending.row && pending.askField) {
+    return answerAiEditValue(pending, text);
+  }
+  // 메뉴를 정한 뒤 바꿀 항목 이름만 말한 경우(예: '대분류', '판매가 바꿀래'): AI 에 다시 묻지 않고 바로 고르게 하거나 값을 묻는다
+  //  (2026-11-27: AI 에 보내면 값이 없어 같은 질문을 되풀이하거나, 바꿀 수 있는 분류를 못 바꾼다고 답함)
+  if (aiChatStep.value === "intent" && pending.row && Object.keys(pending.changes || {}).length === 0) {
+    const field = aiEditFieldOnly(text);
+    if (field) {
+      askAiEditField(pending, field, text);
       return true;
     }
   }
@@ -7168,6 +7359,82 @@ const continueAiHandoff = async () => {
 onMounted(readAiHandoff);
 onActivated(readAiHandoff);
 
+// ===== PnC# AI 도우미에서 '이 메뉴 보기' (2026-11-27) =====
+// AI 창 메뉴 관리 결과에서 메뉴를 누르면 이 화면이 열리고, 조회된 목록에서 그 메뉴 줄을 선택해 상세정보를 보여 준다.
+// 공통 메뉴 브랜드는 바로 조회한다. 매장별 메뉴 브랜드는 그 매장이 선택·조회되면(지금 매장이 맞으면 바로) 선택한다
+const AI_FOCUS_MAX_AGE_MS = 10 * 60 * 1000;
+const aiFocusHandoff = ref(null);
+const applyAiFocusHandoff = async () => {
+  const d = aiFocusHandoff.value;
+  if (!d || !afterSearch.value || (rowData.value || []).length === 0) return;
+  const storeOk = isStoreImageFeatureEnabled.value || String(nowStoreCd.value) === String(d.STORE_CD);
+  if (!storeOk) return;
+  aiFocusHandoff.value = null;
+  // 목록 그리드가 그려질 때까지 잠깐 기다린 뒤 선택한다
+  await nextTick();
+  await new Promise((r) => setTimeout(r, 300));
+  if ((await focusAiMenuRow(d.CODE)) < 0) {
+    Swal.fire({
+      title: "안내",
+      text: `메뉴 목록에서 '[${d.CODE}] ${d.NAME || ""}' 메뉴를 찾지 못했습니다.`,
+      icon: "warning",
+      confirmButtonText: "확인",
+    });
+  }
+};
+const readAiFocusHandoff = async () => {
+  let d = null;
+  try {
+    const raw = sessionStorage.getItem(AI_MENU_FOCUS_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(AI_MENU_FOCUS_KEY);
+    d = JSON.parse(raw);
+  } catch (e) {
+    return;
+  }
+  if (!d || !d.CODE || Date.now() - Number(d.at || 0) > AI_FOCUS_MAX_AGE_MS) return;
+  if (String(d.GROUP_CD) !== String(groupCd.value)) return;
+  aiFocusHandoff.value = d;
+  if (isStoreImageFeatureEnabled.value) {
+    if (!afterSearch.value) await searchButton();
+  } else if (String(nowStoreCd.value) !== String(d.STORE_CD)) {
+    Swal.fire({
+      title: "안내",
+      text: `매장 '${d.STORE_NM || d.STORE_CD}'을(를) 선택하면 '[${d.CODE}] ${d.NAME || ""}' 메뉴로 이동합니다.`,
+      icon: "info",
+      confirmButtonText: "확인",
+    });
+  }
+  await applyAiFocusHandoff();
+};
+watch(
+  () => [afterSearch.value, rowData.value, nowStoreCd.value],
+  () => {
+    applyAiFocusHandoff();
+  }
+);
+// 이 화면이 이미 떠 있을 때(보고 있는 중·기존 탭으로 이동) AI 창이 보내는 알림. 지금 보이는 화면만 읽는다
+let aiFocusScreenActive = false;
+const onAiFocusEvent = () => {
+  if (aiFocusScreenActive) readAiFocusHandoff();
+};
+onMounted(() => {
+  aiFocusScreenActive = true;
+  window.addEventListener(AI_MENU_FOCUS_EVENT, onAiFocusEvent);
+  readAiFocusHandoff();
+});
+onActivated(() => {
+  aiFocusScreenActive = true;
+  readAiFocusHandoff();
+});
+onDeactivated(() => {
+  aiFocusScreenActive = false;
+});
+onBeforeUnmount(() => {
+  aiFocusScreenActive = false;
+  window.removeEventListener(AI_MENU_FOCUS_EVENT, onAiFocusEvent);
+});
+
 const openAiChat = () => {
   if (aiDisabledGroup.value) return;
   if (aiNeedsStorePick.value) {
@@ -7584,7 +7851,7 @@ const sendAiChat = async () => {
   // 저장 뒤 새 대화를 시작했으면 닫아도 초기화하지 않는다
   aiChatSavedAndIdle.value = false;
   // 시작(작업 판단)·조회·질문·메뉴 수정 단계는 chatAssist 로 처리한다 (등록 단계는 아래 기존 chatMenu 흐름)
-  if (["intent", "editPick", "editSub", "editConfirm"].includes(aiChatStep.value)) {
+  if (["intent", "editPick", "editMain", "editSub", "editValue", "editConfirm"].includes(aiChatStep.value)) {
     aiChatText.value = "";
     await sendAiAssist(text);
     scrollAiChatLog();

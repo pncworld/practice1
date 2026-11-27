@@ -141,7 +141,8 @@
               aria-label="PnC# AI 도우미"
               @click="salesAiRef.togglePanel()"
             >
-              <span class="tab-sales-ai-ico" aria-hidden="true">AI</span>
+              <!-- 아이콘: 도우미 창과 같은 로봇 (2026-11-27 요청, 글자 AI 아이콘이 뭉개져 보여 바꿈) -->
+              <SalesAiRobot :size="26" />
             </button>
             <button class="btn-action prev" :class="{ 'is-off': !tabsCanLeft }" type="button" aria-label="이전 탭" @click="moveleft">
               <i class="ico ico-prev"></i>
@@ -203,6 +204,7 @@
 <script setup>
 import BasicMenu from "@/components/BasicMenu.vue";
 import DashboardSalesAi from "@/components/DashboardSalesAi.vue";
+import SalesAiRobot from "@/components/salesAi/SalesAiRobot.vue";
 import { matchesSalesAnalysisHomeTempBypass } from "@/constants/salesAnalysisDashboardApi.js";
 import Loading from "@/components/loading.vue";
 import router from "@/router";
@@ -659,20 +661,6 @@ watch(
 .tab-sales-ai {
   color: #ffffff;
   margin-right: 6px;
-}
-.tab-sales-ai-ico {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: 2px solid currentColor;
-  border-radius: 4px;
-  font-size: 9px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.2px;
-  font-family: Arial, Helvetica, sans-serif;
 }
 
 .layout {
