@@ -4925,6 +4925,10 @@ watch(
       lastReply: lastAssistantReply(),
       // 지금 선택지 이름 (음성으로 '2번'이라고 하면 이 순서로 고른다)
       choices: aiChatLoading.value ? [] : currentChoiceNames(),
+      // 숫자만 받는 단계(판매가): 휴대폰에 숫자 키패드를 띄운다 (2026-11-27)
+      numeric:
+        aiChatStep.value === "price" ||
+        (aiChatStep.value === "editValue" && (aiEditPending.value || {}).askField === "lngPrice"),
     });
   },
   { immediate: true }

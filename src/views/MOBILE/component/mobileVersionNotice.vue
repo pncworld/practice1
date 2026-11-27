@@ -166,7 +166,8 @@ watch(
   position: fixed;
   top: calc(3.25rem + 0.5rem);
   left: 50%;
-  z-index: 40;
+  /* 화면 전체를 덮는 창(PnC# AI 도우미 z-index 9000) 위에도 보이게 (2026-11-27). 위치는 그 창 제목줄 바로 아래와도 맞음 */
+  z-index: 9100;
   display: flex;
   align-items: center;
   gap: 0.5rem;

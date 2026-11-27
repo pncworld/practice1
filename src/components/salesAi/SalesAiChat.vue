@@ -298,6 +298,7 @@
         :placeholder="inputPlaceholder"
         :disabled="inputBusy"
         :readonly="voice.on"
+        :inputmode="menuMode && menuInfo.numeric ? 'numeric' : 'text'"
         @pointerdown="onInputTouch"
         @keydown="onKeydown"></textarea>
       <div class="sac-btns" :class="{ 'sac-btns--voice': voice.supported }">
@@ -377,7 +378,7 @@ function isLiveMenuPanel(msg) {
 // ===== 메뉴 관리 중: 입력창 하나로 (2026-11-27) =====
 // 메뉴 관리 칸이 이 대화 영역에 펼쳐져 있으면 입력창의 말은 메뉴 관리 도우미가 받는다
 const menuMode = computed(() => !!state.menuPanel && liveSurface() === props.surface);
-const EMPTY_MENU_INFO = { ready: false, busy: false, placeholder: "", count: 0 };
+const EMPTY_MENU_INFO = { ready: false, busy: false, placeholder: "", count: 0, numeric: false };
 const menuInfo = ref({ ...EMPTY_MENU_INFO });
 let menuPanelRef = null;
 function setMenuPanelRef(el) {
