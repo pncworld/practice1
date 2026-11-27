@@ -32,6 +32,7 @@
         :open="true"
         :embedded="true"
         :bare="true"
+        :focus-in-list="mobile"
         :initial-text="question"
         :initial-key="questionKey"
         :group-cd="groupCd"
@@ -77,6 +78,8 @@ defineProps({
   questionKey: { type: [String, Number], default: "" },
   // 등록·수정을 막는 이유 (서버 안내: I-FRESH 에서 등록 등). 있으면 조회·매출만
   readOnlyText: { type: String, default: "" },
+  // 모바일 통합 AI 화면 안: 메뉴를 누르면 모바일 메뉴 목록으로 간다 (안내 문구용, 2026-11-27)
+  mobile: { type: Boolean, default: false },
 });
 // sent: 첫 문장을 메뉴 관리 도우미에 넘겼다 (questionKey)
 // menu-state: 도우미 창 입력창이 쓸 상태 { ready, busy, placeholder, count } (2026-11-27 입력창 하나로)
@@ -112,7 +115,12 @@ const sendText = async (text) => {
   if (!menuRef.value) return false;
   return menuRef.value.sendText(text);
 };
-defineExpose({ sendText });
+// 선택지 단계에서 n번째(0부터) 선택지를 누른 것과 같게 (음성 '2번', 2026-11-27)
+const pickChoice = async (index) => {
+  if (!menuRef.value || !menuRef.value.pickChoice) return false;
+  return menuRef.value.pickChoice(index);
+};
+defineExpose({ sendText, pickChoice });
 
 const state = ref("loading"); // loading / denied / ok
 const deniedText = ref("");

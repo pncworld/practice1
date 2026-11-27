@@ -76,7 +76,7 @@
               </svg>
             </span>
             <span class="mm-tool-text">
-              <span class="mm-tool-title">AI 메뉴관리</span>
+              <span class="mm-tool-title">PnC# AI 도우미</span>
               <span class="mm-tool-sub">{{ readOnly ? "대화로 조회·매출" : "대화로 등록·조회·수정" }}</span>
             </span>
           </button>
@@ -87,7 +87,7 @@
             <circle cx="12" cy="12" r="10" fill="currentColor" />
             <path d="M12 10.5v6M12 7.2v.3" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" />
           </svg>
-          <span>초간단은 <b>메뉴코드 등록만</b>, 상세 메뉴설정 등록은 <b>AI 메뉴관리</b>에서 해 주세요.</span>
+          <span>초간단은 <b>메뉴코드 등록만</b>, 상세 메뉴설정 등록은 <b>PnC# AI 도우미</b>에서 해 주세요.</span>
         </div>
       </div>
 
@@ -342,6 +342,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import MobileQuickMenu from "./MobileQuickMenu.vue";
 import MobileAiMenu from "./MobileAiMenu.vue";
+import { AI_MOBILE_MENU_FOCUS_KEY } from "@/components/salesAi/useSalesAi";
 import {
   canUseQuickMenu,
   isAiEnabledGroup,
@@ -703,10 +704,11 @@ const onStoreChange = () => {
 const aiMounted = ref(false);
 const aiOpen = ref(false);
 let aiLastSavedCode = "";
+// 2026-11-27: 「AI 메뉴관리」는 통합 PnC# AI 도우미(/m/MIMASTER/aiAssistant)로 바꾼다. 메뉴 관리는 그 안에서 같은 도우미로 한다
+//  (아래 이 화면 안 AI 대화창(aiOpen)은 더 이상 열지 않는다)
 const openAi = () => {
   if (!canAi.value || !loaded.value) return;
-  aiMounted.value = true;
-  aiOpen.value = true;
+  router.push("/m/MIMASTER/aiAssistant");
 };
 // AI로 등록·수정하면 목록을 다시 불러와 AI 조회에도 바로 반영한다 (대화창은 그대로)
 const onAiSaved = async (code) => {
@@ -868,6 +870,7 @@ onMounted(async () => {
       stores.value = list;
     });
     await loadMenus();
+    revealAiFocus();
     return;
   }
   // 본사 계정 + 매장별 메뉴: 마지막에 고른 매장을 다시 고른다
@@ -879,9 +882,34 @@ onMounted(async () => {
   } catch (error) {
     // 저장된 매장이 없으면 고르게 한다
   }
+  // AI 도우미에서 메뉴를 눌러 들어왔으면 그 메뉴의 매장을 고른다
+  if (aiFocus && aiFocus.STORE_CD && stores.value.some((x) => x.code === aiFocus.STORE_CD)) {
+    pickedStoreCd.value = aiFocus.STORE_CD;
+  }
   accessState.value = "ok";
   await loadMenus();
+  revealAiFocus();
 });
+
+// PnC# AI 도우미(통합 AI)에서 메뉴를 눌러 들어온 경우: 그 메뉴를 펼친다 (2026-11-27, useSalesAi saveMobileMenuFocus)
+const AI_FOCUS_MAX_AGE_MS = 10 * 60 * 1000;
+let aiFocus = null;
+try {
+  const raw = sessionStorage.getItem(AI_MOBILE_MENU_FOCUS_KEY);
+  if (raw) {
+    sessionStorage.removeItem(AI_MOBILE_MENU_FOCUS_KEY);
+    const d = JSON.parse(raw);
+    if (d && d.CODE && Date.now() - Number(d.at || 0) <= AI_FOCUS_MAX_AGE_MS) aiFocus = d;
+  }
+} catch (error) {
+  aiFocus = null;
+}
+const revealAiFocus = () => {
+  if (!aiFocus) return;
+  const code = String(aiFocus.CODE);
+  aiFocus = null;
+  revealMenu(code, false);
+};
 </script>
 
 <style scoped>

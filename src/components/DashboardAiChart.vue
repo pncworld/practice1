@@ -25,6 +25,8 @@ const props = defineProps({
 
 /** 막대 그래프는 최대 15개만 그린다 (2026-11-25 요청). 표·엑셀은 전체 */
 const MAX_BARS = 15;
+// 원그래프 조각 수: 상위 7개 + 기타 = 8 (조각 색 8개, 마지막 회색이 기타)
+const PIE_TOP = 7;
 
 /** 행이 이 열 기준으로 정렬돼 있으면 'desc' / 'asc', 아니면 '' */
 function sortDirection(rows, key) {
@@ -49,6 +51,16 @@ function sortDirection(rows, key) {
 const view = computed(() => {
   const c = props.chart || {};
   const rows = props.rows || [];
+  // 원그래프: 조각이 많으면 값 큰 순 상위 PIE_TOP 개 + 나머지를 '기타' 한 조각으로 (2026-11-27 원그래프 요청)
+  if (c.TYPE === "pie" && rows.length > PIE_TOP + 1 && c.VALUE_KEY) {
+    const sorted = [...rows].sort((a, b) => num(b[c.VALUE_KEY]) - num(a[c.VALUE_KEY]));
+    const rest = sorted.slice(PIE_TOP);
+    const etc = { [c.LABEL_KEY]: `기타 ${rest.length}개`, [c.VALUE_KEY]: rest.reduce((s, r) => s + num(r[c.VALUE_KEY]), 0) };
+    return {
+      rows: [...sorted.slice(0, PIE_TOP), etc],
+      note: `원그래프는 상위 ${PIE_TOP}개와 나머지 ${rest.length}개(기타)입니다. 전체는 표·엑셀에서 볼 수 있습니다.`,
+    };
+  }
   if (c.TYPE !== "bar" || rows.length <= MAX_BARS) return { rows, note: "" };
 
   const candidates = [];
@@ -181,7 +193,14 @@ function render() {
           align: c.TYPE === "pie" ? "center" : "end",
           offset: 2,
           clamp: true,
-          formatter: (v) => (num(v) === 0 ? "" : fmtNum(v)),
+          // 원그래프는 비중(%)을 조각 안에, 금액은 툴팁으로
+          formatter: (v, ctx) => {
+            if (num(v) === 0) return "";
+            if (c.TYPE !== "pie") return fmtNum(v);
+            const total = ctx.dataset.data.reduce((s, x) => s + num(x), 0);
+            const pct = total ? (num(v) / total) * 100 : 0;
+            return pct < 3 ? "" : `${pct.toFixed(1)}%`;
+          },
         },
       },
       scales:

@@ -10,6 +10,22 @@
       </div>
     </div>
 
+    <!-- PnC# AI 도우미 (통합 AI: 매출 질문 + 메뉴 관리, 2026-11-27). 서버가 AI 를 허용한 계정만 -->
+    <button
+      v-if="salesAiState.enabled"
+      type="button"
+      class="home-card home-quick home-ai"
+      @click="openAiAssistant">
+      <span class="home-quick-icon home-ai-icon" aria-hidden="true">
+        <SalesAiRobot :size="30" />
+      </span>
+      <span class="home-quick-title">PnC# AI 도우미</span>
+      <span class="home-quick-sub">무엇이든 AI에게 물어보세요</span>
+      <svg class="home-quick-chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </button>
+
     <!-- 메뉴 관리: 웹 메뉴코드등록(MST01_003INS) 메뉴가 있는 계정만. 인사 카드 바로 아래, 폭 전체의 낮은 한 줄 버튼. 누르면 메뉴 목록 -->
     <button
       v-if="showMenuView"
@@ -24,7 +40,7 @@
         </svg>
       </span>
       <span class="home-quick-title">메뉴 관리</span>
-      <span class="home-quick-sub">{{ showQuickMenu ? "메뉴 조회·등록·AI 메뉴관리" : "메뉴 목록·상세 조회" }}</span>
+      <span class="home-quick-sub">{{ showQuickMenu ? "메뉴 조회·초간단 등록" : "메뉴 목록·상세 조회" }}</span>
       <svg class="home-quick-chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
@@ -162,6 +178,8 @@
 <script setup>
 import { getAppStoreList, getMobileDashBoard } from "@/api/mobile";
 import { canUseQuickMenu, loadMenuAccess } from "@/views/MOBILE/master/mobileMenuAccess";
+import SalesAiRobot from "@/components/salesAi/SalesAiRobot.vue";
+import { loadSalesAiScope, useSalesAi } from "@/components/salesAi/useSalesAi";
 import { useRouter } from "vue-router";
 import {
   formatLocalDate,
@@ -231,9 +249,17 @@ const loadMenuTools = async () => {
   const access = await loadMenuAccess(store.state.StoreToken);
   menuAccessUser.value = access.user;
   menuAccessMenu.value = access.menu;
+  // PnC# AI 도우미 카드: 웹 세션으로 AI 범위를 읽어 서버가 허용한 계정만 보인다 (2026-11-27)
+  if (access.user) loadSalesAiScope(access.user);
 };
 const openMenuManage = () => {
   router.push("/m/MIMASTER/menuManage");
+};
+
+/* PnC# AI 도우미 (통합 AI) */
+const { state: salesAiState } = useSalesAi();
+const openAiAssistant = () => {
+  router.push("/m/MIMASTER/aiAssistant");
 };
 
 /**
@@ -490,6 +516,15 @@ onMounted(async () => {
 .home-quick-icon svg {
   width: 1.15rem;
   height: 1.15rem;
+}
+
+/* PnC# AI 도우미 카드: 로봇 아이콘(배경 없이), 제목은 웹 AI 창 안내와 같은 주황 (2026-11-27) */
+.home-ai .home-ai-icon {
+  background: transparent;
+}
+
+.home-ai .home-quick-title {
+  color: #ea580c;
 }
 
 .home-quick-title {

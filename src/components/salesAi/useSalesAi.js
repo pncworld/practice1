@@ -36,11 +36,20 @@ const state = reactive({
   useCrm: false,
   /** 도구 사용 방식(chatSalesTool)으로 질문한다. 켜는 계정은 서버 설정(Web.config AiToolMode)이 정한다 */
   useTool: false,
+  /** 서버 AI 버전 번호 (getAiScope AI_VER, 예: 1.2). 제목 옆에 v1.2 로 보인다 (2026-11-27) */
+  aiVer: "",
   loading: false,
   /** 로딩 말풍선 안내 종류 ("customer" = 고객 조회, 그 외 빈 값) */
   loadingKind: "",
   testMode: false,
   popupOpen: false,
+  /**
+   * 모바일 통합 AI 화면(MobileAiAssistant.vue)이 떠 있는 동안 true (2026-11-27).
+   * 메뉴 관리 칸은 이때 모바일 화면에 펼치고, 메뉴를 누르면 모바일 메뉴 목록으로 간다
+   */
+  mobileActive: false,
+  /** 모바일: 웹 메뉴코드등록 화면 경로 (모바일 세션에는 웹 왼쪽 메뉴가 없어 메뉴 권한 확인 때 받은 값으로 채운다) */
+  mobileMenuPath: "",
   /** 화면 표시용 메시지 (오류 포함) */
   messages: [],
   /** 서버로 보내는 대화 기록 (성공한 질문·답만, user/assistant 번갈아) */
@@ -70,8 +79,8 @@ export function saveMenuSnapshot(id, html) {
 
 let scopePromise = null;
 
-function currentUserKey() {
-  const u = store.state.userData || {};
+function currentUserKey(userOverride) {
+  const u = userOverride || store.state.userData || {};
   return [u.lngStoreGroup, u.lngSequence, u.lngUserAdminID, u.lngPosition].join("|");
 }
 
@@ -86,6 +95,7 @@ function resetAll() {
   state.menuRegMsg = "";
   state.useCrm = false;
   state.useTool = false;
+  state.aiVer = "";
   state.testMode = false;
   state.popupOpen = false;
   state.messages = [];
@@ -95,9 +105,12 @@ function resetAll() {
   state.menuSnapshots = {};
 }
 
-/** 조회 범위를 한 번만 읽는다. 로그인 계정이 바뀌면 대화와 범위를 비우고 다시 읽는다 */
-export function loadSalesAiScope() {
-  const key = currentUserKey();
+/**
+ * 조회 범위를 한 번만 읽는다. 로그인 계정이 바뀌면 대화와 범위를 비우고 다시 읽는다
+ * @param {object} [userOverride] 모바일처럼 store.state.userData 가 웹 세션이 아닐 때 쓸 웹 세션 (mobileMenuAccess loadMenuAccess 의 user, 2026-11-27)
+ */
+export function loadSalesAiScope(userOverride) {
+  const key = currentUserKey(userOverride);
   if (state.userKey !== key) {
     state.userKey = key;
     resetAll();
@@ -106,7 +119,7 @@ export function loadSalesAiScope() {
   if (scopePromise) return scopePromise;
 
   scopePromise = (async () => {
-    const userData = store.state.userData || {};
+    const userData = userOverride || store.state.userData || {};
     if (!userData.lngStoreGroup || Number(userData.lngUserAdminID) === USER_ADMIN_ID_SUPPLIER_ACCOUNT) {
       state.scopeLoaded = true;
       return;
@@ -124,6 +137,7 @@ export function loadSalesAiScope() {
         state.menuRegMsg = data.MENU_REG_MSG || "";
         state.useCrm = data.CRM_YN === "Y";
         state.useTool = data.TOOL_YN === "Y";
+        state.aiVer = data.AI_VER || "";
         state.enabled = true;
       }
     } catch (e) {
@@ -341,7 +355,7 @@ function findMenuScreen() {
  */
 export function menuScreenPath() {
   const screen = findMenuScreen();
-  if (!screen) return "";
+  if (!screen) return state.mobileActive ? state.mobileMenuPath : "";
   return [screen.strMajorName, screen.strSubName, screen.strTitle || screen.strProgramName]
     .map((v) => String(v || "").trim())
     .filter((v) => v !== "")
@@ -386,6 +400,23 @@ export function openMenuScreenAt(target) {
   return opened;
 }
 
+/** 모바일 메뉴 목록에서 이 메뉴 펼치기 (sessionStorage 키). 모바일 menuManage.vue 가 읽고 지운다 (2026-11-27) */
+export const AI_MOBILE_MENU_FOCUS_KEY = "pncAiMobileMenuFocus";
+
+/** 모바일 통합 AI 에서 메뉴를 누름: 모바일 메뉴 목록이 열리면 그 메뉴를 펼치도록 남겨 둔다 (화면 이동은 부른 쪽이 한다) */
+export function saveMobileMenuFocus(target) {
+  if (!target || !target.code) return false;
+  try {
+    sessionStorage.setItem(
+      AI_MOBILE_MENU_FOCUS_KEY,
+      JSON.stringify({ STORE_CD: String(target.storeCd ?? ""), CODE: String(target.code), NAME: target.name || "", at: Date.now() })
+    );
+  } catch (e) {
+    return false;
+  }
+  return true;
+}
+
 /** 메뉴코드등록 화면에 '이 메뉴 보기'를 다시 읽으라고 알리는 window 이벤트 이름 */
 export const AI_MENU_FOCUS_EVENT = "pnc-ai-menu-focus";
 
@@ -413,6 +444,14 @@ export function pushMenuScreenGuide(menuText) {
     return;
   }
   const target = menuText ? `'${menuText}' 메뉴를 고른 뒤 ` : "메뉴를 고른 뒤 ";
+  if (state.mobileActive) {
+    // 모바일: 웹 화면을 열 수 없으므로 PC 에서 할 곳만 안내한다 (모바일 메뉴 목록은 조회·간단 수정용)
+    state.messages.push({
+      role: "ai",
+      text: `이 항목은 PC의 메뉴코드등록 화면에서 바꿀 수 있습니다.\n경로: ${path}\nPC에서 화면을 열고 매장을 조회한 다음 ${target}오른쪽 상세정보에서 수정하고 저장해 주세요.`,
+    });
+    return;
+  }
   state.messages.push({
     role: "ai",
     text: `이 항목은 메뉴코드등록 화면에서 바꿀 수 있습니다.\n경로: ${path}\n화면을 열고 매장을 조회한 다음 ${target}오른쪽 상세정보에서 수정하고 저장해 주세요.`,
@@ -505,6 +544,14 @@ export function salesAiConditionText(c) {
     parts.push((COMPARE_TEXT[c.COMPARE] || "비교") + " " + c.COMPARE_FROM_DT + " ~ " + c.COMPARE_TO_DT);
   }
   return parts.join(" · ");
+}
+
+/**
+ * 서버 AI 버전 표시 문구: '1.2' → 'v1.2'. 서버가 버전을 주지 않으면(옛 서버) 빈 문자열
+ */
+export function salesAiVersionText(ver) {
+  const v = String(ver || "").trim();
+  return /^\d+(\.\d+)*$/.test(v) ? `v${v}` : "";
 }
 
 export function useSalesAi() {

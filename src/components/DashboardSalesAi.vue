@@ -19,7 +19,11 @@
         <div class="dsa-popup" role="dialog" aria-modal="true" aria-label="PnC# AI 도우미">
           <div class="dsa-head">
             <div class="dsa-title-wrap">
-              <h2 class="dsa-title">PnC# AI 도우미</h2>
+              <h2 class="dsa-title">
+                PnC# AI 도우미
+                <!-- 서버 AI 버전 (운영 중인 버전 구분, 2026-11-27) -->
+                <span v-if="versionText" class="dsa-ver">{{ versionText }} · 계속 진화 중</span>
+              </h2>
               <div class="dsa-prompt">
                 <SalesAiRobot />
                 <span>무엇을 도와드릴까요? 질문이나 요청을 입력해 주세요.</span>
@@ -63,7 +67,7 @@ import { computed, defineExpose, defineProps, nextTick, onMounted, ref, watch } 
 import { useStore } from "vuex";
 import SalesAiChat from "@/components/salesAi/SalesAiChat.vue";
 import SalesAiRobot from "@/components/salesAi/SalesAiRobot.vue";
-import { useSalesAi } from "@/components/salesAi/useSalesAi";
+import { salesAiVersionText, useSalesAi } from "@/components/salesAi/useSalesAi";
 
 const props = defineProps({
   /** 오른쪽 아래 둥근 버튼 표시 */
@@ -72,6 +76,7 @@ const props = defineProps({
 
 const store = useStore();
 const { state, loadScope, resetChat } = useSalesAi();
+const versionText = computed(() => salesAiVersionText(state.aiVer));
 const chatRef = ref(null);
 
 onMounted(() => {
@@ -184,6 +189,16 @@ defineExpose({
   font-size: 1.05rem;
   font-weight: 700;
   color: #0f172a;
+}
+
+/* 서버 AI 버전 (예: v. 11월 27일) */
+/* 버전 표시: 테두리·바탕 없이 하늘색 글자만 (2026-11-27 요청: 주황은 안내 문구·입력창과 겹침) */
+.dsa-ver {
+  margin-left: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0369a1;
+  white-space: nowrap;
 }
 
 .dsa-title::before {

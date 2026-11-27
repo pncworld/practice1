@@ -7,9 +7,11 @@
       <!-- 첫 화면: 대시보드는 KPI·표(slot), 팝업은 안내 문구 -->
       <slot name="intro">
         <div v-if="state.messages.length === 0" class="sac-guide">
-          <p>매출을 말로 물어보세요. 표·그래프로 보여 드리고 엑셀로 받을 수 있습니다. 고객 개인 정보는 다루지 않습니다.</p>
-          <p class="sac-guide-sub">
-            기간: 매출·결제수단·할인·카드사 최대 6개월(월별 12개월), 시간대·메뉴·매출취소 최대 31일
+          <!-- 2026-11-27 요청: 매출만이 아니므로 하는 일을 짧게. 기간 제한·표/그래프 안내는 뺀다 -->
+          <!-- 고객 조회는 멤버십 사용 브랜드(useCrm)만 된다 -->
+          <p>
+            궁금한 것이나 할 일을 말로 요청해 주세요.
+            {{ state.useCrm ? "매출·멤버십 고객 조회" : "매출 조회" }}, 메뉴 등록·수정이 가능합니다.
           </p>
         </div>
       </slot>
@@ -234,6 +236,7 @@
         :question="state.menuPanel.sentKey === state.menuPanel.key ? '' : state.menuPanel.question"
         :question-key="state.menuPanel.key"
         :read-only-text="state.menuPanel.readOnlyText"
+        :mobile="props.surface === 'mobile'"
         @sent="markMenuPanelSent"
         @close="closeMenuPanel"
         @menu-state="onMenuState"
@@ -278,6 +281,13 @@
       </button>
     </div>
 
+    <!-- 음성 대화 중 상태 (모바일). 읽는 중에 누르면 건너뛰고 바로 듣기 -->
+    <div v-if="voice.on" class="sac-voice-bar" :class="'sac-voice-bar--' + voice.phase" @click="onVoiceBarClick">
+      <span class="sac-voice-dot" aria-hidden="true"></span>
+      <span class="sac-voice-text">{{ voicePhaseText }}</span>
+      <button type="button" class="sac-voice-stop" @click.stop="toggleVoice">멈춤</button>
+    </div>
+
     <div class="sac-input">
       <textarea
         ref="inputRef"
@@ -287,7 +297,10 @@
         maxlength="500"
         :placeholder="inputPlaceholder"
         :disabled="inputBusy"
+        :readonly="voice.on"
+        @pointerdown="onInputTouch"
         @keydown="onKeydown"></textarea>
+      <div class="sac-btns" :class="{ 'sac-btns--voice': voice.supported }">
       <button
         type="button"
         class="pnc-sub-btn sac-send"
@@ -298,12 +311,27 @@
         </svg>
         보내기
       </button>
+      <!-- 음성 대화 (모바일, 브라우저가 음성 인식을 지원할 때만): 보내기 아래 (2026-11-27 요청) -->
+      <button
+        v-if="voice.supported"
+        type="button"
+        class="sac-mic"
+        :class="{ 'sac-mic--on': voice.on }"
+        :aria-label="voice.on ? '음성 대화 멈춤' : '음성 대화 시작'"
+        @click="toggleVoice">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <rect x="9" y="3" width="6" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="2" />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        {{ voice.on ? "멈춤" : "말하기" }}
+      </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed, defineExpose, defineProps, nextTick, onActivated, onBeforeUnmount, onDeactivated, ref, watch } from "vue";
+import { computed, defineEmits, defineExpose, defineProps, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, watch } from "vue";
 import SalesAiMenuPanel from "@/components/salesAi/SalesAiMenuPanel.vue";
 import { utils, writeFile } from "xlsx-js-style";
 import Swal from "sweetalert2";
@@ -315,26 +343,39 @@ import {
   openMenuScreenAt,
   pushMenuScreenGuide,
   saveMenuSnapshot,
+  saveMobileMenuFocus,
   salesAiConditionText,
   useSalesAi,
 } from "@/components/salesAi/useSalesAi";
+import { choiceIndexFromSpeech, useVoiceChat } from "@/components/salesAi/useVoiceChat";
 
 const props = defineProps({
-  // 이 대화 영역이 어디에 있는지: inline = 기본 대시보드 AI 창 / popup = 상단 AI 팝업 (메뉴 관리 칸을 보이는 한 곳에만 펼친다)
+  // 이 대화 영역이 어디에 있는지: inline = 기본 대시보드 AI 창 / popup = 상단 AI 팝업 / mobile = 모바일 통합 AI 화면
+  // (메뉴 관리 칸을 보이는 한 곳에만 펼친다)
   surface: { type: String, default: "inline" },
+  // 음성 대화(마이크 듣기 + 휴대폰 음성으로 읽기) 사용. 모바일 통합 AI 화면만 켠다 (2026-11-27 요청: 음성은 모바일만)
+  voice: { type: Boolean, default: false },
 });
+// open-mobile-menu: 모바일에서 메뉴를 누름 → 모바일 메뉴 목록에서 그 메뉴 보기 { code, name, storeCd } (화면 이동은 모바일 화면이 한다)
+const emit = defineEmits(["open-mobile-menu"]);
 
 const { state, examples, sendText, cancelMenu, handoffMenu, markMenuPanelSent, closeMenuPanel } = useSalesAi();
+
+/** 지금 대화가 보이는 곳: 모바일 통합 AI 화면 / 상단 팝업 / 홈 AI 창 */
+function liveSurface() {
+  if (state.mobileActive) return "mobile";
+  return state.popupOpen ? "popup" : "inline";
+}
 
 /** 이 메시지 아래에 메뉴 관리 칸을 펼칠지 (열린 칸의 메시지 + 지금 보이는 곳: 팝업이 열려 있으면 팝업, 아니면 홈 창) */
 function isLiveMenuPanel(msg) {
   if (!msg.menuPanelId || !state.menuPanel || state.menuPanel.id !== msg.menuPanelId) return false;
-  return (state.popupOpen ? "popup" : "inline") === props.surface;
+  return liveSurface() === props.surface;
 }
 
 // ===== 메뉴 관리 중: 입력창 하나로 (2026-11-27) =====
 // 메뉴 관리 칸이 이 대화 영역에 펼쳐져 있으면 입력창의 말은 메뉴 관리 도우미가 받는다
-const menuMode = computed(() => !!state.menuPanel && (state.popupOpen ? "popup" : "inline") === props.surface);
+const menuMode = computed(() => !!state.menuPanel && liveSurface() === props.surface);
 const EMPTY_MENU_INFO = { ready: false, busy: false, placeholder: "", count: 0 };
 const menuInfo = ref({ ...EMPTY_MENU_INFO });
 let menuPanelRef = null;
@@ -355,11 +396,17 @@ watch(
 const inputBusy = computed(() => state.loading || (menuMode.value && menuInfo.value.busy));
 const inputPlaceholder = computed(() =>
   menuMode.value
-    ? `메뉴 관리: ${menuInfo.value.placeholder || "원하시는 작업을 입력해 주세요."} (Enter 보내기)`
-    : "예: 지난달 매장별 매출 TOP 5 (Enter 보내기, Shift+Enter 줄바꿈)"
+    ? `메뉴 관리: ${menuInfo.value.placeholder || "원하시는 작업을 입력해 주세요."}`
+    : "예: 메뉴코드 등록해줘"
 );
 // 메뉴 관리 결과에서 메뉴를 누름: 메뉴코드등록 화면을 열고 그 메뉴 줄을 선택한다 (2026-11-27)
 function onFocusMenuInScreen(target) {
+  // 모바일: 웹 화면 대신 모바일 메뉴 목록에서 그 메뉴를 펼친다
+  if (props.surface === "mobile") {
+    saveMobileMenuFocus(target);
+    emit("open-mobile-menu", target);
+    return;
+  }
   if (!openMenuScreenAt(target)) {
     state.messages.push({
       role: "ai",
@@ -500,22 +547,136 @@ onActivated(() => {
   });
 });
 
+/**
+ * 팝업·모바일 창을 열면 마지막 대화가 보이게 (2026-11-27 요청: 상단 AI 아이콘으로 열면 맨 위부터 보여 불편)
+ *  메뉴 관리 내용처럼 늦게 그려지는 부분이 있어, 그린 직후와 잠시 뒤에 한 번 더 내린다. 대시보드 창(inline)은 위치 기억을 그대로 쓴다
+ */
+onMounted(() => {
+  if (props.surface !== "popup" && props.surface !== "mobile") return;
+  scrollToBottom();
+  requestAnimationFrame(() => scrollToBottom());
+  setTimeout(scrollToBottom, 300);
+});
+
 /** 다른 화면(팝업↔대시보드)에서 대화가 늘어도 아래로 */
 watch(
   () => [state.messages.length, state.loading],
   () => scrollToBottom()
 );
 
-async function send(text) {
+async function send(text, fromVoice = false) {
   const q = String(text || "").trim();
   if (!q || inputBusy.value) return;
+  // 음성 대화 중 버튼(예시·선택지)이나 보내기를 누르면 음성 대화를 멈추고 그 입력으로 진행
+  if (!fromVoice && voiceChat) voiceChat.stop();
   inputText.value = "";
   scrollToBottom();
   if (menuMode.value) await sendToMenu(q);
   else await sendText(q);
   scrollToBottom();
-  nextTick(() => inputRef.value?.focus());
+  // 음성 대화 중에는 입력창에 커서를 두지 않는다 (휴대폰 키보드가 올라오지 않게)
+  if (!voiceChat || !voiceChat.voice.on) nextTick(() => inputRef.value?.focus());
 }
+
+// ===== 모바일 음성 대화 (2026-11-27, voice 를 켠 화면만) =====
+// 말한 글을 같은 보내기 흐름으로 보내고, 그 뒤에 새로 온 답 글을 돌려준다 (소리로 읽기용)
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function waitIdle(limitMs) {
+  const until = Date.now() + limitMs;
+  while (inputBusy.value && Date.now() < until) await sleep(200);
+}
+// 메뉴 관리 도우미는 답 뒤에 다음 질문을 조금 늦게 붙이기도 해서(예: 코드 확정 → 주방출력 질문), 말풍선 수가 잠시 그대로일 때까지 기다린다
+async function waitMenuSettled() {
+  const until = Date.now() + 6000;
+  let count = menuInfo.value.count;
+  let stableSince = Date.now();
+  while (Date.now() < until) {
+    await sleep(150);
+    if (menuInfo.value.busy || menuInfo.value.count !== count) {
+      count = menuInfo.value.count;
+      stableSince = Date.now();
+    } else if (Date.now() - stableSince >= 700) break;
+  }
+  await nextTick();
+}
+async function voiceSend(q) {
+  await waitIdle(60000);
+  const before = state.messages.length;
+  const wasMenu = menuMode.value;
+  // 메뉴 관리의 선택 단계에서 '2번'처럼 번호로 말하면 화면의 그 선택지를 누른 것과 같게 (같은 이름 분류가 둘이어도 정확히)
+  const pick = wasMenu ? choiceIndexFromSpeech(q, (menuInfo.value.choices || []).length) : -1;
+  if (pick >= 0 && menuPanelRef && (await menuPanelRef.pickChoice(pick))) {
+    await waitIdle(60000);
+    await waitMenuSettled();
+    return menuInfo.value.lastReply || "";
+  }
+  await send(q, true);
+  if (wasMenu) {
+    if (menuMode.value) await waitMenuSettled();
+    // 메뉴 관리가 끝났으면(끝내기 등) 대화창에 새로 붙은 안내를 읽는다
+    if (!menuMode.value) {
+      return state.messages
+        .slice(before)
+        .filter((m) => m.role === "ai")
+        .map((m) => m.text)
+        .join("\n");
+    }
+    return menuInfo.value.lastReply || "";
+  }
+  let reply = state.messages
+    .slice(before)
+    .filter((m) => m.role === "ai")
+    .map((m) => m.text)
+    .join("\n");
+  // 이 말로 메뉴 관리가 시작되면(예: '새 메뉴 등록') 메뉴 관리 도우미의 첫 답까지 기다려 함께 읽는다
+  if (!wasMenu && menuMode.value) {
+    const until = Date.now() + 30000;
+    while (Date.now() < until && (!menuInfo.value.ready || menuInfo.value.busy || !menuInfo.value.lastReply)) await sleep(200);
+    await waitMenuSettled();
+    if (menuInfo.value.lastReply) reply = menuInfo.value.lastReply;
+  }
+  return reply;
+}
+const voiceChat = props.voice
+  ? useVoiceChat({
+      send: voiceSend,
+      onInterim: (t) => {
+        inputText.value = t;
+      },
+      onNotice: (msg) => {
+        state.messages.push({ role: "ai", text: msg });
+      },
+    })
+  : null;
+const voice = voiceChat ? voiceChat.voice : { supported: false, on: false, phase: "" };
+const voicePhaseText = computed(() => {
+  if (voice.phase === "listen") return voice.heard ? "듣고 있어요…" : "말씀하세요. 듣고 있어요";
+  if (voice.phase === "think") return "답을 찾고 있어요";
+  if (voice.phase === "speak") return "읽어 드리는 중 · 누르면 건너뜀";
+  return "";
+});
+function toggleVoice() {
+  if (!voiceChat) return;
+  if (voice.on) voiceChat.stop();
+  else {
+    inputRef.value?.blur();
+    voiceChat.start(state.messages.length === 0 ? "무엇을 도와드릴까요? 말씀하세요." : "말씀하세요.");
+  }
+}
+function onVoiceBarClick() {
+  if (voiceChat && voice.phase === "speak") voiceChat.skip();
+}
+// 입력창을 누르면 글자로 입력하려는 것 → 음성 대화를 멈춘다
+function onInputTouch() {
+  if (voiceChat && voice.on) voiceChat.stop();
+}
+// 새 대화(대화 비움)면 음성 대화도 멈춘다
+watch(
+  () => state.messages.length,
+  (n) => {
+    if (n === 0 && voiceChat) voiceChat.stop();
+  }
+);
 
 function onKeydown(e) {
   if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
@@ -1172,6 +1333,8 @@ async function downloadExcel(msg) {
   font-weight: 600;
   text-align: center;
   border-bottom: 1px solid #cbd5e1;
+  /* 합친 칸의 따라오는 이름(.sac-merged-label)이 스크롤 때 헤더 위로 겹치지 않게 헤더를 위 층에 (2026-11-27) */
+  z-index: 2;
 }
 
 .sac-table .sac-td-text {
@@ -1181,6 +1344,7 @@ async function downloadExcel(msg) {
 .sac-table tfoot td {
   position: sticky;
   bottom: 0;
+  z-index: 2;
   background: #f8fafc;
   font-weight: 700;
   border-top: 1px solid #cbd5e1;
@@ -1226,9 +1390,12 @@ async function downloadExcel(msg) {
   height: auto;
   min-height: 0;
   align-self: stretch;
-  padding: 0 1rem;
+  /* 2026-11-27 요청: 버튼 폭을 줄여 질문창을 넓게 */
+  padding: 0 0.6rem;
+  gap: 0.2rem;
   border-width: 2px;
   border-radius: 0.5rem;
+  font-size: 0.8rem;
 }
 
 .sac-input {
@@ -1238,6 +1405,104 @@ async function downloadExcel(msg) {
   padding: 0.75rem 1rem;
   border-top: 1px solid #e2e8f0;
   background: #ffffff;
+}
+
+/* 보내기·말하기 버튼 묶음: 음성이 없는 화면(웹)은 묶음 없이 기존 배치 그대로 */
+.sac-btns {
+  display: contents;
+}
+.sac-btns--voice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+.sac-btns--voice .sac-send {
+  flex: 1.7 1 0;
+  min-height: 2.3rem;
+  font-size: 0.85rem;
+  justify-content: center;
+}
+/* 음성 대화 (모바일, 2026-11-27): 말하기 버튼은 청록 (주황 입력·파랑 조회·연두 등록·보라 고객과 구분), 켜지면 청록으로 채움 */
+.sac-mic {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 1.75rem;
+  padding: 0 0.6rem;
+  border: 1px solid #5eead4;
+  border-radius: 0.5rem;
+  background: #f0fdfa;
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.sac-mic svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.sac-mic--on {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: #ffffff;
+}
+.sac-voice-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-top: 1px solid #99f6e4;
+  background: #f0fdfa;
+  color: #115e59;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.sac-voice-text {
+  flex: 1;
+  min-width: 0;
+}
+.sac-voice-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: #94a3b8;
+  flex-shrink: 0;
+}
+.sac-voice-bar--listen .sac-voice-dot {
+  background: #0d9488;
+  animation: sac-voice-pulse 1s ease-in-out infinite;
+}
+.sac-voice-bar--think .sac-voice-dot {
+  background: #f59e0b;
+}
+.sac-voice-bar--speak .sac-voice-dot {
+  background: #16a34a;
+  animation: sac-voice-pulse 1.4s ease-in-out infinite;
+}
+@keyframes sac-voice-pulse {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+  }
+}
+.sac-voice-stop {
+  flex-shrink: 0;
+  height: 1.9rem;
+  padding: 0 0.8rem;
+  border: 1px solid #5eead4;
+  border-radius: 0.5rem;
+  background: #ffffff;
+  color: #115e59;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
 /* 질문창: 안내 문구와 같은 주황 계열 두꺼운 테두리로 눈에 띄게, 입력 중에는 은은한 빛 */

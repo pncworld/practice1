@@ -1018,6 +1018,8 @@ const props = defineProps({
   readOnlyText: { type: String, default: "" },
   // embedded 와 함께: 제목줄·입력창·안내 없이 도우미 창 대화에 이어 붙인다. 입력은 도우미 창 입력창이 sendText 로 넘긴다 (2026-11-27)
   bare: { type: Boolean, default: false },
+  // bare 에서 메뉴를 누르면 (웹 메뉴코드등록 화면 대신) 모바일 메뉴 목록에서 보여 주는 경우 true — 안내 문구만 바뀐다 (2026-11-27 모바일 통합 AI)
+  focusInList: { type: Boolean, default: false },
 });
 // menu-state: bare 일 때 도우미 창 입력창이 쓸 상태 { busy, placeholder, count }
 // screen-only: bare 일 때 이 도우미로 못 하는 요청 (대상 메뉴 표시 문자열)
@@ -1084,7 +1086,9 @@ const maiParts = (text) => {
   // bare(PnC# AI 도우미 창): 메뉴를 누르면 메뉴코드등록 화면이 열리므로 그렇게 안내한다 (2026-11-27)
   const t = String(text ?? "").replace(
     /행을 누르면[^.]*이동합니다\.?/g,
-    props.bare ? "메뉴를 누르면 메뉴코드등록 화면에서 그 메뉴를 볼 수 있습니다." : "메뉴를 누르면 메뉴 목록에서 볼 수 있습니다."
+    props.bare && !props.focusInList
+      ? "메뉴를 누르면 메뉴코드등록 화면에서 그 메뉴를 볼 수 있습니다."
+      : "메뉴를 누르면 메뉴 목록에서 볼 수 있습니다."
   );
   return t.split(MAI_NUM_RE).filter((p) => p !== "").map((p) => ({ text: p, num: /^\d/.test(p) }));
 };
@@ -4871,6 +4875,42 @@ const sendText = async (text) => {
   await sendAiChat();
   return true;
 };
+// 마지막 사용자 말 뒤의 도우미 답을 한 글로 (답 작성 중 말풍선은 뺀다)
+const lastAssistantReply = () => {
+  const list = aiChatDisplayMessages.value;
+  const out = [];
+  for (let i = list.length - 1; i >= 0; i--) {
+    const m = list[i];
+    if (m.role === "user") break;
+    if (m.typing || typeof m.content !== "string") continue;
+    out.unshift(m.content);
+  }
+  // 최종 확인 단계: 화면 표 대신 핵심 값과 말로 답하는 방법 (소리로만 듣는 사용자용)
+  if (aiChatStep.value === "final" && !aiChatLoading.value) {
+    const sm = [...list].reverse().find((m) => Array.isArray(m.summary));
+    if (sm) {
+      const v = (label) => (sm.summary.find((r) => r.label === label) || {}).value || "-";
+      out.push(`메뉴명 ${v("메뉴명")}, 판매가 ${v("판매가")}, 분류 ${v("대분류")} ${v("소분류")}입니다.`);
+      out.push("저장하려면 '등록', 설정을 바꾸려면 '다시 설정'이라고 말씀해 주세요.");
+    }
+  }
+  // 분류·옵션 선택 단계: 화면의 선택지도 번호와 함께 (말로만 듣는 사용자가 번호나 이름으로 고를 수 있게)
+  const names = currentChoiceNames();
+  if (names.length > 0 && !aiChatLoading.value) {
+    const head = names.slice(0, 8).map((n, i) => `${i + 1}번 ${n}`).join(", ");
+    out.push(
+      names.length <= 8
+        ? `선택지는 ${head}입니다. 번호나 이름으로 말씀해 주세요.`
+        : `선택지는 ${head} 등 ${names.length}개입니다. 화면에서 보고 번호나 이름으로 말씀해 주세요.`
+    );
+  }
+  return out.join("\n");
+};
+// 지금 화면에 보이는 선택지 이름 (분류·옵션 선택 단계만)
+const currentChoiceNames = () =>
+  ["main", "sub", "optionGroup", "settingRef", "editMain", "editSub"].includes(aiChatStep.value)
+    ? aiChatGroupChoices.value.map((c) => String(c.name || c.code || "").trim())
+    : [];
 // 도우미 창 입력창이 쓸 상태: 답을 기다리는 중인지, 지금 단계의 입력 안내, 말풍선 수(아래로 내리기용)
 watch(
   () => [aiChatLoading.value, aiChatStep.value, aiChatDisplayMessages.value.length],
@@ -4881,11 +4921,22 @@ watch(
       placeholder:
         aiChatStep.value === "intent" ? "원하시는 작업을 입력해 주세요." : `${AI_CHAT_STEP_TEXT[aiChatStep.value]} 입력`,
       count: aiChatDisplayMessages.value.length,
+      // 마지막으로 보낸 말 뒤에 온 도우미 답 (모바일 음성 대화에서 소리로 읽기용, 2026-11-27)
+      lastReply: lastAssistantReply(),
+      // 지금 선택지 이름 (음성으로 '2번'이라고 하면 이 순서로 고른다)
+      choices: aiChatLoading.value ? [] : currentChoiceNames(),
     });
   },
   { immediate: true }
 );
-defineExpose({ sendText });
+// 선택지 단계에서 n번째(0부터) 선택지를 누른 것과 같게 (모바일 음성 대화 '2번', 2026-11-27). 같은 이름 분류가 둘이어도 화면 순서로 정확히 고른다
+const pickChoice = async (index) => {
+  const g = currentChoiceNames().length ? aiChatGroupChoices.value[index] : null;
+  if (!g || aiChatLoading.value) return false;
+  await chooseAiChatGroup(g);
+  return true;
+};
+defineExpose({ sendText, pickChoice });
 
 </script>
 

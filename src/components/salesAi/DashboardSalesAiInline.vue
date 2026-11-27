@@ -7,6 +7,8 @@
         <div class="title-section !mb-0">
           <div class="icon"></div>
           <div class="f20 text">PnC# AI 도우미</div>
+          <!-- 서버 AI 버전 (운영 중인 버전 구분, 2026-11-27) -->
+          <span v-if="versionText" class="sai-ver">{{ versionText }} · 계속 진화 중</span>
         </div>
         <div class="sai-prompt">
           <SalesAiRobot />
@@ -45,12 +47,13 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import SalesAiChat from "@/components/salesAi/SalesAiChat.vue";
 import SalesAiRobot from "@/components/salesAi/SalesAiRobot.vue";
-import { useSalesAi } from "@/components/salesAi/useSalesAi";
+import { salesAiVersionText, useSalesAi } from "@/components/salesAi/useSalesAi";
 
 const { state, loadScope, resetChat } = useSalesAi();
+const versionText = computed(() => salesAiVersionText(state.aiVer));
 
 onMounted(() => {
   loadScope();
@@ -83,6 +86,16 @@ onMounted(() => {
 }
 
 /* 안내 문구: 눈에 띄는 주황 (구조 막대 파랑과 구분) */
+/* 서버 AI 버전 (예: v. 11월 27일) */
+/* 버전 표시: 테두리·바탕 없이 하늘색 글자만 (2026-11-27 요청: 주황은 안내 문구·입력창과 겹침) */
+.sai-ver {
+  margin-left: 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #0369a1;
+  white-space: nowrap;
+}
+
 .sai-prompt {
   display: flex;
   align-items: center;
